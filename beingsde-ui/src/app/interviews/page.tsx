@@ -129,7 +129,7 @@ export default function InterviewsPage() {
       experienceLevel: experienceLevel || null,
       bio,
       calendlyLink,
-      isAvailable,
+      available: isAvailable,
     };
 
     try {

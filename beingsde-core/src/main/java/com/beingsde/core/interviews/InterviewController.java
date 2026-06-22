@@ -23,7 +23,7 @@ public class InterviewController {
     private final FeatureFlagService featureFlagService;
 
     public InterviewController(InterviewService interviewService,
-                               FeatureFlagService featureFlagService) {
+                                FeatureFlagService featureFlagService) {
         this.interviewService = interviewService;
         this.featureFlagService = featureFlagService;
     }
