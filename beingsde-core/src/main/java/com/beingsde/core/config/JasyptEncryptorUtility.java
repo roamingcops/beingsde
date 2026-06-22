@@ -11,7 +11,7 @@ public class JasyptEncryptorUtility {
         encryptor.setPassword("beingsdeMasterKey2026");
         encryptor.setAlgorithm("PBEWithMD5AndDES"); 
         
-        String plaintextMongoUri = "mongodb+srv://beingsde-dev:b2IqQ3Up2P4ktY8G@beingsde.b7s3tv2.mongodb.net/beingsde?appName=beingSDE";
+        String plaintextMongoUri = "mongodb+srv://beingsde-dev:b2IqQ3Up2P4ktY8G@beingsde.b7s3tv2.mongodb.net/?appName=beingSDE";
         String encryptedMongoUri = encryptor.encrypt(plaintextMongoUri);
 
         System.out.println("=========================================");

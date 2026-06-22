@@ -2,6 +2,7 @@ jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD:beingsdeMasterKey2026}
     algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
 
 spring:
   application:
@@ -10,7 +11,8 @@ spring:
     type: ${SPRING_CACHE_TYPE:simple}
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:ENC(A0ea43dTGIoBPBHc3fVJhw26AwKRMi6yH8MkPlWc1Iry4wxj5cLRrhNyZxVi4A0nZ6zz7JIUL0RhS3hutwNU4DFpEM29/3q+0dW7LQr9S3RsWLP9EkFFhzbI+PWJlKYWoTyHHlT4J4MmiC44VxTHfw==)}
+      uri: ${SPRING_DATA_MONGODB_URI:ENC(5U0lYfICDMDbGC2qUuFAVMG8vlOH7+WnOD0L2ll6rmJ2Y8WbXfT7fRTNnE9tTJmxRoeUy7s1OIoNsgX8kpFgDpOv0tFf+X/BQQ0rsdpa9i53NV/7bC7DKVXrbzJGlFCXEywJfaGOqCM=)}
+      database: beingsde
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
@@ -27,7 +29,7 @@ app:
     webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:webhook_secret_placeholder}
 
 server:
-  port: 8080
+  port: 8081
   error:
     include-message: always
     include-binding-errors: always
