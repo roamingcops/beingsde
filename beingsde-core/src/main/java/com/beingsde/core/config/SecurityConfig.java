@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**", "/error").permitAll()
                         .requestMatchers("/api/v1/topics/**").permitAll() 
                         .requestMatchers("/api/v1/payments/razorpay/webhook").permitAll() 
+                        .requestMatchers("/api/v1/interviews/calendly-webhook").permitAll() 
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
