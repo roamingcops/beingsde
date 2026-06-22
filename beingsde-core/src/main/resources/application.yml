@@ -16,18 +16,6 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:noreply@beingsde.com}
-    password: ${MAIL_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
 
 app:
   jwt:
@@ -39,7 +27,10 @@ app:
     key-id: ${RAZORPAY_KEY_ID:rzp_test_placeholder}
     key-secret: ${RAZORPAY_KEY_SECRET:placeholder_secret}
     webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:webhook_secret_placeholder}
-  base-url: ${APP_BASE_URL:http://localhost:3000}
+  base-url: ${APP_BASE_URL:https://beingsde.vercel.app}
+  resend:
+    api-key: ${RESEND_API_KEY:re_QMfqx5ve_GkkqgeqRGHKCDtKPefexeHLp}
+    from-address: ${RESEND_FROM_ADDRESS:onboarding@resend.dev}
 
 server:
   port: ${PORT:8081}
