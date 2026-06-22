@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shield, KeyRound, Mail, AlertTriangle, ArrowRight } from "lucide-react";
+import { KeyRound, Mail, AlertTriangle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,8 +42,9 @@ export default function LoginPage() {
       router.push("/topics");
       router.refresh();
 
-    } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +116,7 @@ export default function LoginPage() {
         {/* Footer info */}
         <div className="text-center text-3xs text-zinc-400 border-t border-zinc-100 dark:border-zinc-800 pt-4 flex flex-col gap-2">
           <span>Forgot your password? <Link href="/forgot" className="underline hover:text-zinc-600">Reset it</Link></span>
-          <span>Don't have an account? <Link href="/register" className="underline hover:text-zinc-600">Register</Link></span>
+          <span>Don&apos;t have an account? <Link href="/register" className="underline hover:text-zinc-600">Register</Link></span>
         </div>
       </div>
     </div>

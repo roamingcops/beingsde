@@ -2,7 +2,7 @@
 
 import React, { useState, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download } from "lucide-react";
 
 // Mock Fallback Topics list matching database schema topics
 const MOCK_TOPICS = [

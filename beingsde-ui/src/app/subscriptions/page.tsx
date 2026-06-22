@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Star, Users, ArrowRight } from "lucide-react";
+import { Check, Star, Users } from "lucide-react";
 
 export default function SubscriptionsPage() {
 

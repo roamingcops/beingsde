@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BookOpen, Layers, Users, Zap, Shield, CheckCircle } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Users, Zap } from "lucide-react";
 
 export default function LandingPage() {
   return (

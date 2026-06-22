@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Filter, BookOpen, Clock, Lock, Star } from "lucide-react";
+import { Search, Filter, BookOpen, Clock, Lock } from "lucide-react";
 
 // Mock Fallback Topics list matching MongoDB database schema topics
 const MOCK_TOPICS = [
@@ -71,6 +71,7 @@ export default function TopicsExplorer() {
           const data = await res.json();
           if (data.content && data.content.length > 0) {
             // Merge with local mock metadata to retain premium flag configuration details
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const merged = data.content.map((t: any) => {
               const mockMatch = MOCK_TOPICS.find(m => m.slug === t.slug);
               return {
@@ -81,7 +82,7 @@ export default function TopicsExplorer() {
             setTopics(merged);
           }
         }
-      } catch (e) {
+      } catch {
         // Fallback silently to mock details if server is down
       }
     };
