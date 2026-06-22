@@ -1,0 +1,13 @@
+{
+  "name": "beingsde-tester",
+  "version": "1.0.0",
+  "description": "Integration and E2E testing module for beingsde.com",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.1",
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
+}

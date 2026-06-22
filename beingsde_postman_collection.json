@@ -1,0 +1,323 @@
+{
+  "info": {
+    "_postman_id": "4a88f6c9-04bb-4e1b-b4a1-f3b145cb04d2",
+    "name": "beingsde API collection",
+    "description": "API requests to verify System Design Platform beingsde endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/auth/verify-email?token={{verificationToken}}",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "verify-email"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{verificationToken}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Topics (Gated Content)",
+      "item": [
+        {
+          "name": "Get Topics (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/topics?page=0&size=20&sort=title,asc",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "topics"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "sort",
+                  "value": "title,asc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Topic Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/topics/design-distributed-caching-redis",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "topics",
+                "design-distributed-caching-redis"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Topic (Admin CMS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Design a Distributed Caching System (Redis)\",\n  \"slug\": \"design-distributed-caching-redis\",\n  \"description\": \"Learn how to architect a fault-tolerant, horizontally scalable caching cluster.\",\n  \"contentMarkdown\": \"# Introduction...\",\n  \"difficulty\": \"HARD\",\n  \"tags\": [\"Redis\", \"Caching\", \"Distributed Systems\"],\n  \"category\": \"High-Level Design\",\n  \"estimatedTimeMinutes\": 45,\n  \"prerequisites\": [],\n  \"relatedTopics\": [],\n  \"videoUrl\": \"https://cdn.beingsde.com/videos/redis_hld_720p.mp4\",\n  \"pdfUrl\": \"https://cdn.beingsde.com/pdfs/redis_hld_notes.pdf\",\n  \"version\": 1.0\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/topics",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "topics"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Feature Flags (Admin Control)",
+      "item": [
+        {
+          "name": "Create/Update Feature Flag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"topic_design_distributed_caching_redis\",\n  \"description\": \"Feature flag gating Redis architecture system design\",\n  \"globallyEnabled\": false,\n  \"globallyDisabled\": false,\n  \"rolloutPercentage\": 50,\n  \"allowedSubscriptionTiers\": [\"PREMIUM\"],\n  \"allowedRoles\": [\"PREMIUM_USER\", \"ADMIN\"]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/admin/feature-flags",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "feature-flags"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payments & Billing",
+      "item": [
+        {
+          "name": "Create Razorpay Order ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"PREMIUM_1M\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/payments/razorpay/order",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "payments",
+                "razorpay",
+                "order"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Simulate Razorpay Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-razorpay-signature",
+                "value": "mock_signature"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entity\": \"event\",\n  \"account_id\": \"acc_BF41D1D\",\n  \"event\": \"subscription.charged\",\n  \"id\": \"evt_sim_charged_8913\",\n  \"payload\": {\n    \"payment\": {\n      \"entity\": {\n        \"id\": \"pay_sim_12345\",\n        \"amount\": 299900,\n        \"currency\": \"INR\",\n        \"status\": \"captured\",\n        \"order_id\": \"order_sim_12345\",\n        \"method\": \"upi\"\n      }\n    }\n  },\n  \"created_at\": 1672531199\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/payments/razorpay/webhook",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "payments",
+                "razorpay",
+                "webhook"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

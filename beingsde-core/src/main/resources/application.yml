@@ -1,0 +1,33 @@
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:beingsdeMasterKey2026}
+    algorithm: PBEWithMD5AndDES
+
+spring:
+  application:
+    name: beingsde-core
+  cache:
+    type: ${SPRING_CACHE_TYPE:simple}
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:ENC(A0ea43dTGIoBPBHc3fVJhw26AwKRMi6yH8MkPlWc1Iry4wxj5cLRrhNyZxVi4A0nZ6zz7JIUL0RhS3hutwNU4DFpEM29/3q+0dW7LQr9S3RsWLP9EkFFhzbI+PWJlKYWoTyHHlT4J4MmiC44VxTHfw==)}
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+
+app:
+  jwt:
+    # A standard 256-bit safe secret key for local development
+    secret: ${JWT_SECRET:dGhpcy1pcy1hLXNlY3VyZS1hbmQtc3Ryb25nLWtleS1mb3ItamN3dC1zaWduaW5nLTI1Ni1iaXQtc2FmZQ==}
+    expiration-ms: 900000 # 15 Minutes
+    refresh-expiration-ms: 604800000 # 7 Days
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:rzp_test_placeholder}
+    key-secret: ${RAZORPAY_KEY_SECRET:placeholder_secret}
+    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:webhook_secret_placeholder}
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
