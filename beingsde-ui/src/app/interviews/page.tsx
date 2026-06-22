@@ -370,26 +370,26 @@ export default function InterviewsPage() {
       )}
 
       {/* Workspace Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Column: Interviewer Panel */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <section className={`border p-6 rounded-lg transition-all duration-300 shadow-md ${
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          <section className={`border p-6 rounded-lg transition-all duration-300 shadow-sm ${
             isAvailable 
-              ? "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900/60" 
-              : "border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/20"
+              ? "border-emerald-500/20 dark:border-emerald-500/10 bg-white dark:bg-zinc-900/60" 
+              : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30"
           }`}>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80 mb-6">
               <div className="flex flex-col">
-                <h2 className="text-md font-bold tracking-tight text-zinc-800 dark:text-zinc-200">
+                <h2 className="text-sm font-bold tracking-tight text-zinc-800 dark:text-zinc-200">
                   Interviewer Console
                 </h2>
-                <span className="text-3xs font-mono text-zinc-400">Manage availability & profile</span>
+                <span className="text-3xs font-mono text-zinc-400">Offer mock interviews to candidates</span>
               </div>
 
-              <label className="flex items-center gap-2.5 cursor-pointer">
-                <span className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">
-                  Offer Interviews
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <span className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400">
+                  Offer interviews
                 </span>
                 <div className="relative">
                   <input
@@ -406,17 +406,17 @@ export default function InterviewsPage() {
 
             {/* Profile Statistics Widgets */}
             {profile && (
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="bg-zinc-100/60 dark:bg-zinc-900 p-3 rounded-md border border-zinc-200/50 dark:border-zinc-800">
-                  <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Conducted</span>
-                  <span className="text-lg font-extrabold text-zinc-800 dark:text-zinc-100">
-                    {profile.interviewsConducted} sessions
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-zinc-50/50 dark:bg-zinc-950/20 p-3.5 rounded-lg border border-zinc-100 dark:border-zinc-800/60">
+                  <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Sessions Conducted</span>
+                  <span className="text-md font-extrabold text-zinc-800 dark:text-zinc-100">
+                    {profile.interviewsConducted}
                   </span>
                 </div>
-                <div className="bg-zinc-100/60 dark:bg-zinc-900 p-3 rounded-md border border-zinc-200/50 dark:border-zinc-800">
-                  <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Avg Rating</span>
-                  <span className="text-lg font-extrabold text-zinc-800 dark:text-zinc-100 flex items-center gap-1">
-                    {profile.averageRating ? `${profile.averageRating} ★` : "—"}
+                <div className="bg-zinc-50/50 dark:bg-zinc-950/20 p-3.5 rounded-lg border border-zinc-100 dark:border-zinc-800/60">
+                  <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Average Rating</span>
+                  <span className="text-md font-extrabold text-zinc-800 dark:text-zinc-100 flex items-center gap-1">
+                    {profile.averageRating ? `${profile.averageRating} ★` : "New Interviewer"}
                   </span>
                 </div>
               </div>
@@ -424,31 +424,72 @@ export default function InterviewsPage() {
 
             {/* Edit Form */}
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md"
-                  placeholder="Your name"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Experience Level</label>
+                  <select
+                    value={experienceLevel}
+                    onChange={(e) => setExperienceLevel(e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:bg-zinc-900"
+                  >
+                    <option value="" className="dark:bg-zinc-900">Select level</option>
+                    {EXPERIENCE_LEVELS.map((level) => (
+                      <option key={level} value={level} className="dark:bg-zinc-900">
+                        {level.replace("_", " ")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Experience Level</label>
-                <select
-                  value={experienceLevel}
-                  onChange={(e) => setExperienceLevel(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md dark:bg-zinc-900"
-                >
-                  <option value="" className="dark:bg-zinc-900">Select level</option>
-                  {EXPERIENCE_LEVELS.map((level) => (
-                    <option key={level} value={level} className="dark:bg-zinc-900">
-                      {level.replace("_", " ")}
-                    </option>
-                  ))}
-                </select>
+                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Scheduling Link (Calendly, Cal.com, etc.)</label>
+                <input
+                  type="url"
+                  value={calendlyLink}
+                  onChange={(e) => setCalendlyLink(e.target.value)}
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
+                  placeholder="https://calendly.com/your-link or Cal.com scheduler link"
+                />
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cleanName = (name || "user").toLowerCase().replace(/[^a-z0-9]/g, "-");
+                      setCalendlyLink(`https://meet.jit.si/beingsde-interviews-${cleanName}-${Math.floor(1000 + Math.random() * 9000)}`);
+                    }}
+                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-350 px-2 py-1 rounded-md transition-colors"
+                  >
+                    + Generate Jitsi Link
+                  </button>
+                  <a
+                    href="https://calendly.com/signup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-350 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
+                  >
+                    Get Calendly <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <a
+                    href="https://cal.com/signup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-355 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
+                  >
+                    Get Cal.com <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
@@ -459,7 +500,7 @@ export default function InterviewsPage() {
                   type="text"
                   value={topicsInput}
                   onChange={(e) => setTopicsInput(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
                   placeholder="Redis, Kafka, Load Balancing"
                 />
                 {topicsInput && (
@@ -481,57 +522,18 @@ export default function InterviewsPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Scheduling Link (Calendly, Cal.com, etc.)</label>
-                <input
-                  type="url"
-                  value={calendlyLink}
-                  onChange={(e) => setCalendlyLink(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md"
-                  placeholder="https://calendly.com/your-link or Cal.com scheduler link"
-                />
-                <div className="flex flex-wrap gap-2 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const cleanName = (name || "user").toLowerCase().replace(/[^a-z0-9]/g, "-");
-                      setCalendlyLink(`https://meet.jit.si/beingsde-interviews-${cleanName}-${Math.floor(1000 + Math.random() * 9000)}`);
-                    }}
-                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors"
-                  >
-                    + Generate Jitsi Link
-                  </button>
-                  <a
-                    href="https://calendly.com/signup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
-                  >
-                    Get Calendly <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                  <a
-                    href="https://cal.com/signup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
-                  >
-                    Get Cal.com <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
                 <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Bio</label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors resize-none rounded-md"
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors resize-none rounded-md"
                   placeholder="Brief description of your system design expertise..."
                 />
               </div>
             </div>
 
-            <div className="flex items-center gap-3 mt-6">
+            <div className="flex items-center gap-3 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
               <button
                 onClick={saveProfile}
                 disabled={saving}
@@ -542,7 +544,7 @@ export default function InterviewsPage() {
               {profile?.isAvailable && (
                 <button
                   onClick={stopOffering}
-                  className="text-xs font-semibold uppercase tracking-wider bg-transparent text-red-500 border border-red-300 dark:border-red-900/60 px-4 py-2 hover:border-red-500 rounded-md transition-colors"
+                  className="text-xs font-semibold uppercase tracking-wider bg-transparent text-red-500 border border-red-200 dark:border-red-950 px-4 py-2 hover:border-red-500 rounded-md transition-colors"
                 >
                   Stop offering
                 </button>
@@ -552,7 +554,7 @@ export default function InterviewsPage() {
         </div>
 
         {/* Right Column: Search & Schedule Directory */}
-        <div className="lg:col-span-8 flex flex-col gap-8">
+        <div className="lg:col-span-7 flex flex-col gap-8">
           
           {/* Section: Find an Interviewer */}
           <section className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-6 rounded-lg shadow-sm">
