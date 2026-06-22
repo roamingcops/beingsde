@@ -489,6 +489,34 @@ export default function InterviewsPage() {
                   className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md"
                   placeholder="https://calendly.com/your-link or Cal.com scheduler link"
                 />
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cleanName = (name || "user").toLowerCase().replace(/[^a-z0-9]/g, "-");
+                      setCalendlyLink(`https://meet.jit.si/beingsde-interviews-${cleanName}-${Math.floor(1000 + Math.random() * 9000)}`);
+                    }}
+                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors"
+                  >
+                    + Generate Jitsi Link
+                  </button>
+                  <a
+                    href="https://calendly.com/signup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
+                  >
+                    Get Calendly <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <a
+                    href="https://cal.com/signup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
+                  >
+                    Get Cal.com <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1.5">
