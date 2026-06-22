@@ -1,118 +1,128 @@
 package com.beingsde.core.interviews;
 
+import com.beingsde.core.auth.User;
+import com.beingsde.core.auth.UserRepository;
+import com.beingsde.core.interviews.dto.ProfileRequest;
+import com.beingsde.core.interviews.dto.ProfileResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InterviewService {
 
+    private final InterviewerProfileRepository profileRepo;
     private final InterviewRepository interviewRepo;
+    private final UserRepository userRepo;
 
-    public InterviewService(InterviewRepository interviewRepo) {
+    public InterviewService(InterviewerProfileRepository profileRepo,
+                            InterviewRepository interviewRepo,
+                            UserRepository userRepo) {
+        this.profileRepo = profileRepo;
         this.interviewRepo = interviewRepo;
+        this.userRepo = userRepo;
     }
 
-    @Transactional
-    public Interview matchRequest(String userId, String calendlyLink, List<String> preferredTopics,
-                                   String experienceLevel, String notes) {
-        Optional<Interview> existingActive = interviewRepo.findTopByUserIdAndStatus(userId, "LOOKING");
-        if (existingActive.isPresent()) {
-            Interview existing = existingActive.get();
-            existing.setCalendlyLink(calendlyLink);
-            existing.setPreferredTopics(preferredTopics);
-            existing.setExperienceLevel(experienceLevel);
-            existing.setNotes(notes);
-            return interviewRepo.save(existing);
+    private User resolveUser(String email) {
+        return userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+    }
+
+    public ProfileResponse upsertProfile(String email, ProfileRequest request) {
+        User user = resolveUser(email);
+        String userId = user.getId();
+
+        InterviewerProfile profile = profileRepo.findByUserId(userId).orElseGet(() ->
+                InterviewerProfile.builder()
+                        .userId(userId)
+                        .build()
+        );
+
+        profile.setName(request.getName() != null ? request.getName() : user.getName());
+        profile.setTopics(request.getTopics());
+        profile.setExperienceLevel(request.getExperienceLevel());
+        profile.setBio(request.getBio());
+        profile.setCalendlyLink(request.getCalendlyLink());
+        profile.setAvailable(request.isAvailable());
+
+        InterviewerProfile saved = profileRepo.save(profile);
+        return ProfileResponse.fromProfile(saved);
+    }
+
+    public ProfileResponse getMyProfile(String email) {
+        User user = resolveUser(email);
+        InterviewerProfile profile = profileRepo.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        return ProfileResponse.fromProfile(profile);
+    }
+
+    public void disableProfile(String email) {
+        User user = resolveUser(email);
+        InterviewerProfile profile = profileRepo.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+        profile.setAvailable(false);
+        profileRepo.save(profile);
+    }
+
+    public List<ProfileResponse> getDirectory(String topic, String experienceLevel) {
+        List<InterviewerProfile> profiles;
+
+        boolean hasTopic = topic != null && !topic.isBlank();
+        boolean hasLevel = experienceLevel != null && !experienceLevel.isBlank();
+
+        if (hasTopic && hasLevel) {
+            ExperienceLevel level = ExperienceLevel.valueOf(experienceLevel.toUpperCase());
+            profiles = profileRepo.findByIsAvailableTrueAndTopicsInAndExperienceLevel(
+                    List.of(topic), level);
+        } else if (hasTopic) {
+            profiles = profileRepo.findByIsAvailableTrueAndTopicsIn(List.of(topic));
+        } else if (hasLevel) {
+            ExperienceLevel level = ExperienceLevel.valueOf(experienceLevel.toUpperCase());
+            profiles = profileRepo.findByIsAvailableTrueAndExperienceLevel(level);
+        } else {
+            profiles = profileRepo.findByIsAvailableTrue();
         }
 
-        Interview newRequest = Interview.builder()
-                .userId(userId)
-                .status("LOOKING")
-                .calendlyLink(calendlyLink)
-                .preferredTopics(preferredTopics)
-                .experienceLevel(experienceLevel)
-                .notes(notes)
-                .createdAt(Instant.now())
+        return profiles.stream()
+                .map(ProfileResponse::fromProfile)
+                .toList();
+    }
+
+    public List<Interview> getUserInterviews(String email) {
+        User user = resolveUser(email);
+        String userId = user.getId();
+        return interviewRepo.findByInterviewerIdOrCandidateIdOrderByCreatedAtDesc(userId, userId);
+    }
+
+    public Interview handleCalendlyWebhook(String interviewerEmail, String candidateId,
+                                           String topic, Instant scheduledTime, String meetingLink) {
+        User interviewer = resolveUser(interviewerEmail);
+
+        Interview interview = Interview.builder()
+                .interviewerId(interviewer.getId())
+                .candidateId(candidateId)
+                .topic(topic)
+                .status(InterviewStatus.SCHEDULED)
+                .scheduledAt(scheduledTime)
+                .meetingLink(meetingLink)
                 .build();
 
-        Interview saved = interviewRepo.save(newRequest);
-
-        tryMatch(saved);
-
-        return interviewRepo.findById(saved.getId()).orElse(saved);
-    }
-
-    private void tryMatch(Interview request) {
-        Optional<Interview> matchCandidate = interviewRepo
-                .findTopByStatusAndUserIdNotOrderByCreatedAtAsc("LOOKING", request.getUserId());
-
-        if (matchCandidate.isPresent()) {
-            Interview candidate = matchCandidate.get();
-
-            candidate.setStatus("MATCHED");
-            candidate.setMatchedUserId(request.getUserId());
-            interviewRepo.save(candidate);
-
-            request.setStatus("MATCHED");
-            request.setMatchedUserId(candidate.getUserId());
-            interviewRepo.save(request);
-        }
-    }
-
-    public List<Interview> getUserInterviews(String userId) {
-        return interviewRepo.findByUserIdOrderByCreatedAtDesc(userId);
-    }
-
-    public Interview getInterview(String id, String userId) {
-        Interview interview = interviewRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Interview not found with id: " + id));
-        if (!interview.getUserId().equals(userId) &&
-                (interview.getMatchedUserId() == null || !interview.getMatchedUserId().equals(userId))) {
-            throw new RuntimeException("Access denied");
-        }
-        return interview;
-    }
-
-    @Transactional
-    public Interview cancelMatch(String id, String userId) {
-        Interview interview = getInterview(id, userId);
-        if (!"MATCHED".equals(interview.getStatus()) && !"LOOKING".equals(interview.getStatus())) {
-            throw new RuntimeException("Cannot cancel interview in status: " + interview.getStatus());
-        }
-
-        if (interview.getMatchedUserId() != null) {
-            Optional<Interview> partnerInterview = interviewRepo
-                    .findTopByUserIdAndStatus(interview.getMatchedUserId(), "MATCHED");
-            partnerInterview.ifPresent(partner -> {
-                partner.setStatus("LOOKING");
-                partner.setMatchedUserId(null);
-                interviewRepo.save(partner);
-            });
-        }
-
-        interview.setStatus("CANCELLED");
-        interview.setMatchedUserId(null);
         return interviewRepo.save(interview);
     }
 
-    @Transactional
-    public Interview handleCalendlyWebhook(String eventType, String userId, String matchedUserId,
-                                            Instant scheduledTime, String meetingLink) {
-        Optional<Interview> userInterview = interviewRepo.findTopByUserIdAndStatus(userId, "MATCHED");
-        if (userInterview.isEmpty()) {
-            throw new RuntimeException("No matched interview found for user: " + userId);
+    public Interview submitFeedback(String interviewId, String email, Integer score, String notes) {
+        User user = resolveUser(email);
+        Interview interview = interviewRepo.findById(interviewId)
+                .orElseThrow(() -> new RuntimeException("Interview not found: " + interviewId));
+
+        if (!interview.getInterviewerId().equals(user.getId())) {
+            throw new RuntimeException("Only the interviewer can submit feedback");
         }
 
-        Interview interview = userInterview.get();
-        interview.setStatus("SCHEDULED");
-        interview.setScheduledAt(scheduledTime);
-        if (meetingLink != null && !meetingLink.isBlank()) {
-            interview.setMeetingLink(meetingLink);
-        }
+        interview.setFeedbackScore(score);
+        interview.setFeedbackNotes(notes);
+        interview.setStatus(InterviewStatus.COMPLETED);
         return interviewRepo.save(interview);
     }
 }

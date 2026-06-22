@@ -1,8 +1,8 @@
 package com.beingsde.core.interviews;
 
 import com.beingsde.core.featureflags.FeatureFlagService;
-import com.beingsde.core.interviews.dto.InterviewResponse;
-import com.beingsde.core.interviews.dto.MatchRequest;
+import com.beingsde.core.interviews.dto.ProfileRequest;
+import com.beingsde.core.interviews.dto.ProfileResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +17,8 @@ import java.util.Map;
 @RequestMapping("/api/v1/interviews")
 public class InterviewController {
 
+    private static final String FEATURE_FLAG = "feature_premium_mock_interviews";
+
     private final InterviewService interviewService;
     private final FeatureFlagService featureFlagService;
 
@@ -26,68 +28,99 @@ public class InterviewController {
         this.featureFlagService = featureFlagService;
     }
 
-    @PostMapping("/match")
-    public ResponseEntity<?> requestMatch(@RequestBody MatchRequest request) {
-        String userId = getCurrentUserId();
+    private String getCurrentUserEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+            return (String) auth.getPrincipal();
+        }
+        return "anonymous";
+    }
 
-        if (!featureFlagService.evaluate(userId, "feature_premium_mock_interviews")) {
+    private ResponseEntity<?> checkPremiumAccess(String email) {
+        if (!featureFlagService.evaluate(email, FEATURE_FLAG)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of(
                             "type", "https://api.beingsde.com/errors/insufficient-permissions",
-                            "title", "Feature Locked",
+                            "title", "Premium Feature",
                             "status", 403,
-                            "detail", "Mock interviews are a premium feature. Please upgrade your subscription to access."
+                            "detail", "Mock interviews are a premium feature. Please upgrade your subscription.",
+                            "instance", "/api/v1/interviews"
                     ));
         }
+        return null;
+    }
+
+    @PostMapping("/profile")
+    public ResponseEntity<?> upsertProfile(@RequestBody ProfileRequest request) {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
+
+        ProfileResponse profile = interviewService.upsertProfile(email, request);
+        return ResponseEntity.ok(profile);
+    }
+
+    @GetMapping("/profile/me")
+    public ResponseEntity<?> getMyProfile() {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
 
         try {
-            Interview interview = interviewService.matchRequest(
-                    userId,
-                    request.getCalendlyLink(),
-                    request.getPreferredTopics(),
-                    request.getExperienceLevel(),
-                    request.getNotes()
-            );
-            return ResponseEntity.ok(toResponse(interview));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", e.getMessage()));
+            ProfileResponse profile = interviewService.getMyProfile(email);
+            return ResponseEntity.ok(profile);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Profile not found"));
         }
+    }
+
+    @DeleteMapping("/profile")
+    public ResponseEntity<?> disableProfile() {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
+
+        interviewService.disableProfile(email);
+        return ResponseEntity.ok(Map.of("message", "Profile disabled"));
+    }
+
+    @GetMapping("/directory")
+    public ResponseEntity<?> getDirectory(
+            @RequestParam(required = false) String topic,
+            @RequestParam(required = false) String experienceLevel) {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
+
+        List<ProfileResponse> directory = interviewService.getDirectory(topic, experienceLevel);
+        return ResponseEntity.ok(directory);
     }
 
     @GetMapping
-    public ResponseEntity<?> getUserInterviews() {
-        try {
-            String userId = getCurrentUserId();
-            List<Interview> interviews = interviewService.getUserInterviews(userId);
-            List<InterviewResponse> responses = interviews.stream()
-                    .map(this::toResponse)
-                    .toList();
-            return ResponseEntity.ok(Map.of("interviews", responses));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", e.getMessage()));
-        }
+    public ResponseEntity<?> getMyInterviews() {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
+
+        List<Interview> interviews = interviewService.getUserInterviews(email);
+        return ResponseEntity.ok(interviews);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getInterview(@PathVariable String id) {
-        try {
-            String userId = getCurrentUserId();
-            Interview interview = interviewService.getInterview(id, userId);
-            return ResponseEntity.ok(toResponse(interview));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("message", e.getMessage()));
-        }
-    }
+    @PostMapping("/{id}/feedback")
+    public ResponseEntity<?> submitFeedback(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> body) {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
 
-    @PostMapping("/{id}/cancel")
-    public ResponseEntity<?> cancelMatch(@PathVariable String id) {
+        Integer score = body.get("score") != null ? ((Number) body.get("score")).intValue() : null;
+        String notes = (String) body.get("notes");
+
         try {
-            String userId = getCurrentUserId();
-            Interview interview = interviewService.cancelMatch(id, userId);
-            return ResponseEntity.ok(toResponse(interview));
+            Interview interview = interviewService.submitFeedback(id, email, score, notes);
+            return ResponseEntity.ok(interview);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("message", e.getMessage()));
@@ -95,83 +128,26 @@ public class InterviewController {
     }
 
     @PostMapping("/calendly-webhook")
-    public ResponseEntity<?> handleCalendlyWebhook(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> calendlyWebhook(@RequestBody Map<String, Object> body) {
+        String interviewerEmail = (String) body.get("interviewerEmail");
+        String candidateId = (String) body.get("candidateId");
+        String topic = (String) body.get("topic");
+        String scheduledTimeStr = (String) body.get("scheduled_time");
+        String meetingLink = (String) body.get("meetingLink");
+
+        if (interviewerEmail == null || candidateId == null || topic == null || scheduledTimeStr == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Missing required fields: interviewerEmail, candidateId, topic, scheduled_time"));
+        }
+
         try {
-            String event = (String) payload.get("event");
-            if (event == null || !event.contains("invitee.created")) {
-                return ResponseEntity.ok(Map.of("status", "ignored"));
-            }
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> payloadObj = (Map<String, Object>) payload.get("payload");
-            if (payloadObj == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Invalid payload"));
-            }
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> invitee = (Map<String, Object>) payloadObj.get("invitee");
-            if (invitee == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Missing invitee"));
-            }
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> questionsAndAnswers = (Map<String, Object>) invitee.get("questions_and_answers");
-            String userId = null;
-            String matchedUserId = null;
-            if (questionsAndAnswers != null) {
-                userId = (String) questionsAndAnswers.get("userId");
-                matchedUserId = (String) questionsAndAnswers.get("matchedUserId");
-            }
-
-            if (userId == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Missing userId in invitee questions"));
-            }
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> scheduledEvent = (Map<String, Object>) payloadObj.get("scheduled_event");
-            String meetingLink = null;
-            Instant scheduledTime = null;
-            if (scheduledEvent != null) {
-                meetingLink = (String) scheduledEvent.get("location");
-                String startTimeStr = (String) scheduledEvent.get("start_time");
-                if (startTimeStr != null) {
-                    scheduledTime = Instant.parse(startTimeStr);
-                }
-            }
-
+            Instant scheduledTime = Instant.parse(scheduledTimeStr);
             Interview interview = interviewService.handleCalendlyWebhook(
-                    event, userId, matchedUserId, scheduledTime, meetingLink);
-
-            return ResponseEntity.ok(Map.of("status", "success", "interview", toResponse(interview)));
-
+                    interviewerEmail, candidateId, topic, scheduledTime, meetingLink);
+            return ResponseEntity.status(HttpStatus.CREATED).body(interview);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("message", "Error processing Calendly webhook: " + e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Failed to process webhook: " + e.getMessage()));
         }
-    }
-
-    private InterviewResponse toResponse(Interview interview) {
-        return new InterviewResponse(
-                interview.getId(),
-                interview.getUserId(),
-                interview.getMatchedUserId(),
-                interview.getStatus(),
-                interview.getPreferredTopics(),
-                interview.getExperienceLevel(),
-                interview.getCalendlyLink(),
-                interview.getNotes(),
-                interview.getMeetingLink(),
-                interview.getScheduledAt(),
-                interview.getCreatedAt(),
-                interview.getUpdatedAt()
-        );
-    }
-
-    private String getCurrentUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            throw new RuntimeException("Authentication required");
-        }
-        return (String) auth.getPrincipal();
     }
 }
