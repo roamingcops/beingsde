@@ -364,14 +364,14 @@ export default function SubscriptionsPage() {
           <div className="flex flex-col gap-3">
             <button
               onClick={() => handleCheckout("PREMIUM_1M")}
-              disabled={loading || (subscription && subscription.status === "ACTIVE")}
+              disabled={loading || subscription?.status === "ACTIVE"}
               className="w-full text-xs font-semibold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-4 py-3 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300 disabled:opacity-50 cursor-pointer rounded-md shadow-sm"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-1.5">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" /> Upgrading...
                 </span>
-              ) : subscription && subscription.status === "ACTIVE" ? (
+              ) : subscription?.status === "ACTIVE" ? (
                 "Subscribed (Auto-pay)"
               ) : (
                 "Upgrade to Premium"
