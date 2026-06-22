@@ -299,5 +299,10 @@ public class InterviewService {
     public void testCleanup() {
         profileRepo.deleteAll();
         interviewRepo.deleteAll();
+        // Reset test user role to FREE_USER for checkout tests
+        userRepo.findByEmail("testuser@beingsde.com").ifPresent(user -> {
+            user.setRole(com.beingsde.core.auth.UserRole.FREE_USER);
+            userRepo.save(user);
+        });
     }
 }

@@ -1,23 +1,182 @@
 "use client";
 
-import { Check, Star, Users } from "lucide-react";
+import { useState } from "react";
+import { Check, Star, Users, ExternalLink, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
+
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1/payments";
 
 export default function SubscriptionsPage() {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Sandbox simulations
+  const [showSimulateModal, setShowSimulateModal] = useState(false);
+  const [simulatedOrder, setSimulatedOrder] = useState<{
+    orderId: string;
+    amount: number;
+    currency: string;
+  } | null>(null);
 
-  const handleCheckout = (planId: string) => {
-    alert(`Initiating Razorpay payment workflow for plan: ${planId}. Order payload triggers billing controllers.`);
+  const handleCheckout = async (planId: string) => {
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("Please sign in to upgrade your subscription tier.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await sessionAwareFetch(`${API_BASE}/razorpay/order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ planId }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.message || "Failed to create checkout order.");
+        setLoading(false);
+        return;
+      }
+
+      const orderData = await res.json();
+
+      if (orderData.keyId === "rzp_test_placeholder") {
+        // Simulation Mode (Local Dev/Sandbox)
+        setSimulatedOrder({
+          orderId: orderData.orderId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+        });
+        setShowSimulateModal(true);
+        setLoading(false);
+      } else {
+        // Live Razorpay script overlay flow
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "beingsde.com",
+          description: "Premium Pass subscription",
+          order_id: orderData.orderId,
+          handler: async function (response: any) {
+            setLoading(true);
+            try {
+              const verifyRes = await sessionAwareFetch(`${API_BASE}/razorpay/verify`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  orderId: response.razorpay_order_id,
+                  paymentId: response.razorpay_payment_id,
+                  signature: response.razorpay_signature,
+                }),
+              });
+              if (verifyRes.ok) {
+                setSuccess("Payment successful! Your account has been upgraded to Premium.");
+                setTimeout(() => window.location.reload(), 2000);
+              } else {
+                const errData = await verifyRes.json();
+                setError(errData.message || "Payment verification failed.");
+              }
+            } catch {
+              setError("Network error validating payment.");
+            } finally {
+              setLoading(false);
+            }
+          },
+          prefill: {
+            email: localStorage.getItem("userEmail") || "",
+          },
+          theme: {
+            color: "#09090b",
+          },
+        };
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+        setLoading(false);
+      }
+
+    } catch {
+      setError("Network error creating payment order.");
+      setLoading(false);
+    }
+  };
+
+  const confirmSimulatedPayment = async () => {
+    if (!simulatedOrder) return;
+    setShowSimulateModal(false);
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    const mockPaymentId = "pay_sim_" + Math.random().toString(36).substring(7);
+    const mockSignature = "signature_sim_" + Math.random().toString(36).substring(7);
+
+    try {
+      const verifyRes = await sessionAwareFetch(`${API_BASE}/razorpay/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderId: simulatedOrder.orderId,
+          paymentId: mockPaymentId,
+          signature: mockSignature,
+        }),
+      });
+
+      if (verifyRes.ok) {
+        setSuccess("Payment successful! Sandbox user upgraded to Premium tier.");
+        setTimeout(() => window.location.reload(), 2000);
+      } else {
+        const errData = await verifyRes.json();
+        setError(errData.message || "Simulated payment verification failed.");
+      }
+    } catch {
+      setError("Network error validating simulated payment.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col items-center gap-12 py-8 max-w-5xl mx-auto">
+    <div className="flex flex-col items-center gap-12 py-8 max-w-5xl mx-auto px-4 sm:px-6">
       
       {/* Page Header */}
       <section className="text-center max-w-xl flex flex-col gap-3">
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Structured Pricing Plans</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-800 dark:from-zinc-100 dark:via-zinc-300 dark:to-zinc-200 bg-clip-text text-transparent">
+          Structured Pricing Plans
+        </h1>
+        <p className="text-sm text-zinc-550">
           Get unlimited access to high-resolution system design breakdowns, low-level diagrams, and 1-on-1 mock interviews.
         </p>
       </section>
+
+      {/* Notifications */}
+      {error && (
+        <div className="w-full max-w-3xl flex gap-2.5 items-start p-4 text-sm border border-red-200 dark:border-red-950 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 rounded-md">
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <span>{error}</span>
+        </div>
+      )}
+      {success && (
+        <div className="w-full max-w-3xl flex gap-2.5 items-start p-4 text-sm border border-emerald-200 dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 rounded-md animate-pulse">
+          <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" />
+          <span>{success}</span>
+        </div>
+      )}
 
       {/* PLAN COMPARISON CARDS */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl items-stretch">
@@ -36,15 +195,15 @@ export default function SubscriptionsPage() {
             
             {/* Features */}
             <ul className="flex flex-col gap-3 mt-4 border-t border-zinc-100 dark:border-zinc-800 pt-4">
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Access to Basic HLD Topics (e.g. Consistent Hashing)
               </li>
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Read Online Lesson notes
               </li>
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Limited Video Previews
               </li>
@@ -52,8 +211,8 @@ export default function SubscriptionsPage() {
           </div>
 
           <button
-            onClick={() => handleCheckout("FREE")}
-            className="w-full text-xs font-semibold uppercase tracking-wider bg-transparent text-zinc-900 dark:text-zinc-100 px-4 py-3 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 transition-colors"
+            disabled
+            className="w-full text-xs font-semibold uppercase tracking-wider bg-transparent text-zinc-400 px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-md cursor-not-allowed"
           >
             Current Plan
           </button>
@@ -62,7 +221,6 @@ export default function SubscriptionsPage() {
         {/* PREMIUM PLAN */}
         <div className="relative border-2 border-zinc-900 dark:border-zinc-100 bg-white dark:bg-[#18181b] p-8 rounded-md flex flex-col justify-between gap-8 shadow-md">
           
-          {/* Circular Scribble Ring overlay around premium star */}
           <div className="absolute -top-3 -right-3 p-1.5 bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 rounded-full border border-zinc-900 dark:border-zinc-100">
             <Star className="w-4 h-4 fill-current" />
           </div>
@@ -77,7 +235,7 @@ export default function SubscriptionsPage() {
             
             <div className="flex flex-col gap-1">
               <h2 className="text-2xl font-bold">Premium Pass</h2>
-              <p className="text-xs text-zinc-500">Unlimited preparation for Staff+ roles.</p>
+              <p className="text-xs text-zinc-550">Unlimited preparation for Staff+ roles.</p>
             </div>
             <div className="text-3xl font-black mt-2">
               ₹2,999 <span className="text-xs font-normal text-zinc-400 font-mono">/ Month (Razorpay)</span>
@@ -89,31 +247,51 @@ export default function SubscriptionsPage() {
                 <Check className="w-4 h-4 text-zinc-900 dark:text-zinc-100 shrink-0" />
                 Unrestricted Access to All HLD & LLD Topics
               </li>
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Unlock PDF Architectural blueprints & downloads
               </li>
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Access all HD Video lectures on CDN edge
               </li>
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Includes 1 Mock Interview credit per month
               </li>
-              <li className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+              <li className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-350">
                 <Check className="w-4 h-4 text-zinc-400 shrink-0" />
                 Premium Slack community channel access
               </li>
             </ul>
           </div>
 
-          <button
-            onClick={() => handleCheckout("PREMIUM_1M")}
-            className="w-full text-xs font-semibold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 px-4 py-3 border border-zinc-950 dark:border-zinc-50 hover:bg-transparent hover:text-zinc-900 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300"
-          >
-            Upgrade to Premium
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => handleCheckout("PREMIUM_1M")}
+              disabled={loading}
+              className="w-full text-xs font-semibold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-4 py-3 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300 disabled:opacity-50 cursor-pointer rounded-md shadow-sm"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Upgrading...
+                </span>
+              ) : (
+                "Upgrade to Premium"
+              )}
+            </button>
+            <div className="text-center">
+              <span className="text-[10px] text-zinc-400 dark:text-zinc-550">or pay directly via </span>
+              <a
+                href="https://razorpay.me/@beingsde"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-bold text-zinc-650 dark:text-zinc-450 hover:underline inline-flex items-center gap-0.5 cursor-pointer"
+              >
+                Razorpay Payment Page <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -141,6 +319,48 @@ export default function SubscriptionsPage() {
           </div>
         </div>
       </section>
+
+      {/* Checkout Sandbox Simulation Modal */}
+      {showSimulateModal && simulatedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm transition-opacity">
+          <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 shadow-2xl flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-md font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
+                <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                Simulate Razorpay Payment
+              </h2>
+              <span className="text-2xs text-zinc-500 font-mono">
+                Local Dev Sandbox (rzp_test_placeholder key detected)
+              </span>
+            </div>
+
+            <div className="bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-150 dark:border-zinc-800 p-3 rounded-md text-3xs text-zinc-650 dark:text-zinc-400 font-mono flex flex-col gap-1.5">
+              <div>Order ID: <strong>{simulatedOrder.orderId}</strong></div>
+              <div>Amount: <strong>₹{(simulatedOrder.amount / 100).toLocaleString("en-IN")}</strong></div>
+              <div>Currency: <strong>{simulatedOrder.currency}</strong></div>
+            </div>
+
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              This is a sandbox simulation to test the full checkout and signature verification flow. Clicking "Simulate Success" will make a mock call to our signature verification API.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 mt-4">
+              <button
+                onClick={() => setShowSimulateModal(false)}
+                className="text-xs font-semibold px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-500 rounded-md transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSimulatedPayment}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md shadow-sm transition-colors cursor-pointer"
+              >
+                Simulate Success
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

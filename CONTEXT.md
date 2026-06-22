@@ -67,6 +67,18 @@ The application is split into three main modules:
 - **Database Reset Endpoint**: A public-facing (test-profile only) endpoint `DELETE /api/v1/interviews/test/cleanup` purges test profile entries between E2E assertions.
 - **Playwright Setup**: Tests utilize `request.delete()` inside `beforeEach` to reset databases, guaranteeing test isolation and 100% deterministic runs.
 
+### E. Razorpay Payment & Subscription Integration
+- **Goal**: Allow users to upgrade their accounts from `FREE_USER` to `PREMIUM_USER` using Razorpay subscriptions.
+- **Backend Flow**:
+  - `POST /api/v1/payments/razorpay/order` generates a payment order ID. For local development, it defaults to a sandbox mode (when API key is `rzp_test_placeholder`).
+  - `POST /api/v1/payments/razorpay/verify` validates the Razorpay checkout signatures. Bypasses check in sandbox simulation.
+  - `POST /api/v1/payments/razorpay/webhook` processes payment captured notifications, auto-matching/upgrading users by email for direct payments made via the hosted checkout page.
+- **Frontend Flow**:
+  - The subscriptions view ([subscriptions/page.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/subscriptions/page.tsx)) triggers the inline Razorpay checkout modal or shows an interactive local sandbox simulation popup if local test credentials are used.
+  - Provides a direct hosted payment page backup link pointing to `https://razorpay.me/@beingsde`.
+- **E2E Tester**:
+  - [payment-flow.spec.ts](file:///Users/arnavagarwal/beingsde/beingsde-tester/tests/payment-flow.spec.ts) runs a full E2E flow testing the signup, navigating to subscriptions, launching the sandbox payment modal, simulating success, and checking role updates.
+
 ---
 
 ## 3. Important Files Map
@@ -75,13 +87,16 @@ The application is split into three main modules:
   - [SecurityConfig.java](file:///Users/arnavagarwal/beingsde/beingsde-core/src/main/java/com/beingsde/core/config/SecurityConfig.java) — Enforces JWT filters & test-endpoint public paths.
   - [InterviewController.java](file:///Users/arnavagarwal/beingsde/beingsde-core/src/main/java/com/beingsde/core/interviews/InterviewController.java) — Core interviews API entry.
   - [InterviewService.java](file:///Users/arnavagarwal/beingsde/beingsde-core/src/main/java/com/beingsde/core/interviews/InterviewService.java) — Profile management & Webhook/Booking logic.
+  - [BillingController.java](file:///Users/arnavagarwal/beingsde/beingsde-core/src/main/java/com/beingsde/core/billing/BillingController.java) — Entrypoint for payment order creation, verification, and webhooks.
 - **Frontend Pages & Components**:
   - [page.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/interviews/page.tsx) — Main Interviews dashboard UI.
-  - [layout.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/layout.tsx) — Navigation header and Theme Script integration.
+  - [page.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/subscriptions/page.tsx) — Subscription page with standard checkout triggers & sandbox payment modal.
+  - [layout.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/layout.tsx) — Navigation header, dynamic theme script, and Razorpay script integration.
   - [ThemeToggle.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/components/ThemeToggle.tsx) — Floating Moon/Sun theme-toggle button component.
   - [globals.css](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/globals.css) — Custom variant configuration & HSL theme color definitions.
 - **Automation tests**:
   - [interviewer-directory.spec.ts](file:///Users/arnavagarwal/beingsde/beingsde-tester/tests/interviewer-directory.spec.ts) — Playwright test covering directory profile upserts, empty states, and mock scheduling.
+  - [payment-flow.spec.ts](file:///Users/arnavagarwal/beingsde/beingsde-tester/tests/payment-flow.spec.ts) — Playwright test covering subscription payment simulation and account upgrade.
 
 ---
 

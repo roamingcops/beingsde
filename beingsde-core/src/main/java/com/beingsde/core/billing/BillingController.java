@@ -138,7 +138,11 @@ public class BillingController {
                 String paymentId = entityObj.optString("id");
                 String method = entityObj.optString("method");
 
-                Optional<Payment> paymentOpt = paymentRepo.findByRazorpayOrderId(orderId);
+                Optional<Payment> paymentOpt = Optional.empty();
+                if (orderId != null && !orderId.isEmpty()) {
+                    paymentOpt = paymentRepo.findByRazorpayOrderId(orderId);
+                }
+
                 if (paymentOpt.isPresent()) {
                     Payment payment = paymentOpt.get();
                     payment.setRazorpayPaymentId(paymentId);
@@ -147,24 +151,29 @@ public class BillingController {
                     payment.setStatus("CAPTURED");
                     paymentRepo.save(payment);
 
-                    // Upgrade User Tier
-                    Optional<User> userOpt = userRepo.findById(payment.getUserId());
-                    if (userOpt.isPresent()) {
-                        User user = userOpt.get();
-                        user.setRole(UserRole.PREMIUM_USER);
-                        userRepo.save(user);
+                    upgradeUserRole(payment.getUserId());
+                } else {
+                    // Fallback: Hosted Payment Pages (no pre-created Order ID)
+                    String customerEmail = entityObj.optString("email");
+                    if (customerEmail != null && !customerEmail.isEmpty()) {
+                        Optional<User> userOpt = userRepo.findByEmail(customerEmail);
+                        if (userOpt.isPresent()) {
+                            User user = userOpt.get();
+                            Payment payment = Payment.builder()
+                                    .userId(user.getId())
+                                    .razorpayOrderId(orderId != null ? orderId : "")
+                                    .razorpayPaymentId(paymentId)
+                                    .razorpaySignature(signature)
+                                    .amountInPaise(entityObj.optLong("amount", 299900L))
+                                    .currency(entityObj.optString("currency", "INR"))
+                                    .status("CAPTURED")
+                                    .paymentMethod(method)
+                                    .createdAt(Instant.now())
+                                    .build();
+                            paymentRepo.save(payment);
 
-                        // Save Subscription record
-                        Subscription subscription = Subscription.builder()
-                                .userId(user.getId())
-                                .tier("PREMIUM")
-                                .status("ACTIVE")
-                                .startedAt(Instant.now())
-                                .expiresAt(Instant.now().plus(30, ChronoUnit.DAYS))
-                                .autoRenew(true)
-                                .createdAt(Instant.now())
-                                .build();
-                        subscriptionRepo.save(subscription);
+                            upgradeUserRole(user.getId());
+                        }
                     }
                 }
             }
@@ -174,6 +183,88 @@ public class BillingController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Error processing webhook: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/razorpay/verify")
+    @Transactional
+    public ResponseEntity<?> verifyPayment(@RequestBody Map<String, String> request) {
+        String orderId = request.get("orderId");
+        String paymentId = request.get("paymentId");
+        String signature = request.get("signature");
+
+        if (orderId == null || paymentId == null || signature == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Missing required parameters: orderId, paymentId, or signature"));
+        }
+
+        String currentUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepo.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
+
+        try {
+            boolean isValid = false;
+
+            if ("rzp_test_placeholder".equals(keyId)) {
+                // Simulation Mode
+                isValid = true;
+            } else {
+                // Real Razorpay Signature Verification
+                JSONObject attributes = new JSONObject();
+                attributes.put("razorpay_order_id", orderId);
+                attributes.put("razorpay_payment_id", paymentId);
+                attributes.put("razorpay_signature", signature);
+                isValid = Utils.verifyPaymentSignature(attributes, keySecret);
+            }
+
+            if (!isValid) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Invalid payment signature"));
+            }
+
+            // Find payment record, or create if missing (e.g. simulated payment)
+            Payment payment = paymentRepo.findByRazorpayOrderId(orderId)
+                    .orElseGet(() -> Payment.builder()
+                            .userId(user.getId())
+                            .razorpayOrderId(orderId)
+                            .amountInPaise(299900L)
+                            .currency("INR")
+                            .createdAt(Instant.now())
+                            .build());
+
+            payment.setRazorpayPaymentId(paymentId);
+            payment.setRazorpaySignature(signature);
+            payment.setStatus("CAPTURED");
+            paymentRepo.save(payment);
+
+            upgradeUserRole(user.getId());
+
+            return ResponseEntity.ok(Map.of("status", "success", "message", "Payment verified and tier upgraded"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error verifying payment signature: " + e.getMessage()));
+        }
+    }
+
+    private void upgradeUserRole(String userId) {
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setRole(UserRole.PREMIUM_USER);
+            userRepo.save(user);
+
+            // Save Subscription record
+            Subscription subscription = Subscription.builder()
+                    .userId(user.getId())
+                    .tier("PREMIUM")
+                    .status("ACTIVE")
+                    .startedAt(Instant.now())
+                    .expiresAt(Instant.now().plus(30, ChronoUnit.DAYS))
+                    .autoRenew(true)
+                    .createdAt(Instant.now())
+                    .build();
+            subscriptionRepo.save(subscription);
         }
     }
 }
