@@ -14,11 +14,14 @@ public class ProfileResponse {
     private String calendlyLink;
     private boolean isAvailable;
     private Instant createdAt;
+    private Double averageRating;
+    private Integer interviewsConducted;
 
     public ProfileResponse() {}
 
     public ProfileResponse(String id, String name, List<String> topics, ExperienceLevel experienceLevel,
-                           String bio, String calendlyLink, boolean isAvailable, Instant createdAt) {
+                           String bio, String calendlyLink, boolean isAvailable, Instant createdAt,
+                           Double averageRating, Integer interviewsConducted) {
         this.id = id;
         this.name = name;
         this.topics = topics;
@@ -27,6 +30,8 @@ public class ProfileResponse {
         this.calendlyLink = calendlyLink;
         this.isAvailable = isAvailable;
         this.createdAt = createdAt;
+        this.averageRating = averageRating;
+        this.interviewsConducted = interviewsConducted;
     }
 
     public String getId() { return id; }
@@ -45,8 +50,12 @@ public class ProfileResponse {
     public void setAvailable(boolean available) { isAvailable = available; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+    public Integer getInterviewsConducted() { return interviewsConducted; }
+    public void setInterviewsConducted(Integer interviewsConducted) { this.interviewsConducted = interviewsConducted; }
 
-    public static ProfileResponse fromProfile(com.beingsde.core.interviews.InterviewerProfile profile) {
+    public static ProfileResponse fromProfile(com.beingsde.core.interviews.InterviewerProfile profile, Double averageRating, Integer interviewsConducted) {
         return new ProfileResponse(
                 profile.getId(),
                 profile.getName(),
@@ -55,7 +64,9 @@ public class ProfileResponse {
                 profile.getBio(),
                 profile.getCalendlyLink(),
                 profile.isAvailable(),
-                profile.getCreatedAt()
+                profile.getCreatedAt(),
+                averageRating,
+                interviewsConducted
         );
     }
 }

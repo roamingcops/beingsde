@@ -103,8 +103,49 @@ public class InterviewController {
         ResponseEntity<?> accessError = checkPremiumAccess(email);
         if (accessError != null) return accessError;
 
-        List<Interview> interviews = interviewService.getUserInterviews(email);
+        List<com.beingsde.core.interviews.dto.InterviewResponse> interviews = interviewService.getUserInterviews(email);
         return ResponseEntity.ok(interviews);
+    }
+
+    @PostMapping("/book")
+    public ResponseEntity<?> bookInterview(@RequestBody Map<String, Object> body) {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
+
+        String profileId = (String) body.get("profileId");
+        String topic = (String) body.get("topic");
+        String scheduledAtStr = (String) body.get("scheduledAt");
+        String meetingLink = (String) body.get("meetingLink");
+
+        if (profileId == null || topic == null || scheduledAtStr == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Missing required fields: profileId, topic, scheduledAt"));
+        }
+
+        try {
+            Instant scheduledAt = Instant.parse(scheduledAtStr);
+            Interview interview = interviewService.bookInterview(email, profileId, topic, scheduledAt, meetingLink);
+            return ResponseEntity.status(HttpStatus.CREATED).body(interview);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelInterview(@PathVariable String id) {
+        String email = getCurrentUserEmail();
+        ResponseEntity<?> accessError = checkPremiumAccess(email);
+        if (accessError != null) return accessError;
+
+        try {
+            Interview interview = interviewService.cancelInterview(id, email);
+            return ResponseEntity.ok(interview);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/feedback")
