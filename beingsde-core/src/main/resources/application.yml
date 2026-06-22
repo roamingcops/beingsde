@@ -29,7 +29,7 @@ app:
     webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:webhook_secret_placeholder}
 
 server:
-  port: 8081
+  port: ${PORT:8081}
   error:
     include-message: always
     include-binding-errors: always
