@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Filter, BookOpen, Clock, Lock } from "lucide-react";
+import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
 
 // Mock Fallback Topics list matching MongoDB database schema topics
 const MOCK_TOPICS = [
@@ -66,7 +67,8 @@ export default function TopicsExplorer() {
           headers["Authorization"] = `Bearer ${token}`;
         }
         
-        const res = await fetch("http://localhost:8081/api/v1/topics", { headers });
+        const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
+        const res = await sessionAwareFetch(`${API_BASE}/topics`, { headers });
         if (res.ok) {
           const data = await res.json();
           if (data.content && data.content.length > 0) {

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { KeyRound, Mail, AlertTriangle, CheckCircle } from "lucide-react";
+import { KeyRound, Mail, AlertTriangle, CheckCircle, ShieldAlert } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [isPasswordReset, setIsPasswordReset] = useState(false);
+  const [isSessionInvalidated, setIsSessionInvalidated] = useState(false);
 
   const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
 
@@ -24,6 +25,9 @@ export default function LoginPage() {
       }
       if (params.get("reset") === "true") {
         setTimeout(() => setIsPasswordReset(true), 0);
+      }
+      if (params.get("reason") === "session_invalidated") {
+        setTimeout(() => setIsSessionInvalidated(true), 0);
       }
     }
   }, []);
@@ -92,6 +96,16 @@ export default function LoginPage() {
           </div>
         )}
 
+        {/* Session Invalidated Warning */}
+        {isSessionInvalidated && !error && (
+          <div className="flex gap-2.5 items-start p-3 text-xs bg-amber-50 border border-amber-200 text-amber-700 rounded-sm dark:bg-amber-950/20 dark:border-amber-900/50">
+            <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              <strong>You were signed out.</strong> Your account was accessed from another device or browser.
+              Sign in again to continue.
+            </span>
+          </div>
+        )}
         {/* Error Callout */}
         {error && (
           <div className="flex gap-2.5 items-start p-3 text-xs bg-rose-50 border border-rose-200 text-rose-600 rounded-sm dark:bg-rose-950/20 dark:border-rose-900/50">

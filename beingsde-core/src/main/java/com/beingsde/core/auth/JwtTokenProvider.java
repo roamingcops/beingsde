@@ -26,13 +26,18 @@ public class JwtTokenProvider {
         this.refreshExpirationMs = refreshExpirationMs;
     }
 
-    public String generateAccessToken(String email, String role) {
+    /**
+     * Generates an access token that includes the sessionId claim.
+     * The sessionId is validated on every request to enforce single-session login.
+     */
+    public String generateAccessToken(String email, String role, String sessionId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .subject(email)
                 .claim("role", role)
+                .claim("sid", sessionId)   // session fingerprint
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key)
@@ -51,24 +56,28 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parser()
+    private Claims getClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
 
-        return claims.getSubject();
+    public String getEmailFromToken(String token) {
+        return getClaims(token).getSubject();
     }
 
     public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        return getClaims(token).get("role", String.class);
+    }
 
-        return claims.get("role", String.class);
+    /**
+     * Extracts the session ID embedded in the JWT at login time.
+     * Returns null if claim is absent (e.g. old tokens issued before this feature).
+     */
+    public String getSessionIdFromToken(String token) {
+        return getClaims(token).get("sid", String.class);
     }
 
     public boolean validateToken(String token) {

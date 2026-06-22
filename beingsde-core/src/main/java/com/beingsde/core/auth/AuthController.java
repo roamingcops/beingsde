@@ -8,6 +8,7 @@ import com.beingsde.core.auth.dto.ResetPasswordRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,15 +24,18 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final PasswordResetEmailService emailService;
+    private final SessionStore sessionStore;
 
     public AuthController(UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
                           JwtTokenProvider tokenProvider,
-                          PasswordResetEmailService emailService) {
+                          PasswordResetEmailService emailService,
+                          SessionStore sessionStore) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.emailService = emailService;
+        this.sessionStore = sessionStore;
     }
 
     @PostMapping("/register")
@@ -72,7 +76,12 @@ public class AuthController {
                     .body(Map.of("message", "Invalid email or password"));
         }
 
-        String accessToken = tokenProvider.generateAccessToken(user.getEmail(), user.getRole().name());
+        // Generate a unique session fingerprint and store it in Redis.
+        // This overwrites any existing session, kicking out other active devices.
+        String sessionId = UUID.randomUUID().toString();
+        sessionStore.save(user.getEmail(), sessionId);
+
+        String accessToken = tokenProvider.generateAccessToken(user.getEmail(), user.getRole().name(), sessionId);
         String refreshToken = tokenProvider.generateRefreshToken(user.getEmail());
 
         return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken, user.getRole().name()));
@@ -88,6 +97,18 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+    }
+
+    /**
+     * Logs out the currently authenticated user by removing their session from Redis.
+     * Their JWT will be rejected on the next request.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal String email) {
+        if (email != null) {
+            sessionStore.invalidate(email);
+        }
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
     /**
