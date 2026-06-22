@@ -295,4 +295,9 @@ public class InterviewService {
 
         return saved;
     }
+
+    public void testCleanup() {
+        profileRepo.deleteAll();
+        interviewRepo.deleteAll();
+    }
 }

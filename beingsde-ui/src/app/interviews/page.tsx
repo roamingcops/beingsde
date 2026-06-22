@@ -29,7 +29,7 @@ const EXPERIENCE_LEVELS = ["ENTRY_LEVEL", "MID_LEVEL", "SENIOR", "STAFF"];
 function InfoTooltip({ text }: { text: string }) {
   return (
     <div className="group relative inline-block ml-1.5 cursor-pointer align-middle">
-      <HelpCircle className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 hover:text-zinc-500 dark:hover:text-zinc-450 transition-colors" />
+      <HelpCircle className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 hover:text-zinc-500 dark:hover:text-zinc-400 transition-colors" />
       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 text-3xs font-mono leading-relaxed bg-zinc-950 dark:bg-zinc-800 text-zinc-100 dark:text-zinc-200 border border-zinc-800 rounded shadow-md z-30 pointer-events-none select-none text-center">
         {text}
         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-950 dark:border-t-zinc-800" />
@@ -125,16 +125,20 @@ export default function InterviewsPage() {
 
       if (profileRes.ok) {
         const p: Profile = await profileRes.json();
-        setProfile(p);
-        setName(p.name || "");
-        setExperienceLevel(p.experienceLevel || "");
-        setBio(p.bio || "");
-        setCalendlyLink(p.calendlyLink || "");
-        setIsAvailable(p.isAvailable);
-        setAvailabilitySlots(p.availabilitySlots || []);
-        setAvailabilityText(p.availabilityText || "");
-        if (p.topics) {
-          setTopicsInput(p.topics.join(", "));
+        const normalized = {
+          ...p,
+          isAvailable: p.isAvailable ?? (p as any).available
+        };
+        setProfile(normalized);
+        setName(normalized.name || "");
+        setExperienceLevel(normalized.experienceLevel || "");
+        setBio(normalized.bio || "");
+        setCalendlyLink(normalized.calendlyLink || "");
+        setIsAvailable(normalized.isAvailable);
+        setAvailabilitySlots(normalized.availabilitySlots || []);
+        setAvailabilityText(normalized.availabilityText || "");
+        if (normalized.topics) {
+          setTopicsInput(normalized.topics.join(", "));
         }
       } else {
         // No profile yet, keep inputs clean
@@ -195,7 +199,11 @@ export default function InterviewsPage() {
         setError(data.detail || data.message || "Failed to save profile");
       } else {
         const updated: Profile = await res.json();
-        setProfile(updated);
+        const normalized = {
+          ...updated,
+          isAvailable: updated.isAvailable ?? (updated as any).available
+        };
+        setProfile(normalized);
         setSuccessMsg("Interviewer profile updated successfully!");
         setTimeout(() => setSuccessMsg(""), 3000);
         // Refresh directory to reflect updates
@@ -218,7 +226,7 @@ export default function InterviewsPage() {
       headers: { Authorization: `Bearer ${token}` },
     });
     setIsAvailable(false);
-    if (profile) setProfile({ ...profile, isAvailable: false });
+    if (profile) setProfile({ ...profile, isAvailable: false, available: false } as any);
     setSuccessMsg("You have stopped offering mock interviews.");
     setTimeout(() => setSuccessMsg(""), 3000);
     // Refresh directory
@@ -399,75 +407,69 @@ export default function InterviewsPage() {
         
         {/* Left Column: Interviewer Panel */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <section className={`relative overflow-hidden border p-6 rounded-lg transition-all duration-300 shadow-sm ${
+          <section className={`relative overflow-hidden border p-5 rounded-xl transition-all duration-350 shadow-md ${
             isAvailable 
-              ? "border-emerald-500/20 dark:border-emerald-500/10 bg-white dark:bg-zinc-900/60" 
-              : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/30"
-          }`}>
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800/80 mb-6">
-              <div className="flex flex-col">
-                <h2 className="text-sm font-bold tracking-tight text-zinc-800 dark:text-zinc-200">
+              ? "border-emerald-500/25 dark:border-emerald-500/15 bg-white/70 dark:bg-zinc-900/60" 
+              : "border-zinc-200/80 dark:border-zinc-800/80 bg-white/40 dark:bg-zinc-900/30"
+          } backdrop-blur-sm`}>
+            
+            <div className="flex items-center justify-between pb-3.5 border-b border-zinc-100 dark:border-zinc-800/80 mb-4 relative z-10">
+              <div>
+                <h2 className="text-sm font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-1.5">
                   Interviewer Console
                 </h2>
-                <span className="text-3xs font-mono text-zinc-400">Offer mock interviews to candidates</span>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <span className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 flex items-center">
-                  Offer interviews
-                  <InfoTooltip text="Toggle ON to list your profile in the public mock interview directory." />
+              <label className="flex items-center gap-2 cursor-pointer select-none relative">
+                <span className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500">
+                  Online
                 </span>
-                <div className="relative">
+                <div className="relative w-8 h-4.5">
                   <input
                     type="checkbox"
                     checked={isAvailable}
                     onChange={(e) => setIsAvailable(e.target.checked)}
-                    className="sr-only peer"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 peer"
                   />
-                  <div className="w-9 h-5 rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-200 dark:bg-zinc-800 peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 peer-checked:border-emerald-600 dark:peer-checked:border-emerald-500 transition-colors" />
-                  <div className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 peer-checked:translate-x-4 peer-checked:border-emerald-500 transition-all shadow-sm" />
+                  <div className="w-8 h-4.5 rounded-full border border-zinc-300 dark:border-zinc-700 bg-zinc-250 dark:bg-zinc-800 peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 peer-checked:border-emerald-600 dark:peer-checked:border-emerald-500 transition-colors" />
+                  <div className="absolute top-0.5 left-0.5 w-3.5 h-3.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 peer-checked:translate-x-3.5 peer-checked:border-emerald-500 transition-all shadow-sm" />
                 </div>
               </label>
             </div>
 
             {/* Profile Statistics Widgets */}
             {profile && (
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-zinc-50/50 dark:bg-zinc-950/20 p-3.5 rounded-lg border border-zinc-100 dark:border-zinc-800/60">
-                  <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Sessions Conducted</span>
-                  <span className="text-md font-extrabold text-zinc-800 dark:text-zinc-100">
-                    {profile.interviewsConducted}
-                  </span>
+              <div className="flex items-center justify-around py-1.5 px-3 bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-100 dark:border-zinc-800/50 rounded-lg mb-4 text-3xs text-zinc-500 dark:text-zinc-400 font-mono relative z-10">
+                <div>
+                  Conducted: <strong className="text-zinc-700 dark:text-zinc-300">{profile.interviewsConducted}</strong>
                 </div>
-                <div className="bg-zinc-50/50 dark:bg-zinc-950/20 p-3.5 rounded-lg border border-zinc-100 dark:border-zinc-800/60">
-                  <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Average Rating</span>
-                  <span className="text-md font-extrabold text-zinc-800 dark:text-zinc-100 flex items-center gap-1">
-                    {profile.averageRating ? `${profile.averageRating} ★` : "New"}
-                  </span>
+                <div className="w-px h-3 bg-zinc-200 dark:bg-zinc-800" />
+                <div className="flex items-center gap-1">
+                  Rating: <strong className="text-zinc-700 dark:text-zinc-300">{profile.averageRating ? `${profile.averageRating} ★` : "New"}</strong>
                 </div>
               </div>
             )}
 
             {/* Edit Form */}
-            <div className="flex flex-col gap-4 relative z-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Name</label>
+            <div className="flex flex-col gap-3.5 relative z-10">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500">Name</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
+                    className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:text-zinc-100"
                     placeholder="Your name"
                   />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Experience Level</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500">Level</label>
                   <select
                     value={experienceLevel}
                     onChange={(e) => setExperienceLevel(e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:bg-zinc-900"
+                    className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:bg-zinc-900 dark:text-zinc-100"
                   >
                     <option value="" className="dark:bg-zinc-900">Select level</option>
                     {EXPERIENCE_LEVELS.map((level) => (
@@ -479,87 +481,55 @@ export default function InterviewsPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400 flex items-center">
-                  Booking Link
-                  <InfoTooltip text="Link your scheduling page (Calendly, Cal.com) or click to auto-generate a persistent Jitsi room link." />
+              <div className="flex flex-col gap-1">
+                <label className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500 flex items-center justify-between">
+                  <span>Booking Link</span>
+                  <InfoTooltip text="Link your Calendly, Cal.com scheduling page. Signup links: calendly.com / cal.com" />
                 </label>
-                <input
-                  type="url"
-                  value={calendlyLink}
-                  onChange={(e) => setCalendlyLink(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
-                  placeholder="https://calendly.com/your-link or Cal.com scheduler link"
-                />
-                <div className="flex flex-wrap gap-2 mt-1">
+                <div className="relative flex items-center">
+                  <input
+                    type="url"
+                    value={calendlyLink}
+                    onChange={(e) => setCalendlyLink(e.target.value)}
+                    className="w-full pl-2.5 pr-20 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:text-zinc-100"
+                    placeholder="https://calendly.com/your-username"
+                  />
                   <button
                     type="button"
                     onClick={() => {
                       const cleanName = (name || "user").toLowerCase().replace(/[^a-z0-9]/g, "-");
                       setCalendlyLink(`https://meet.jit.si/beingsde-interviews-${cleanName}-${Math.floor(1000 + Math.random() * 9000)}`);
                     }}
-                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-350 dark:border-zinc-700 hover:border-zinc-500 dark:hover:border-zinc-400 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors"
+                    className="absolute right-1.5 text-[9px] font-bold font-mono uppercase tracking-wider bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 px-2 py-0.5 rounded transition-colors cursor-pointer"
                   >
                     + Jitsi Link
                   </button>
-                  <a
-                    href="https://calendly.com/signup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-350 dark:border-zinc-700 hover:border-zinc-500 dark:hover:border-zinc-400 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
-                  >
-                    Calendly <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                  <a
-                    href="https://cal.com/signup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-3xs font-semibold font-mono border border-dashed border-zinc-350 dark:border-zinc-700 hover:border-zinc-500 dark:hover:border-zinc-400 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-355 px-2 py-1 rounded-md transition-colors inline-flex items-center gap-1"
-                  >
-                    Cal.com <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400 flex items-center">
-                  Topics
+              <div className="flex flex-col gap-1">
+                <label className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500 flex items-center justify-between">
+                  <span>Topics</span>
                   <InfoTooltip text="Enter mock interview topics you cover, separated by commas (e.g. Caching, Sharding)." />
                 </label>
                 <input
                   type="text"
                   value={topicsInput}
                   onChange={(e) => setTopicsInput(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
-                  placeholder="Redis, Kafka, Load Balancing"
+                  className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:text-zinc-100"
+                  placeholder="Redis, Kafka (comma-separated)"
                 />
-                {topicsInput && (
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {topicsInput
-                      .split(",")
-                      .map((t) => t.trim())
-                      .filter(Boolean)
-                      .map((topic) => (
-                        <span
-                          key={topic}
-                          className="text-3xs font-mono px-2 py-0.5 border border-zinc-200 dark:border-zinc-800 text-zinc-500 bg-zinc-100 dark:bg-zinc-800 rounded-sm"
-                        >
-                          {topic}
-                        </span>
-                      ))}
-                  </div>
-                )}
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400 flex items-center">
-                  Availability Preferences
-                  <InfoTooltip text="Select the time periods you are free, and describe custom slots/hours in the text box." />
+              <div className="flex flex-col gap-1">
+                <label className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500 flex items-center justify-between">
+                  <span>Availability</span>
+                  <InfoTooltip text="Select the general slots you are free, and describe custom details below." />
                 </label>
-                <div className="flex flex-wrap gap-2 p-2 bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-150 dark:border-zinc-800 rounded-md">
+                <div className="grid grid-cols-3 gap-1.5 mb-0.5">
                   {[
-                    { label: "Weekdays Morning", value: "WEEKDAYS_MORNING" },
-                    { label: "Weekdays Evening", value: "WEEKDAYS_EVENING" },
+                    { label: "Weekdays AM", value: "WEEKDAYS_MORNING" },
+                    { label: "Weekdays PM", value: "WEEKDAYS_EVENING" },
                     { label: "Weekends", value: "WEEKENDS" },
                   ].map((s) => {
                     const active = availabilitySlots.includes(s.value);
@@ -574,10 +544,10 @@ export default function InterviewsPage() {
                             setAvailabilitySlots((prev) => [...prev, s.value]);
                           }
                         }}
-                        className={`text-3xs font-semibold px-2 py-1 border rounded-full transition-all select-none ${
+                        className={`text-[9px] font-bold uppercase tracking-wider py-1.5 rounded-md border text-center transition-all select-none cursor-pointer ${
                           active
-                            ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold"
-                            : "bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-400 dark:hover:border-zinc-700"
+                            ? "bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold"
+                            : "bg-transparent border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:border-zinc-500 dark:hover:border-zinc-700"
                         }`}
                       >
                         {active ? "✓ " : "+ "} {s.label}
@@ -589,22 +559,22 @@ export default function InterviewsPage() {
                   type="text"
                   value={availabilityText}
                   onChange={(e) => setAvailabilityText(e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
+                  className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md dark:text-zinc-100"
                   placeholder="e.g. Saturdays 10 AM - 4 PM EST"
                 />
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400 flex items-center">
-                  Bio / Focus
+              <div className="flex flex-col gap-1">
+                <label className="text-3xs font-bold uppercase tracking-wider font-mono text-zinc-400 dark:text-zinc-500 flex items-center justify-between">
+                  <span>Bio / Focus</span>
                   <InfoTooltip text="A brief bio of your system design background, expertise, or typical mock structure." />
                 </label>
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors resize-none rounded-md"
-                  placeholder="System design focus..."
+                  className="w-full px-2.5 py-1.5 border border-zinc-200 dark:border-zinc-800 bg-transparent text-xs focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors resize-none rounded-md dark:text-zinc-100"
+                  placeholder="Describe your system design experience and focus..."
                 />
               </div>
             </div>
@@ -622,18 +592,18 @@ export default function InterviewsPage() {
               <path d="M28,68 C32,66 33,70 31,72 Z" fill="currentColor" opacity="0.5" />
             </svg>
 
-            <div className="flex items-center gap-3 mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+            <div className="flex items-center gap-3 mt-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/80">
               <button
                 onClick={saveProfile}
                 disabled={saving}
-                className="flex-1 text-xs font-semibold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-4 py-2 border border-zinc-950 dark:border-zinc-50 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300 disabled:opacity-50 rounded-md shadow-sm"
+                className="flex-1 text-xs font-semibold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-4 py-2 border border-zinc-950 dark:border-zinc-50 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300 disabled:opacity-50 rounded-md shadow-sm cursor-pointer"
               >
                 {saving ? "Saving..." : "Save Profile"}
               </button>
               {profile?.isAvailable && (
                 <button
                   onClick={stopOffering}
-                  className="text-xs font-semibold uppercase tracking-wider bg-transparent text-red-500 border border-red-200 dark:border-red-950 px-4 py-2 hover:border-red-500 rounded-md transition-colors"
+                  className="text-xs font-semibold uppercase tracking-wider bg-transparent text-red-500 border border-red-200 dark:border-red-950/60 px-4 py-2 hover:border-red-500 rounded-md transition-colors cursor-pointer"
                 >
                   Stop offering
                 </button>
@@ -766,7 +736,7 @@ export default function InterviewsPage() {
                           rel="noopener noreferrer"
                           className="flex-1 inline-flex items-center justify-center gap-1.5 text-3xs font-bold uppercase tracking-wider bg-transparent text-zinc-800 dark:text-zinc-200 px-3 py-2 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-950 dark:hover:border-zinc-300 rounded-md transition-colors"
                         >
-                          Book via Calendly / Custom Link
+                          Book via Calendly
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
@@ -1090,7 +1060,7 @@ function InterviewRow({
       {interview.status === "COMPLETED" && interview.feedbackNotes && (
         <div className="mt-2.5 p-3 bg-zinc-100/50 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-md">
           <span className="text-3xs font-mono font-bold uppercase text-zinc-400 block mb-1">Feedback from Interviewer</span>
-          <p className="text-xs text-zinc-600 dark:text-zinc-450 italic leading-relaxed">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 italic leading-relaxed">
             &ldquo;{interview.feedbackNotes}&rdquo;
           </p>
         </div>

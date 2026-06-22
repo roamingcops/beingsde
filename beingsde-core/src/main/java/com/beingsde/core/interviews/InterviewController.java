@@ -192,4 +192,10 @@ public class InterviewController {
                     .body(Map.of("message", "Failed to process webhook: " + e.getMessage()));
         }
     }
+
+    @DeleteMapping("/test/cleanup")
+    public ResponseEntity<?> testCleanup() {
+        interviewService.testCleanup();
+        return ResponseEntity.ok(Map.of("message", "Test database cleared"));
+    }
 }
