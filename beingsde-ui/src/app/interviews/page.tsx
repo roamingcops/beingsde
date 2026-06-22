@@ -481,13 +481,13 @@ export default function InterviewsPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Calendly Link</label>
+                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Scheduling Link (Calendly, Cal.com, etc.)</label>
                 <input
                   type="url"
                   value={calendlyLink}
                   onChange={(e) => setCalendlyLink(e.target.value)}
                   className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md"
-                  placeholder="https://calendly.com/your-link"
+                  placeholder="https://calendly.com/your-link or Cal.com scheduler link"
                 />
               </div>
 
@@ -617,7 +617,7 @@ export default function InterviewsPage() {
                           rel="noopener noreferrer"
                           className="flex-1 inline-flex items-center justify-center gap-1.5 text-3xs font-bold uppercase tracking-wider bg-transparent text-zinc-800 dark:text-zinc-200 px-3 py-2 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-950 dark:hover:border-zinc-300 rounded-md transition-colors"
                         >
-                          Book via Calendly
+                          Book via Calendly / Custom Link
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}

@@ -5,6 +5,8 @@ import com.beingsde.core.auth.UserRepository;
 import com.beingsde.core.interviews.dto.ProfileRequest;
 import com.beingsde.core.interviews.dto.ProfileResponse;
 import com.beingsde.core.interviews.dto.InterviewResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -14,16 +16,21 @@ import java.util.UUID;
 @Service
 public class InterviewService {
 
+    private static final Logger log = LoggerFactory.getLogger(InterviewService.class);
+
     private final InterviewerProfileRepository profileRepo;
     private final InterviewRepository interviewRepo;
     private final UserRepository userRepo;
+    private final InterviewEmailService emailService;
 
     public InterviewService(InterviewerProfileRepository profileRepo,
                             InterviewRepository interviewRepo,
-                            UserRepository userRepo) {
+                            UserRepository userRepo,
+                            InterviewEmailService emailService) {
         this.profileRepo = profileRepo;
         this.interviewRepo = interviewRepo;
         this.userRepo = userRepo;
+        this.emailService = emailService;
     }
 
     private User resolveUser(String email) {
@@ -163,6 +170,11 @@ public class InterviewService {
     public Interview handleCalendlyWebhook(String interviewerEmail, String candidateId,
                                            String topic, Instant scheduledTime, String meetingLink) {
         User interviewer = resolveUser(interviewerEmail);
+        User candidate = userRepo.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Candidate not found: " + candidateId));
+
+        String meetLink = meetingLink != null && !meetingLink.isBlank() ? meetingLink : 
+                "https://meet.jit.si/beingsde-mock-interview-" + UUID.randomUUID().toString().substring(0, 8);
 
         Interview interview = Interview.builder()
                 .interviewerId(interviewer.getId())
@@ -170,11 +182,20 @@ public class InterviewService {
                 .topic(topic)
                 .status(InterviewStatus.SCHEDULED)
                 .scheduledAt(scheduledTime)
-                .meetingLink(meetingLink)
+                .meetingLink(meetLink)
                 .createdAt(Instant.now())
                 .build();
 
-        return interviewRepo.save(interview);
+        Interview saved = interviewRepo.save(interview);
+
+        try {
+            emailService.sendBookingEmailToCandidate(candidate.getEmail(), candidate.getName(), interviewer.getName(), topic, scheduledTime, meetLink);
+            emailService.sendBookingEmailToInterviewer(interviewer.getEmail(), interviewer.getName(), candidate.getName(), topic, scheduledTime, meetLink);
+        } catch (Exception e) {
+            log.error("Failed to send webhook email notifications: {}", e.getMessage());
+        }
+
+        return saved;
     }
 
     public Interview bookInterview(String email, String profileId, String topic, Instant scheduledAt, String meetingLink) {
@@ -187,7 +208,7 @@ public class InterviewService {
         }
 
         String meetLink = meetingLink != null && !meetingLink.isBlank() ? meetingLink : 
-                "https://meet.google.com/mock-" + UUID.randomUUID().toString().substring(0, 8);
+                "https://meet.jit.si/beingsde-mock-interview-" + UUID.randomUUID().toString().substring(0, 8);
 
         Interview interview = Interview.builder()
                 .interviewerId(profile.getUserId())
@@ -199,7 +220,19 @@ public class InterviewService {
                 .createdAt(Instant.now())
                 .build();
 
-        return interviewRepo.save(interview);
+        Interview saved = interviewRepo.save(interview);
+
+        User interviewer = userRepo.findById(profile.getUserId())
+                .orElseThrow(() -> new RuntimeException("Interviewer user not found"));
+
+        try {
+            emailService.sendBookingEmailToCandidate(candidate.getEmail(), candidate.getName(), interviewer.getName(), topic, scheduledAt, meetLink);
+            emailService.sendBookingEmailToInterviewer(interviewer.getEmail(), interviewer.getName(), candidate.getName(), topic, scheduledAt, meetLink);
+        } catch (Exception e) {
+            log.error("Failed to send booking email notifications: {}", e.getMessage());
+        }
+
+        return saved;
     }
 
     public Interview cancelInterview(String interviewId, String email) {
@@ -212,7 +245,23 @@ public class InterviewService {
         }
 
         interview.setStatus(InterviewStatus.CANCELLED);
-        return interviewRepo.save(interview);
+        Interview saved = interviewRepo.save(interview);
+
+        try {
+            User interviewer = userRepo.findById(interview.getInterviewerId()).orElse(null);
+            User candidate = userRepo.findById(interview.getCandidateId()).orElse(null);
+            if (interviewer != null && candidate != null) {
+                if (user.getId().equals(candidate.getId())) {
+                    emailService.sendCancellationEmail(interviewer.getEmail(), candidate.getName(), interview.getTopic(), interview.getScheduledAt(), "Candidate");
+                } else {
+                    emailService.sendCancellationEmail(candidate.getEmail(), interviewer.getName(), interview.getTopic(), interview.getScheduledAt(), "Interviewer");
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to send cancellation email notifications: {}", e.getMessage());
+        }
+
+        return saved;
     }
 
     public Interview submitFeedback(String interviewId, String email, Integer score, String notes) {
@@ -227,6 +276,17 @@ public class InterviewService {
         interview.setFeedbackScore(score);
         interview.setFeedbackNotes(notes);
         interview.setStatus(InterviewStatus.COMPLETED);
-        return interviewRepo.save(interview);
+        Interview saved = interviewRepo.save(interview);
+
+        try {
+            User candidate = userRepo.findById(interview.getCandidateId()).orElse(null);
+            if (candidate != null) {
+                emailService.sendFeedbackEmail(candidate.getEmail(), candidate.getName(), user.getName(), interview.getTopic(), score, notes);
+            }
+        } catch (Exception e) {
+            log.error("Failed to send feedback email notification: {}", e.getMessage());
+        }
+
+        return saved;
     }
 }
