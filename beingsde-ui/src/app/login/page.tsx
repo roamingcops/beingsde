@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { KeyRound, Mail, AlertTriangle } from "lucide-react";
+import { KeyRound, Mail, AlertTriangle, CheckCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,6 +11,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [isPasswordReset, setIsPasswordReset] = useState(false);
+
+  const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("registered") === "true") {
+        setTimeout(() => setIsRegistered(true), 0);
+      }
+      if (params.get("reset") === "true") {
+        setTimeout(() => setIsPasswordReset(true), 0);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +34,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8081/api/v1/auth/login", {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,6 +75,22 @@ export default function LoginPage() {
           <h1 className="text-2xl font-black tracking-tight">Access Workbench</h1>
           <p className="text-xs text-zinc-500">Sign in to sync your system design logs.</p>
         </div>
+
+        {/* Registration Success Callout */}
+        {isRegistered && !error && (
+          <div className="flex gap-2.5 items-start p-3 text-xs bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-sm dark:bg-emerald-950/20 dark:border-emerald-900/50">
+            <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>Registration successful! Please sign in with your credentials.</span>
+          </div>
+        )}
+
+        {/* Password Reset Success Callout */}
+        {isPasswordReset && !isRegistered && !error && (
+          <div className="flex gap-2.5 items-start p-3 text-xs bg-sky-50 border border-sky-200 text-sky-700 rounded-sm dark:bg-sky-950/20 dark:border-sky-900/50">
+            <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>Password updated successfully! Sign in with your new password.</span>
+          </div>
+        )}
 
         {/* Error Callout */}
         {error && (
