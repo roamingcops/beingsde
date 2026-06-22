@@ -5,6 +5,7 @@ import com.beingsde.core.auth.UserRepository;
 import com.beingsde.core.interviews.dto.ProfileRequest;
 import com.beingsde.core.interviews.dto.ProfileResponse;
 import com.beingsde.core.interviews.dto.InterviewResponse;
+import com.beingsde.core.billing.SubscriptionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,18 @@ public class InterviewService {
     private final InterviewRepository interviewRepo;
     private final UserRepository userRepo;
     private final InterviewEmailService emailService;
+    private final SubscriptionRepository subscriptionRepo;
 
     public InterviewService(InterviewerProfileRepository profileRepo,
                             InterviewRepository interviewRepo,
                             UserRepository userRepo,
-                            InterviewEmailService emailService) {
+                            InterviewEmailService emailService,
+                            SubscriptionRepository subscriptionRepo) {
         this.profileRepo = profileRepo;
         this.interviewRepo = interviewRepo;
         this.userRepo = userRepo;
         this.emailService = emailService;
+        this.subscriptionRepo = subscriptionRepo;
     }
 
     private User resolveUser(String email) {
@@ -299,6 +303,7 @@ public class InterviewService {
     public void testCleanup() {
         profileRepo.deleteAll();
         interviewRepo.deleteAll();
+        subscriptionRepo.deleteAll();
         // Reset test user role to FREE_USER for checkout tests
         userRepo.findByEmail("testuser@beingsde.com").ifPresent(user -> {
             user.setRole(com.beingsde.core.auth.UserRole.FREE_USER);

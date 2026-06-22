@@ -13,7 +13,7 @@ test.describe("Razorpay Payment Integration & Sandbox Simulation Flow", () => {
     await page.waitForURL("**/topics");
   });
 
-  test("should successfully purchase subscription via sandbox payment simulator", async ({ page }) => {
+  test("should successfully purchase subscription via sandbox payment simulator and cancel it", async ({ page }) => {
     // Navigate to Subscriptions page
     await page.goto("/subscriptions");
     await expect(page.locator("h1")).toHaveText("Structured Pricing Plans");
@@ -35,5 +35,25 @@ test.describe("Razorpay Payment Integration & Sandbox Simulation Flow", () => {
     // Verify success alert message
     const successMsg = page.locator("text=Payment successful! Sandbox user upgraded to Premium tier.");
     await expect(successMsg).toBeVisible();
+
+    // Wait for auto-reload to fetch new status
+    await page.waitForTimeout(2500);
+
+    // Verify Active Subscription status panel appears
+    const activeSubHeading = page.locator("text=Active Premium Subscription");
+    await expect(activeSubHeading).toBeVisible();
+
+    // Click "Cancel Subscription" button
+    const cancelBtn = page.locator('button:has-text("Cancel Subscription")');
+    await expect(cancelBtn).toBeVisible();
+    await cancelBtn.click();
+
+    // Verify cancellation success message
+    const cancelSuccessMsg = page.locator("text=Subscription cancelled successfully. Auto-pay has been disabled.");
+    await expect(cancelSuccessMsg).toBeVisible();
+
+    // Verify status panel changes to Cancelled Subscription (Pending Expiry)
+    const cancelledSubHeading = page.locator("text=Cancelled Subscription (Pending Expiry)");
+    await expect(cancelledSubHeading).toBeVisible();
   });
 });

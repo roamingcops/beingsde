@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Star, Users, ExternalLink, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
 
@@ -11,13 +11,38 @@ export default function SubscriptionsPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   
+  // Subscription info
+  const [subscription, setSubscription] = useState<{
+    status: string;
+    tier: string;
+    autoRenew: boolean;
+    expiresAt: string;
+  } | null>(null);
+
   // Sandbox simulations
   const [showSimulateModal, setShowSimulateModal] = useState(false);
   const [simulatedOrder, setSimulatedOrder] = useState<{
-    orderId: string;
+    subscriptionId: string;
     amount: number;
     currency: string;
   } | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    sessionAwareFetch(`${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "")}/api/v1/payments/subscription`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (res && res.ok) return res.json();
+      })
+      .then((data) => {
+        if (data) setSubscription(data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleCheckout = async (planId: string) => {
     setError("");
@@ -32,7 +57,7 @@ export default function SubscriptionsPage() {
     }
 
     try {
-      const res = await sessionAwareFetch(`${API_BASE}/razorpay/order`, {
+      const res = await sessionAwareFetch(`${API_BASE}/razorpay/subscription`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +68,7 @@ export default function SubscriptionsPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.message || "Failed to create checkout order.");
+        setError(data.message || "Failed to create subscription checkout.");
         setLoading(false);
         return;
       }
@@ -53,7 +78,7 @@ export default function SubscriptionsPage() {
       if (orderData.keyId === "rzp_test_placeholder") {
         // Simulation Mode (Local Dev/Sandbox)
         setSimulatedOrder({
-          orderId: orderData.orderId,
+          subscriptionId: orderData.subscriptionId,
           amount: orderData.amount,
           currency: orderData.currency,
         });
@@ -63,11 +88,9 @@ export default function SubscriptionsPage() {
         // Live Razorpay script overlay flow
         const options = {
           key: orderData.keyId,
-          amount: orderData.amount,
-          currency: orderData.currency,
+          subscription_id: orderData.subscriptionId,
           name: "beingsde.com",
           description: "Premium Pass subscription",
-          order_id: orderData.orderId,
           handler: async function (response: any) {
             setLoading(true);
             try {
@@ -78,12 +101,15 @@ export default function SubscriptionsPage() {
                   Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                  orderId: response.razorpay_order_id,
+                  subscriptionId: response.razorpay_subscription_id,
                   paymentId: response.razorpay_payment_id,
                   signature: response.razorpay_signature,
                 }),
               });
               if (verifyRes.ok) {
+                const verifyData = await verifyRes.json();
+                localStorage.setItem("accessToken", verifyData.accessToken);
+                localStorage.setItem("userRole", verifyData.role);
                 setSuccess("Payment successful! Your account has been upgraded to Premium.");
                 setTimeout(() => window.location.reload(), 2000);
               } else {
@@ -109,7 +135,7 @@ export default function SubscriptionsPage() {
       }
 
     } catch {
-      setError("Network error creating payment order.");
+      setError("Network error creating subscription checkout.");
       setLoading(false);
     }
   };
@@ -131,13 +157,16 @@ export default function SubscriptionsPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          orderId: simulatedOrder.orderId,
+          subscriptionId: simulatedOrder.subscriptionId,
           paymentId: mockPaymentId,
           signature: mockSignature,
         }),
       });
 
       if (verifyRes.ok) {
+        const verifyData = await verifyRes.json();
+        localStorage.setItem("accessToken", verifyData.accessToken);
+        localStorage.setItem("userRole", verifyData.role);
         setSuccess("Payment successful! Sandbox user upgraded to Premium tier.");
         setTimeout(() => window.location.reload(), 2000);
       } else {
@@ -146,6 +175,34 @@ export default function SubscriptionsPage() {
       }
     } catch {
       setError("Network error validating simulated payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    const token = localStorage.getItem("accessToken");
+    try {
+      const res = await sessionAwareFetch(`${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "")}/api/v1/payments/subscription/cancel`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        setSuccess("Subscription cancelled successfully. Auto-pay has been disabled.");
+        setSubscription((prev) => prev ? { ...prev, autoRenew: false, status: "CANCELLED" } : null);
+      } else {
+        const data = await res.json();
+        setError(data.message || "Failed to cancel subscription.");
+      }
+    } catch {
+      setError("Network error cancelling subscription.");
     } finally {
       setLoading(false);
     }
@@ -175,6 +232,44 @@ export default function SubscriptionsPage() {
         <div className="w-full max-w-3xl flex gap-2.5 items-start p-4 text-sm border border-emerald-200 dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 rounded-md animate-pulse">
           <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" />
           <span>{success}</span>
+        </div>
+      )}
+
+      {/* Active Subscription Info */}
+      {subscription && subscription.status === "ACTIVE" && (
+        <div className="w-full max-w-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <CheckCircle className="w-4.5 h-4.5 text-emerald-500 shrink-0" />
+              Active Premium Subscription
+            </h3>
+            <p className="text-xs text-zinc-500">
+              Auto-renew (Auto-pay) is <span className="font-semibold text-emerald-600 dark:text-emerald-400">ON</span>. 
+              Billing period ends: <span className="font-mono">{new Date(subscription.expiresAt).toLocaleDateString()}</span>.
+            </p>
+          </div>
+          <button
+            onClick={handleCancelSubscription}
+            disabled={loading}
+            className="text-xs font-semibold bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Cancel Subscription
+          </button>
+        </div>
+      )}
+
+      {subscription && subscription.status === "CANCELLED" && (
+        <div className="w-full max-w-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <AlertCircle className="w-4.5 h-4.5 text-zinc-400 shrink-0" />
+              Cancelled Subscription (Pending Expiry)
+            </h3>
+            <p className="text-xs text-zinc-500">
+              Auto-renew is <span className="font-semibold text-red-600">OFF</span>. 
+              Your Premium access will remain active until: <span className="font-mono">{new Date(subscription.expiresAt).toLocaleDateString()}</span>.
+            </p>
+          </div>
         </div>
       )}
 
@@ -269,13 +364,15 @@ export default function SubscriptionsPage() {
           <div className="flex flex-col gap-3">
             <button
               onClick={() => handleCheckout("PREMIUM_1M")}
-              disabled={loading}
+              disabled={loading || (subscription && subscription.status === "ACTIVE")}
               className="w-full text-xs font-semibold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-4 py-3 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300 disabled:opacity-50 cursor-pointer rounded-md shadow-sm"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-1.5">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" /> Upgrading...
                 </span>
+              ) : subscription && subscription.status === "ACTIVE" ? (
+                "Subscribed (Auto-pay)"
               ) : (
                 "Upgrade to Premium"
               )}
@@ -335,13 +432,13 @@ export default function SubscriptionsPage() {
             </div>
 
             <div className="bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-150 dark:border-zinc-800 p-3 rounded-md text-3xs text-zinc-650 dark:text-zinc-400 font-mono flex flex-col gap-1.5">
-              <div>Order ID: <strong>{simulatedOrder.orderId}</strong></div>
+              <div>Subscription ID: <strong>{simulatedOrder.subscriptionId}</strong></div>
               <div>Amount: <strong>₹{(simulatedOrder.amount / 100).toLocaleString("en-IN")}</strong></div>
               <div>Currency: <strong>{simulatedOrder.currency}</strong></div>
             </div>
 
             <p className="text-xs text-zinc-500 leading-relaxed">
-              This is a sandbox simulation to test the full checkout and signature verification flow. Clicking "Simulate Success" will make a mock call to our signature verification API.
+              This is a sandbox simulation to test the full checkout and subscription verification flow. Clicking "Simulate Success" will make a mock call to our subscription verification API.
             </p>
 
             <div className="flex items-center justify-end gap-3 mt-4">
