@@ -238,7 +238,7 @@ export default function SubscriptionsPage() {
               <p className="text-xs text-zinc-550">Unlimited preparation for Staff+ roles.</p>
             </div>
             <div className="text-3xl font-black mt-2">
-              ₹2,999 <span className="text-xs font-normal text-zinc-400 font-mono">/ Month (Razorpay)</span>
+              ₹999 <span className="text-xs font-normal text-zinc-400 font-mono">/ Month (Razorpay)</span>
             </div>
 
             {/* Features */}

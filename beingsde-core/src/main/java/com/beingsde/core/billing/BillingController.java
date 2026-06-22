@@ -51,7 +51,7 @@ public class BillingController {
     @PostMapping("/razorpay/order")
     public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> request) {
         String planId = (String) request.getOrDefault("planId", "PREMIUM_1M");
-        long amountInPaise = "PREMIUM_1M".equals(planId) ? 299900L : 999900L; // 2999 INR vs 9999 INR
+        long amountInPaise = "PREMIUM_1M".equals(planId) ? 99900L : 999900L; // 999 INR vs 9999 INR
 
         String currentUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepo.findByEmail(currentUserEmail)
@@ -164,7 +164,7 @@ public class BillingController {
                                     .razorpayOrderId(orderId != null ? orderId : "")
                                     .razorpayPaymentId(paymentId)
                                     .razorpaySignature(signature)
-                                    .amountInPaise(entityObj.optLong("amount", 299900L))
+                                    .amountInPaise(entityObj.optLong("amount", 99900L))
                                     .currency(entityObj.optString("currency", "INR"))
                                     .status("CAPTURED")
                                     .paymentMethod(method)
@@ -227,7 +227,7 @@ public class BillingController {
                     .orElseGet(() -> Payment.builder()
                             .userId(user.getId())
                             .razorpayOrderId(orderId)
-                            .amountInPaise(299900L)
+                            .amountInPaise(99900L)
                             .currency("INR")
                             .createdAt(Instant.now())
                             .build());
