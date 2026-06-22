@@ -505,6 +505,26 @@ export default function InterviewsPage() {
                     + Jitsi Link
                   </button>
                 </div>
+                <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-zinc-400 dark:text-zinc-550">
+                  <span>Sign up:</span>
+                  <a
+                    href="https://calendly.com/signup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors inline-flex items-center gap-0.5"
+                  >
+                    Calendly <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                  <span>•</span>
+                  <a
+                    href="https://cal.com/signup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors inline-flex items-center gap-0.5"
+                  >
+                    Cal.com <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1">
