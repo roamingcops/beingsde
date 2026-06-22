@@ -44,7 +44,7 @@ export default function RootLayout({
               <Link href="/subscriptions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Subscriptions
               </Link>
-              <Link href="/mock-interviews" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+              <Link href="/interviews" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Mock Interviews
               </Link>
             </nav>
