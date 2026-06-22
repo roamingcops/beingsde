@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, BookOpen, Layers, Users, Zap } from "lucide-react";
 
 export default function LandingPage() {
@@ -86,40 +87,16 @@ export default function LandingPage() {
           <span className="flex items-center gap-1.5 text-xs text-zinc-400"><Layers className="w-3.5 h-3.5" /> High-Level Design (HLD)</span>
         </div>
 
-        {/* Dynamic Architectural SVG Diagram */}
-        <div className="w-full overflow-x-auto py-4 flex justify-center">
-          <svg width="600" height="150" viewBox="0 0 600 150" className="fill-none stroke-zinc-900 dark:stroke-zinc-100 overflow-visible">
-            
-            {/* Box 1: Client */}
-            <rect x="20" y="45" width="80" height="60" rx="3" strokeWidth="1.5" />
-            <text x="60" y="80" textAnchor="middle" className="fill-zinc-900 dark:fill-zinc-100 font-mono text-xs font-semibold">Client</text>
-            
-            {/* Arrow 1 */}
-            <path className="animate-scribble" strokeWidth="1" d="M100,75 L160,75 M150,70 L160,75 L150,80" />
-            
-            {/* Box 2: API Gateway */}
-            <rect x="170" y="45" width="100" height="60" rx="3" strokeWidth="1.5" />
-            <text x="220" y="80" textAnchor="middle" className="fill-zinc-900 dark:fill-zinc-100 font-mono text-xs font-semibold">ALB / Gateway</text>
-            
-            {/* Arrow 2 (Fork) */}
-            <path className="animate-scribble" strokeWidth="1" d="M270,75 L330,75 M320,70 L330,75 L320,80" />
-            
-            {/* Box 3: Core Monolith */}
-            <rect x="340" y="45" width="110" height="60" rx="3" strokeWidth="1.5" />
-            <text x="395" y="80" textAnchor="middle" className="fill-zinc-900 dark:fill-zinc-100 font-mono text-xs font-semibold">beingsde-core</text>
-            
-            {/* Arrow 3 (Split path to Cache & DB) */}
-            <path className="animate-scribble" strokeWidth="1" d="M450,60 C470,40 480,30 500,30 L500,30 M495,27 L500,30 L495,35" />
-            <path className="animate-scribble" strokeWidth="1" d="M450,90 C470,110 480,120 500,120 L500,120 M495,115 L500,120 L495,125" />
-
-            {/* Cache Node */}
-            <rect x="500" y="10" width="80" height="40" rx="3" strokeWidth="1.5" />
-            <text x="540" y="35" textAnchor="middle" className="fill-zinc-900 dark:fill-zinc-100 font-mono text-2xs">Redis Cache</text>
-
-            {/* Database Node */}
-            <rect x="500" y="100" width="80" height="40" rx="3" strokeWidth="1.5" />
-            <text x="540" y="125" textAnchor="middle" className="fill-zinc-900 dark:fill-zinc-100 font-mono text-2xs">MongoDB</text>
-          </svg>
+        {/* Scribble System Design Image */}
+        <div className="w-full overflow-hidden rounded-sm">
+          <Image
+            src="/hld-scribble.png"
+            alt="Hand-drawn HLD diagram showing Client → ALB/Gateway → beingsde-core → Redis Cache & MongoDB"
+            width={1024}
+            height={512}
+            className="w-full h-auto object-contain"
+            priority
+          />
         </div>
       </section>
 
