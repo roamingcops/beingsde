@@ -505,24 +505,22 @@ export default function InterviewsPage() {
                     + Jitsi Link
                   </button>
                 </div>
-                <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-zinc-400 dark:text-zinc-550">
-                  <span>Sign up:</span>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
                   <a
                     href="https://calendly.com/signup"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors inline-flex items-center gap-0.5"
+                    className="text-[9px] font-bold font-mono uppercase tracking-wider border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-550 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-0.5 rounded transition-colors inline-flex items-center gap-1"
                   >
-                    Calendly <ExternalLink className="w-2.5 h-2.5" />
+                    Get Calendly <ExternalLink className="w-2.5 h-2.5" />
                   </a>
-                  <span>•</span>
                   <a
                     href="https://cal.com/signup"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors inline-flex items-center gap-0.5"
+                    className="text-[9px] font-bold font-mono uppercase tracking-wider border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-550 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-0.5 rounded transition-colors inline-flex items-center gap-1"
                   >
-                    Cal.com <ExternalLink className="w-2.5 h-2.5" />
+                    Get Cal.com <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 </div>
               </div>
@@ -756,7 +754,13 @@ export default function InterviewsPage() {
                           rel="noopener noreferrer"
                           className="flex-1 inline-flex items-center justify-center gap-1.5 text-3xs font-bold uppercase tracking-wider bg-transparent text-zinc-800 dark:text-zinc-200 px-3 py-2 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-950 dark:hover:border-zinc-300 rounded-md transition-colors"
                         >
-                          Book via Calendly
+                          {p.calendlyLink.includes("calendly.com")
+                            ? "Book via Calendly"
+                            : p.calendlyLink.includes("cal.com")
+                            ? "Book via Cal.com"
+                            : p.calendlyLink.includes("jit.si")
+                            ? "Join Jitsi Room"
+                            : "Book Session"}
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}

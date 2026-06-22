@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Interviewer Directory E2E Flow", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, request }) => {
+    // Clean up test database before each test run
+    await request.delete("http://localhost:8081/api/v1/interviews/test/cleanup");
+
     await page.goto("/login");
     await page.fill("#email-input", "testuser@beingsde.com");
     await page.fill("#password-input", "testuser123");
