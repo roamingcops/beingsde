@@ -49,11 +49,7 @@ export default function TermsOfServicePage() {
           <li>You must provide accurate, current, and complete information during registration.</li>
           <li>You are responsible for maintaining the confidentiality of your credentials.</li>
           <li>You are responsible for all activity that occurs under your account.</li>
-          <li>You must notify us immediately at{" "}
-            <a href="mailto:support@beingsde.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-              support@beingsde.com
-            </a>{" "}if you suspect unauthorised access to your account.
-          </li>
+          <li>You must notify us immediately if you suspect unauthorised access to your account.</li>
           <li>We reserve the right to terminate accounts that contain false information or that violate these Terms.</li>
         </ul>
       </Section>
@@ -70,10 +66,7 @@ export default function TermsOfServicePage() {
           <li>
             <strong>Refund Policy:</strong> You may request a full refund within <strong>7 days</strong> of
             your initial subscription purchase if you are not satisfied. Renewals are non-refundable.
-            To request a refund, contact{" "}
-            <a href="mailto:billing@beingsde.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-              billing@beingsde.com
-            </a>.
+            To request a refund, contact us via our Support page.
           </li>
           <li>We reserve the right to change pricing with 30 days&apos; notice. Price changes will not affect the current billing period of existing subscribers.</li>
         </ul>
@@ -149,11 +142,7 @@ export default function TermsOfServicePage() {
 
       <Section title="11. Contact">
         <p>
-          Questions about these Terms? Contact us at{" "}
-          <a href="mailto:legal@beingsde.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-            legal@beingsde.com
-          </a>{" "}
-          or visit our{" "}
+          Questions about these Terms? Visit our{" "}
           <Link href="/support" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
             Support page
           </Link>.

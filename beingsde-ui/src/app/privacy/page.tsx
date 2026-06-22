@@ -101,10 +101,10 @@ export default function PrivacyPolicyPage() {
           <li>Object to or restrict certain processing activities.</li>
         </ul>
         <p>
-          To exercise any of these rights, email us at{" "}
-          <a href="mailto:privacy@beingsde.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-            privacy@beingsde.com
-          </a>.
+          To exercise any of these rights, visit our{" "}
+          <Link href="/support" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+            Support page
+          </Link>.
         </p>
       </Section>
 
@@ -126,11 +126,7 @@ export default function PrivacyPolicyPage() {
 
       <Section title="10. Contact Us">
         <p>
-          If you have questions or concerns about this Privacy Policy, please reach out to us at{" "}
-          <a href="mailto:privacy@beingsde.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-            privacy@beingsde.com
-          </a>{" "}
-          or visit our{" "}
+          If you have questions or concerns about this Privacy Policy, please visit our{" "}
           <Link href="/support" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
             Support page
           </Link>.
