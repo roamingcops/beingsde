@@ -11,6 +11,8 @@ public class ProfileRequest {
     private String bio;
     private String calendlyLink;
     private boolean isAvailable;
+    private List<String> availabilitySlots;
+    private String availabilityText;
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -24,4 +26,8 @@ public class ProfileRequest {
     public void setCalendlyLink(String calendlyLink) { this.calendlyLink = calendlyLink; }
     public boolean isAvailable() { return isAvailable; }
     public void setAvailable(boolean available) { isAvailable = available; }
+    public List<String> getAvailabilitySlots() { return availabilitySlots; }
+    public void setAvailabilitySlots(List<String> availabilitySlots) { this.availabilitySlots = availabilitySlots; }
+    public String getAvailabilityText() { return availabilityText; }
+    public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
 }

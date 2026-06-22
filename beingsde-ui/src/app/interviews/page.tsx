@@ -36,6 +36,8 @@ interface Profile {
   createdAt: string;
   averageRating: number | null;
   interviewsConducted: number;
+  availabilitySlots?: string[];
+  availabilityText?: string;
 }
 
 interface Interview {
@@ -71,10 +73,13 @@ export default function InterviewsPage() {
   const [bio, setBio] = useState("");
   const [calendlyLink, setCalendlyLink] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
+  const [availabilitySlots, setAvailabilitySlots] = useState<string[]>([]);
+  const [availabilityText, setAvailabilityText] = useState("");
 
   // Search & Filter
   const [dirSearch, setDirSearch] = useState("");
   const [dirLevel, setDirLevel] = useState("");
+  const [dirSlot, setDirSlot] = useState("");
 
   // Booking Modal
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -113,6 +118,8 @@ export default function InterviewsPage() {
         setBio(p.bio || "");
         setCalendlyLink(p.calendlyLink || "");
         setIsAvailable(p.isAvailable);
+        setAvailabilitySlots(p.availabilitySlots || []);
+        setAvailabilityText(p.availabilityText || "");
         if (p.topics) {
           setTopicsInput(p.topics.join(", "));
         }
@@ -156,6 +163,8 @@ export default function InterviewsPage() {
       bio,
       calendlyLink,
       available: isAvailable,
+      availabilitySlots,
+      availabilityText,
     };
 
     try {
@@ -301,6 +310,9 @@ export default function InterviewsPage() {
   const filteredDirectory = directory.filter((p) => {
     const matchLevel = !dirLevel || p.experienceLevel === dirLevel;
     if (!matchLevel) return false;
+
+    const matchSlot = !dirSlot || (p.availabilitySlots && p.availabilitySlots.includes(dirSlot));
+    if (!matchSlot) return false;
 
     if (!dirSearch) return true;
     const query = dirSearch.toLowerCase();
@@ -522,6 +534,40 @@ export default function InterviewsPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Availability Preferences</label>
+                <div className="flex flex-wrap gap-3 p-3 bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-150 dark:border-zinc-800 rounded-md">
+                  {[
+                    { label: "Weekdays (Mornings)", value: "WEEKDAYS_MORNING" },
+                    { label: "Weekdays (Evenings)", value: "WEEKDAYS_EVENING" },
+                    { label: "Weekends", value: "WEEKENDS" },
+                  ].map((s) => (
+                    <label key={s.value} className="flex items-center gap-2 text-xs text-zinc-650 dark:text-zinc-400 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={availabilitySlots.includes(s.value)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAvailabilitySlots((prev) => [...prev, s.value]);
+                          } else {
+                            setAvailabilitySlots((prev) => prev.filter((val) => val !== s.value));
+                          }
+                        }}
+                        className="rounded border-zinc-350 dark:border-zinc-700 bg-transparent focus:ring-0 text-zinc-900"
+                      />
+                      <span>{s.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={availabilityText}
+                  onChange={(e) => setAvailabilityText(e.target.value)}
+                  className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-500 dark:focus:border-zinc-400 transition-colors rounded-md"
+                  placeholder="Custom slots/hours (e.g. Saturdays 10 AM - 4 PM EST)"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <label className="text-2xs font-bold uppercase tracking-wider font-mono text-zinc-400">Bio</label>
                 <textarea
                   value={bio}
@@ -588,6 +634,16 @@ export default function InterviewsPage() {
                   </option>
                 ))}
               </select>
+              <select
+                value={dirSlot}
+                onChange={(e) => setDirSlot(e.target.value)}
+                className="px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 transition-colors rounded-md dark:bg-zinc-900"
+              >
+                <option value="" className="dark:bg-zinc-900">All Slots</option>
+                <option value="WEEKDAYS_MORNING" className="dark:bg-zinc-900">Weekdays (Mornings)</option>
+                <option value="WEEKDAYS_EVENING" className="dark:bg-zinc-900">Weekdays (Evenings)</option>
+                <option value="WEEKENDS" className="dark:bg-zinc-900">Weekends</option>
+              </select>
             </div>
 
             {filteredDirectory.length === 0 ? (
@@ -636,6 +692,26 @@ export default function InterviewsPage() {
 
                       {p.bio && (
                         <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{p.bio}</p>
+                      )}
+
+                      {((p.availabilitySlots && p.availabilitySlots.length > 0) || p.availabilityText) && (
+                        <div className="flex flex-col gap-1 mt-1 p-2 bg-zinc-100/50 dark:bg-zinc-950/20 border border-zinc-200/40 dark:border-zinc-800/40 rounded-md">
+                          <span className="text-3xs font-mono font-bold uppercase text-zinc-400 flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5" /> Availability
+                          </span>
+                          <span className="text-3xs text-zinc-500 font-medium">
+                            {p.availabilitySlots && p.availabilitySlots.length > 0 && (
+                              <span className="capitalize block mb-0.5 font-mono">
+                                {p.availabilitySlots.map(s => s.toLowerCase().replace("_", " ")).join(", ")}
+                              </span>
+                            )}
+                            {p.availabilityText && (
+                              <span className="italic block text-zinc-400">
+                                {p.availabilityText}
+                              </span>
+                            )}
+                          </span>
+                        </div>
                       )}
                     </div>
 
@@ -766,6 +842,22 @@ export default function InterviewsPage() {
                 Simulate a live design interview with <strong className="text-zinc-700 dark:text-zinc-300">{selectedProfile.name}</strong>
               </span>
             </div>
+
+            {((selectedProfile.availabilitySlots && selectedProfile.availabilitySlots.length > 0) || selectedProfile.availabilityText) && (
+              <div className="bg-zinc-50 dark:bg-zinc-950/20 border border-zinc-150 dark:border-zinc-800 p-3 rounded-md text-3xs text-zinc-500">
+                <span className="font-bold text-zinc-400 block uppercase font-mono mb-1">Interviewer Availability</span>
+                {selectedProfile.availabilitySlots && selectedProfile.availabilitySlots.length > 0 && (
+                  <div className="capitalize font-mono mb-0.5">
+                    Slots: {selectedProfile.availabilitySlots.map(s => s.toLowerCase().replace("_", " ")).join(", ")}
+                  </div>
+                )}
+                {selectedProfile.availabilityText && (
+                  <div className="italic text-zinc-400">
+                    Hours: {selectedProfile.availabilityText}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex flex-col gap-3.5 mt-2">
               <div className="flex flex-col gap-1">

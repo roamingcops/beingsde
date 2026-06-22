@@ -16,12 +16,14 @@ public class ProfileResponse {
     private Instant createdAt;
     private Double averageRating;
     private Integer interviewsConducted;
+    private List<String> availabilitySlots;
+    private String availabilityText;
 
     public ProfileResponse() {}
 
     public ProfileResponse(String id, String name, List<String> topics, ExperienceLevel experienceLevel,
                            String bio, String calendlyLink, boolean isAvailable, Instant createdAt,
-                           Double averageRating, Integer interviewsConducted) {
+                           Double averageRating, Integer interviewsConducted, List<String> availabilitySlots, String availabilityText) {
         this.id = id;
         this.name = name;
         this.topics = topics;
@@ -32,6 +34,8 @@ public class ProfileResponse {
         this.createdAt = createdAt;
         this.averageRating = averageRating;
         this.interviewsConducted = interviewsConducted;
+        this.availabilitySlots = availabilitySlots;
+        this.availabilityText = availabilityText;
     }
 
     public String getId() { return id; }
@@ -54,6 +58,10 @@ public class ProfileResponse {
     public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
     public Integer getInterviewsConducted() { return interviewsConducted; }
     public void setInterviewsConducted(Integer interviewsConducted) { this.interviewsConducted = interviewsConducted; }
+    public List<String> getAvailabilitySlots() { return availabilitySlots; }
+    public void setAvailabilitySlots(List<String> availabilitySlots) { this.availabilitySlots = availabilitySlots; }
+    public String getAvailabilityText() { return availabilityText; }
+    public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
 
     public static ProfileResponse fromProfile(com.beingsde.core.interviews.InterviewerProfile profile, Double averageRating, Integer interviewsConducted) {
         return new ProfileResponse(
@@ -66,7 +74,9 @@ public class ProfileResponse {
                 profile.isAvailable(),
                 profile.getCreatedAt(),
                 averageRating,
-                interviewsConducted
+                interviewsConducted,
+                profile.getAvailabilitySlots(),
+                profile.getAvailabilityText()
         );
     }
 }

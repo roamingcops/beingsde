@@ -29,6 +29,10 @@ public class InterviewerProfile {
 
     private boolean isAvailable;
 
+    private List<String> availabilitySlots;
+
+    private String availabilityText;
+
     @CreatedDate
     private Instant createdAt;
 
@@ -37,7 +41,7 @@ public class InterviewerProfile {
 
     public InterviewerProfile(String id, String userId, String name, List<String> topics,
                               ExperienceLevel experienceLevel, String bio, String calendlyLink,
-                              boolean isAvailable, Instant createdAt) {
+                              boolean isAvailable, List<String> availabilitySlots, String availabilityText, Instant createdAt) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -46,6 +50,8 @@ public class InterviewerProfile {
         this.bio = bio;
         this.calendlyLink = calendlyLink;
         this.isAvailable = isAvailable;
+        this.availabilitySlots = availabilitySlots;
+        this.availabilityText = availabilityText;
         this.createdAt = createdAt;
     }
 
@@ -65,6 +71,10 @@ public class InterviewerProfile {
     public void setCalendlyLink(String calendlyLink) { this.calendlyLink = calendlyLink; }
     public boolean isAvailable() { return isAvailable; }
     public void setAvailable(boolean available) { isAvailable = available; }
+    public List<String> getAvailabilitySlots() { return availabilitySlots; }
+    public void setAvailabilitySlots(List<String> availabilitySlots) { this.availabilitySlots = availabilitySlots; }
+    public String getAvailabilityText() { return availabilityText; }
+    public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
@@ -81,6 +91,8 @@ public class InterviewerProfile {
         private String bio;
         private String calendlyLink;
         private boolean isAvailable;
+        private List<String> availabilitySlots;
+        private String availabilityText;
         private Instant createdAt;
 
         InterviewerProfileBuilder() {}
@@ -93,10 +105,12 @@ public class InterviewerProfile {
         public InterviewerProfileBuilder bio(String bio) { this.bio = bio; return this; }
         public InterviewerProfileBuilder calendlyLink(String calendlyLink) { this.calendlyLink = calendlyLink; return this; }
         public InterviewerProfileBuilder isAvailable(boolean isAvailable) { this.isAvailable = isAvailable; return this; }
+        public InterviewerProfileBuilder availabilitySlots(List<String> availabilitySlots) { this.availabilitySlots = availabilitySlots; return this; }
+        public InterviewerProfileBuilder availabilityText(String availabilityText) { this.availabilityText = availabilityText; return this; }
         public InterviewerProfileBuilder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
 
         public InterviewerProfile build() {
-            return new InterviewerProfile(id, userId, name, topics, experienceLevel, bio, calendlyLink, isAvailable, createdAt);
+            return new InterviewerProfile(id, userId, name, topics, experienceLevel, bio, calendlyLink, isAvailable, availabilitySlots, availabilityText, createdAt);
         }
     }
 }

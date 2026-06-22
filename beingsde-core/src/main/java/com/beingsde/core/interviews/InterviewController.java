@@ -88,12 +88,13 @@ public class InterviewController {
     @GetMapping("/directory")
     public ResponseEntity<?> getDirectory(
             @RequestParam(required = false) String topic,
-            @RequestParam(required = false) String experienceLevel) {
+            @RequestParam(required = false) String experienceLevel,
+            @RequestParam(required = false) String slot) {
         String email = getCurrentUserEmail();
         ResponseEntity<?> accessError = checkPremiumAccess(email);
         if (accessError != null) return accessError;
 
-        List<ProfileResponse> directory = interviewService.getDirectory(topic, experienceLevel);
+        List<ProfileResponse> directory = interviewService.getDirectory(topic, experienceLevel, slot);
         return ResponseEntity.ok(directory);
     }
 

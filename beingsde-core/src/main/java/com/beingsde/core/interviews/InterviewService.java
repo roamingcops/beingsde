@@ -114,6 +114,8 @@ public class InterviewService {
         profile.setBio(request.getBio());
         profile.setCalendlyLink(request.getCalendlyLink());
         profile.setAvailable(request.isAvailable());
+        profile.setAvailabilitySlots(request.getAvailabilitySlots());
+        profile.setAvailabilityText(request.getAvailabilityText());
 
         InterviewerProfile saved = profileRepo.save(profile);
         return mapProfileToResponse(saved);
@@ -134,26 +136,30 @@ public class InterviewService {
         profileRepo.save(profile);
     }
 
-    public List<ProfileResponse> getDirectory(String topic, String experienceLevel) {
-        List<InterviewerProfile> profiles;
-
-        boolean hasTopic = topic != null && !topic.isBlank();
-        boolean hasLevel = experienceLevel != null && !experienceLevel.isBlank();
-
-        if (hasTopic && hasLevel) {
-            ExperienceLevel level = ExperienceLevel.valueOf(experienceLevel.toUpperCase());
-            profiles = profileRepo.findByIsAvailableTrueAndTopicsInAndExperienceLevel(
-                    List.of(topic), level);
-        } else if (hasTopic) {
-            profiles = profileRepo.findByIsAvailableTrueAndTopicsIn(List.of(topic));
-        } else if (hasLevel) {
-            ExperienceLevel level = ExperienceLevel.valueOf(experienceLevel.toUpperCase());
-            profiles = profileRepo.findByIsAvailableTrueAndExperienceLevel(level);
-        } else {
-            profiles = profileRepo.findByIsAvailableTrue();
-        }
+    public List<ProfileResponse> getDirectory(String topic, String experienceLevel, String slot) {
+        List<InterviewerProfile> profiles = profileRepo.findByIsAvailableTrue();
 
         return profiles.stream()
+                .filter(p -> {
+                    if (topic != null && !topic.isBlank()) {
+                        return p.getTopics() != null && p.getTopics().stream()
+                                .anyMatch(t -> t.equalsIgnoreCase(topic.trim()));
+                    }
+                    return true;
+                })
+                .filter(p -> {
+                    if (experienceLevel != null && !experienceLevel.isBlank()) {
+                        return p.getExperienceLevel() != null && p.getExperienceLevel().name().equalsIgnoreCase(experienceLevel.trim());
+                    }
+                    return true;
+                })
+                .filter(p -> {
+                    if (slot != null && !slot.isBlank()) {
+                        return p.getAvailabilitySlots() != null && p.getAvailabilitySlots().stream()
+                                .anyMatch(s -> s.equalsIgnoreCase(slot.trim()));
+                    }
+                    return true;
+                })
                 .map(this::mapProfileToResponse)
                 .toList();
     }
