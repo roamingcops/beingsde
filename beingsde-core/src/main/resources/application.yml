@@ -27,7 +27,7 @@ app:
     key-id: ${RAZORPAY_KEY_ID:rzp_test_placeholder}
     key-secret: ${RAZORPAY_KEY_SECRET:placeholder_secret}
     webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:webhook_secret_placeholder}
-  base-url: ${APP_BASE_URL:https://beingsde.vercel.app}
+  base-url: ${APP_BASE_URL:https://beingsde.in}
   resend:
     api-key: ${RESEND_API_KEY:re_QMfqx5ve_GkkqgeqRGHKCDtKPefexeHLp}
     from-address: ${RESEND_FROM_ADDRESS:onboarding@resend.dev}
