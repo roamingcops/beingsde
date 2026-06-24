@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download } from "lucide-react";
 
@@ -11,9 +11,16 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
   const slug = resolvedParams.slug;
   
   const [activeTab, setActiveTab] = useState<"notes" | "video" | "pdf">("notes");
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    setIsPremiumUser(role === "PREMIUM_USER" || role === "ADMIN");
+  }, []);
 
   // Retrieve topic info matching slug
   const topic = MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1];
+  const isLocked = topic.isPremium && !isPremiumUser;
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto py-4">
@@ -50,7 +57,7 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
       </section>
 
       {/* CORE WORKSPACE SECTION */}
-      {topic.isPremium ? (
+      {isLocked ? (
         
         /* LOCKED PREMIUM OVERLAY */
         <section className="relative w-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-10 rounded-md shadow-sm min-h-[400px] flex flex-col items-center justify-center text-center gap-6 overflow-hidden">
