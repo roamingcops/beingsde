@@ -21,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -83,10 +84,7 @@ public class BillingController {
                 razorpayOrderId = order.get("id");
             }
 
-            // Deduplicate: remove any existing subscriptions for this user
-            subscriptionRepo.findAll().stream()
-                    .filter(s -> user.getId().equals(s.getUserId()))
-                    .forEach(subscriptionRepo::delete);
+            // Keep existing subscriptions intact for history
 
             Payment payment = Payment.builder()
                     .userId(user.getId())
@@ -135,10 +133,7 @@ public class BillingController {
                 razorpaySubscriptionId = subscription.get("id");
             }
 
-            // Deduplicate: remove any existing subscriptions for this user
-            subscriptionRepo.findAll().stream()
-                    .filter(s -> user.getId().equals(s.getUserId()))
-                    .forEach(subscriptionRepo::delete);
+            // Keep existing subscriptions intact for history
 
             // Create a pending subscription in MongoDB
             Subscription subscription = Subscription.builder()
@@ -172,9 +167,9 @@ public class BillingController {
         User user = userRepo.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
 
-        Optional<Subscription> subOpt = subscriptionRepo.findByUserId(user.getId());
-        if (subOpt.isPresent()) {
-            Subscription sub = subOpt.get();
+        List<Subscription> subs = subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        if (!subs.isEmpty()) {
+            Subscription sub = subs.get(0);
             return ResponseEntity.ok(Map.of(
                     "status", sub.getStatus(),
                     "tier", sub.getTier(),
@@ -193,8 +188,11 @@ public class BillingController {
         User user = userRepo.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
 
-        Subscription sub = subscriptionRepo.findByUserId(user.getId())
-                .orElseThrow(() -> new RuntimeException("Active subscription not found for user"));
+        List<Subscription> subs = subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        Subscription sub = subs.isEmpty() ? null : subs.get(0);
+        if (sub == null) {
+            throw new RuntimeException("Active subscription not found for user");
+        }
 
         if (!"ACTIVE".equals(sub.getStatus())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -217,6 +215,21 @@ public class BillingController {
         subscriptionRepo.save(sub);
 
         return ResponseEntity.ok(Map.of("message", "Subscription auto-renewal has been cancelled. Premium access remains active until the end of your billing cycle."));
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<?> getBillingHistory() {
+        String currentUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepo.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
+
+        List<Subscription> subscriptions = subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        List<Payment> payments = paymentRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+
+        return ResponseEntity.ok(Map.of(
+                "subscriptions", subscriptions,
+                "payments", payments
+        ));
     }
 
     @PostMapping("/razorpay/webhook")
@@ -436,10 +449,7 @@ public class BillingController {
             user.setRole(UserRole.PREMIUM_USER);
             userRepo.save(user);
 
-            // Deduplicate: remove any existing subscriptions for this user
-            subscriptionRepo.findAll().stream()
-                    .filter(s -> userId.equals(s.getUserId()))
-                    .forEach(subscriptionRepo::delete);
+            // Keep existing subscriptions intact for history
 
             // Save Subscription record
             Subscription subscription = Subscription.builder()

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, Star, Users, ExternalLink, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { Check, Star, Users, ExternalLink, AlertCircle, CheckCircle, Loader2, Calendar, Clock, CreditCard, History } from "lucide-react";
 import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1/payments";
@@ -19,6 +19,32 @@ export default function SubscriptionsPage() {
     expiresAt: string;
   } | null>(null);
 
+  // History info
+  const [history, setHistory] = useState<{
+    subscriptions: Array<{
+      id: string;
+      tier: string;
+      status: string;
+      razorpaySubscriptionId: string;
+      startedAt: string;
+      expiresAt: string;
+      autoRenew: boolean;
+      createdAt: string;
+    }>;
+    payments: Array<{
+      id: string;
+      razorpayPaymentId: string;
+      razorpayOrderId: string;
+      amountInPaise: number;
+      currency: string;
+      status: string;
+      paymentMethod: string;
+      createdAt: string;
+    }>;
+  } | null>(null);
+
+  const [activeTab, setActiveTab] = useState<"payments" | "subscriptions">("payments");
+
   // Sandbox simulations
   const [showSimulateModal, setShowSimulateModal] = useState(false);
   const [simulatedOrder, setSimulatedOrder] = useState<{
@@ -26,6 +52,24 @@ export default function SubscriptionsPage() {
     amount: number;
     currency: string;
   } | null>(null);
+
+  const fetchHistory = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    try {
+      const res = await sessionAwareFetch(`${(process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "")}/api/v1/payments/history`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res && res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch billing history:", e);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -42,6 +86,8 @@ export default function SubscriptionsPage() {
         if (data) setSubscription(data);
       })
       .catch(() => {});
+
+    fetchHistory();
   }, []);
 
   const handleCheckout = async (planId: string) => {
@@ -197,6 +243,7 @@ export default function SubscriptionsPage() {
       if (res.ok) {
         setSuccess("Subscription cancelled successfully. Auto-pay has been disabled.");
         setSubscription((prev) => prev ? { ...prev, autoRenew: false, status: "CANCELLED" } : null);
+        fetchHistory();
       } else {
         const data = await res.json();
         setError(data.message || "Failed to cancel subscription.");
@@ -416,6 +463,178 @@ export default function SubscriptionsPage() {
           </div>
         </div>
       </section>
+
+      {/* BILLING & SUBSCRIPTION HISTORY */}
+      {history && (
+        <section className="w-full max-w-3xl flex flex-col gap-6 mt-6 border-t border-zinc-200 dark:border-zinc-800 pt-10">
+          <div className="flex flex-col gap-2 text-center mb-2">
+            <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 flex items-center justify-center gap-1.5">
+              <History className="w-4 h-4 text-zinc-400" />
+              Billing & Subscription History
+            </h3>
+            <p className="text-3xs text-zinc-550">
+              Track all your past payments, receipts, and plan changes.
+            </p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex justify-center border-b border-zinc-100 dark:border-zinc-850 gap-6 text-xs font-semibold">
+            <button
+              onClick={() => setActiveTab("payments")}
+              className={`pb-2 transition-all duration-300 relative cursor-pointer ${
+                activeTab === "payments"
+                  ? "text-zinc-900 dark:text-zinc-100 font-bold"
+                  : "text-zinc-400 hover:text-zinc-650"
+              }`}
+            >
+              Payment Log
+              {activeTab === "payments" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-zinc-100 rounded-full" />
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("subscriptions")}
+              className={`pb-2 transition-all duration-300 relative cursor-pointer ${
+                activeTab === "subscriptions"
+                  ? "text-zinc-900 dark:text-zinc-100 font-bold"
+                  : "text-zinc-400 hover:text-zinc-650"
+              }`}
+            >
+              Subscription History
+              {activeTab === "subscriptions" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-zinc-100 rounded-full" />
+              )}
+            </button>
+          </div>
+
+          {/* TAB CONTENTS */}
+          <div className="w-full min-h-[150px] transition-all duration-300">
+            {activeTab === "payments" ? (
+              <div className="overflow-x-auto">
+                {history.payments && history.payments.length > 0 ? (
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-zinc-100 dark:border-zinc-800 text-zinc-450 text-3xs font-mono uppercase tracking-wider">
+                        <th className="py-3 px-2">Date</th>
+                        <th className="py-3 px-2">Transaction ID</th>
+                        <th className="py-3 px-2">Method</th>
+                        <th className="py-3 px-2">Amount</th>
+                        <th className="py-3 px-2 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.payments.map((pmt) => (
+                        <tr
+                          key={pmt.id}
+                          className="border-b border-zinc-100/50 dark:border-zinc-800/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors"
+                        >
+                          <td className="py-3 px-2 text-zinc-600 dark:text-zinc-400 font-mono text-3xs">
+                            {new Date(pmt.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-2 font-mono text-3xs text-zinc-500">
+                            {pmt.razorpayPaymentId || pmt.razorpayOrderId || "N/A"}
+                          </td>
+                          <td className="py-3 px-2 capitalize text-zinc-500 font-mono text-3xs">
+                            {pmt.paymentMethod || "Razorpay"}
+                          </td>
+                          <td className="py-3 px-2 font-bold font-mono text-3xs">
+                            ₹{(pmt.amountInPaise / 100).toLocaleString("en-IN")}
+                          </td>
+                          <td className="py-3 px-2 text-right">
+                            <span
+                              className={`inline-block text-[9px] font-mono px-2 py-0.5 rounded-sm uppercase tracking-wider ${
+                                pmt.status === "CAPTURED"
+                                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-250/20"
+                                  : pmt.status === "PENDING"
+                                  ? "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-250/20"
+                                  : "bg-zinc-105 text-zinc-650 dark:bg-zinc-800/40 dark:text-zinc-400"
+                              }`}
+                            >
+                              {pmt.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center text-3xs text-zinc-450 gap-2 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-md bg-zinc-50/20">
+                    <Clock className="w-5 h-5 text-zinc-300" />
+                    <span>No payment records found.</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                {history.subscriptions && history.subscriptions.length > 0 ? (
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-zinc-100 dark:border-zinc-800 text-zinc-450 text-3xs font-mono uppercase tracking-wider">
+                        <th className="py-3 px-2">Plan</th>
+                        <th className="py-3 px-2">Sub ID</th>
+                        <th className="py-3 px-2">Started At</th>
+                        <th className="py-3 px-2">Expires At</th>
+                        <th className="py-3 px-2">Auto-Renew</th>
+                        <th className="py-3 px-2 text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {history.subscriptions.map((sub) => (
+                        <tr
+                          key={sub.id}
+                          className="border-b border-zinc-100/50 dark:border-zinc-800/40 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors"
+                        >
+                          <td className="py-3 px-2 font-bold text-zinc-800 dark:text-zinc-200 font-mono text-3xs">
+                            {sub.tier}
+                          </td>
+                          <td className="py-3 px-2 font-mono text-3xs text-zinc-500">
+                            {sub.razorpaySubscriptionId || "N/A"}
+                          </td>
+                          <td className="py-3 px-2 text-zinc-500 font-mono text-3xs">
+                            {new Date(sub.startedAt).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 px-2 text-zinc-500 font-mono text-3xs">
+                            {sub.expiresAt ? new Date(sub.expiresAt).toLocaleDateString() : "N/A"}
+                          </td>
+                          <td className="py-3 px-2">
+                            <span
+                              className={`inline-block text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm ${
+                                sub.autoRenew
+                                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400"
+                                  : "bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400"
+                              }`}
+                            >
+                              {sub.autoRenew ? "ON" : "OFF"}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-right">
+                            <span
+                              className={`inline-block text-[9px] font-mono px-2 py-0.5 rounded-sm uppercase tracking-wider ${
+                                sub.status === "ACTIVE"
+                                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 border border-emerald-250/20"
+                                  : sub.status === "PENDING"
+                                  ? "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-250/20"
+                                  : "bg-zinc-105 text-zinc-650 dark:bg-zinc-800/40 dark:text-zinc-400 border border-zinc-200/20"
+                              }`}
+                            >
+                              {sub.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-8 text-center text-3xs text-zinc-450 gap-2 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-md bg-zinc-50/20">
+                    <Calendar className="w-5 h-5 text-zinc-300" />
+                    <span>No subscription history found.</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Checkout Sandbox Simulation Modal */}
       {showSimulateModal && simulatedOrder && (
