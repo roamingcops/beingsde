@@ -4,70 +4,7 @@ import React, { useState, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download } from "lucide-react";
 
-// Mock Fallback Topics list matching database schema topics
-const MOCK_TOPICS = [
-  {
-    id: "60c72b2f9b1d8a234a9e1e21",
-    title: "Design a Distributed Caching System (Redis)",
-    slug: "design-distributed-caching-redis",
-    description: "Learn how to architect a fault-tolerant, horizontally scalable caching cluster.",
-    difficulty: "HARD",
-    category: "High-Level Design",
-    estimatedTimeMinutes: 45,
-    tags: ["Redis", "Caching", "Distributed Systems"],
-    isPremium: true,
-    contentMarkdown: `
-# Architectural Goals
-
-1. **Low Latency**: Read and write response times must stay under 5ms at p99.
-2. **High Write Throughput**: The system must sustain 200,000 write ops/sec.
-3. **Partition Tolerance**: Cache ring data sharding mapping nodes.
-
----
-
-## 1. High-Level Design Overview
-In high scale topologies, a single cache instance runs out of memory limits. We partition key spaces using a Consistent Hashing ring...
-`,
-    prerequisites: ["Consistent Hashing Basic", "TCP Networking"],
-    videoUrl: "https://cdn.beingsde.com/videos/redis_hld_720p.mp4",
-    pdfUrl: "https://cdn.beingsde.com/pdfs/redis_hld_notes.pdf"
-  },
-  {
-    id: "60c72b2f9b1d8a234a9e1e28",
-    title: "Consistent Hashing Basic",
-    slug: "consistent-hashing-basic",
-    description: "Deconstruct routing rings, virtual nodes, and distribution keys.",
-    difficulty: "EASY",
-    category: "Distributed Systems",
-    estimatedTimeMinutes: 20,
-    tags: ["Scaling", "Hashing", "Consistency"],
-    isPremium: false,
-    contentMarkdown: `
-# Core Concepts of Consistent Hashing
-
-Traditional hashing uses the modulo operator: \`hash(key) % N\`, where N is the number of server nodes. 
-This behaves poorly when servers are added or removed, since **almost all keys** re-map to new servers, causing a cache stampede.
-
-Consistent hashing solves this problem by using a shared circular hash ring (e.g., from 0 to $2^{32}-1$).
-
----
-
-## 1. Step-by-Step Distribution
-1. **Hash the Servers**: Hash server IPs and map them to positions on the ring.
-2. **Hash the Keys**: Hash client keys and map them on the same ring.
-3. **Route Requests**: To locate a key's server, travel clockwise from the key's position until you hit the first server node.
-
----
-
-## 2. Virtual Nodes (V-Nodes)
-To prevent hot spots (uneven distribution), we hash each physical server multiple times using offsets (e.g., \`Node1#1\`, \`Node1#2\`). 
-This guarantees a highly uniform key distribution across all active physical servers.
-`,
-    prerequisites: ["Modular Math Basics"],
-    videoUrl: "https://cdn.beingsde.com/videos/consistent_hashing_basic.mp4",
-    pdfUrl: "https://cdn.beingsde.com/pdfs/consistent_hashing.pdf"
-  }
-];
+import MOCK_TOPICS from "@/data/topics.json";
 
 export default function TopicDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);

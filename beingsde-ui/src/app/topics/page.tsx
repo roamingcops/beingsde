@@ -5,53 +5,7 @@ import Link from "next/link";
 import { Search, Filter, BookOpen, Clock, Lock } from "lucide-react";
 import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
 
-// Mock Fallback Topics list matching MongoDB database schema topics
-const MOCK_TOPICS = [
-  {
-    id: "60c72b2f9b1d8a234a9e1e21",
-    title: "Design a Distributed Caching System (Redis)",
-    slug: "design-distributed-caching-redis",
-    description: "Learn how to architect a fault-tolerant, horizontally scalable caching cluster.",
-    difficulty: "HARD",
-    category: "High-Level Design",
-    estimatedTimeMinutes: 45,
-    tags: ["Redis", "Caching", "Distributed Systems"],
-    isPremium: true,
-  },
-  {
-    id: "60c72b2f9b1d8a234a9e1e28",
-    title: "Consistent Hashing Basic",
-    slug: "consistent-hashing-basic",
-    description: "Deconstruct routing rings, virtual nodes, and distribution keys.",
-    difficulty: "EASY",
-    category: "Distributed Systems",
-    estimatedTimeMinutes: 20,
-    tags: ["Scaling", "Hashing", "Consistency"],
-    isPremium: false,
-  },
-  {
-    id: "60c72b2f9b1d8a234a9e1e35",
-    title: "Design a URL Shortener (TinyURL)",
-    slug: "design-url-shortener",
-    description: "Build a high-throughput shortener analyzing base58 encodings and database sharding.",
-    difficulty: "MEDIUM",
-    category: "High-Level Design",
-    estimatedTimeMinutes: 30,
-    tags: ["Database", "Scaling", "Microservices"],
-    isPremium: false,
-  },
-  {
-    id: "60c72b2f9b1d8a234a9e1e40",
-    title: "Event-Driven Scaling with Apache Kafka",
-    slug: "kafka-event-driven-scaling",
-    description: "Deep-dive into partition offsets, producer acknowledgments, and consumer groups.",
-    difficulty: "HARD",
-    category: "Messaging Systems",
-    estimatedTimeMinutes: 50,
-    tags: ["Kafka", "Event Driven", "Microservices"],
-    isPremium: true,
-  }
-];
+import MOCK_TOPICS from "@/data/topics.json";
 
 export default function TopicsExplorer() {
   const [searchQuery, setSearchQuery] = useState("");
