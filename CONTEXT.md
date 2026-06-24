@@ -68,16 +68,19 @@ The application is split into three main modules:
 - **Playwright Setup**: Tests utilize `request.delete()` inside `beforeEach` to reset databases, guaranteeing test isolation and 100% deterministic runs.
 
 ### E. Razorpay Payment & Subscription Integration
-- **Goal**: Allow users to upgrade their accounts from `FREE_USER` to `PREMIUM_USER` using Razorpay subscriptions.
+- **Goal**: Allow users to upgrade their accounts from `FREE_USER` to `PREMIUM_USER` using Razorpay recurring subscriptions (Auto-pay) priced at **₹999/month**.
 - **Backend Flow**:
-  - `POST /api/v1/payments/razorpay/order` generates a payment order ID. For local development, it defaults to a sandbox mode (when API key is `rzp_test_placeholder`).
-  - `POST /api/v1/payments/razorpay/verify` validates the Razorpay checkout signatures. Bypasses check in sandbox simulation.
-  - `POST /api/v1/payments/razorpay/webhook` processes payment captured notifications, auto-matching/upgrading users by email for direct payments made via the hosted checkout page.
+  - `POST /api/v1/payments/razorpay/subscription` creates a plan subscription in Razorpay (or a simulated `sub_sim_*` ID in sandbox mode) with auto-pay active.
+  - `POST /api/v1/payments/razorpay/verify` validates signatures. It generates and returns a fresh JWT access token with the upgraded `PREMIUM_USER` role, allowing immediate frontend state sync.
+  - `POST /api/v1/payments/subscription/cancel` cancels recurring auto-renewals on Razorpay (and in MongoDB), allowing users to retain access until their current billing period expires.
+  - `GET /api/v1/payments/subscription` retrieves the logged-in user's subscription tier, status, auto-renew value, and expiration date.
+  - `POST /api/v1/payments/razorpay/webhook` handles charge capturing, cancelled events, and direct fallback payment page matching by user email.
 - **Frontend Flow**:
-  - The subscriptions view ([subscriptions/page.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/subscriptions/page.tsx)) triggers the inline Razorpay checkout modal or shows an interactive local sandbox simulation popup if local test credentials are used.
-  - Provides a direct hosted payment page backup link pointing to `https://razorpay.me/@beingsde`.
+  - The subscriptions view ([subscriptions/page.tsx](file:///Users/arnavagarwal/beingsde/beingsde-ui/src/app/subscriptions/page.tsx)) displays active/cancelled subscription status cards with a **"Cancel Subscription"** action button.
+  - Triggers Razorpay Checkout overlays using the retrieved `subscription_id` parameter or displays a local sandbox simulator modal.
+  - Provides a direct fallback hosted payment link pointing to `https://razorpay.me/@beingsde`.
 - **E2E Tester**:
-  - [payment-flow.spec.ts](file:///Users/arnavagarwal/beingsde/beingsde-tester/tests/payment-flow.spec.ts) runs a full E2E flow testing the signup, navigating to subscriptions, launching the sandbox payment modal, simulating success, and checking role updates.
+  - [payment-flow.spec.ts](file:///Users/arnavagarwal/beingsde/beingsde-tester/tests/payment-flow.spec.ts) runs a full E2E flow testing signup, subscription checkout, sandbox mock payment success, role change verification, page reload state sync, subscription cancellation, and status switch.
 
 ---
 
