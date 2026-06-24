@@ -94,6 +94,30 @@ export default function RegisterPage() {
         throw new Error(errData.message || "Registration failed. Please try again.");
       }
 
+      // Auto-login immediately
+      try {
+        const loginRes = await fetch(`${API_BASE}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (loginRes.ok) {
+          const loginData = await loginRes.json();
+          localStorage.setItem("accessToken", loginData.accessToken);
+          localStorage.setItem("userRole", loginData.role);
+          localStorage.setItem("userEmail", email);
+          
+          router.push("/topics");
+          router.refresh();
+          return;
+        }
+      } catch (loginErr) {
+        // Log error and fall back to regular login redirection
+        console.error("Auto-login failed:", loginErr);
+      }
+
+      // Fallback redirection to login page with registered flag
       router.push("/login?registered=true");
       router.refresh();
     } catch (err) {
