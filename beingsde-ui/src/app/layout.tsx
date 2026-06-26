@@ -18,32 +18,53 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://beingsde.in"),
   title: {
-    default: "beingsde.in | Master System Design Interviews & Architectures",
+    default: "beingsde.in | #1 System Design Interview Prep Platform",
     template: "%s | beingsde.in"
   },
-  description: "A premium interactive learning platform to master High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and consistent hashing. Ace your FAANG software engineering system design interviews.",
+  description: "beingsde.in is the leading interactive platform to master System Design interviews — HLD, LLD, distributed databases, caching, Kafka, consistent hashing, and sharding. Used by engineers at Google, Amazon, Meta, and top startups.",
   keywords: [
     "beingsde",
     "beingsde.in",
-    "beingsde.com",
-    "system design",
-    "system design interview",
-    "high level design",
-    "low level design",
-    "distributed systems",
-    "system design guide",
+    "being sde",
+    "beingsde system design",
+    "system design interview prep",
+    "system design interview questions",
+    "high level design HLD",
+    "low level design LLD",
+    "distributed systems tutorial",
+    "system design guide 2024",
     "FAANG system design interview",
-    "software engineering scalability"
+    "software engineering scalability",
+    "database sharding tutorial",
+    "consistent hashing explained",
+    "Redis caching architecture",
+    "Kafka event streaming design",
+    "SQL vs NoSQL comparison",
+    "CAP theorem explained",
+    "microservices system design",
+    "load balancing architecture",
+    "rate limiter design",
+    "system design for beginners",
+    "staff engineer interview prep",
+    "principal engineer interview",
+    "system design mock interview",
+    "beingsde interview",
+    "beingsde topics",
+    "beingsde questions"
   ],
-  authors: [{ name: "beingsde Team" }],
+  authors: [{ name: "beingsde Team", url: "https://beingsde.in" }],
   creator: "beingsde",
   publisher: "beingsde",
+  category: "Education",
+  classification: "System Design Interview Preparation",
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
@@ -56,24 +77,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://beingsde.in",
-    title: "beingsde.in | Master System Design Interviews & Architectures",
-    description: "Learn High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and scalable architecture with interactive blueprints.",
-    siteName: "beingsde",
+    title: "beingsde.in | #1 System Design Interview Prep Platform",
+    description: "Master High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and scalable architecture. The most comprehensive system design learning platform for FAANG interviews.",
+    siteName: "beingsde.in",
     images: [
       {
         url: "/images/redis-caching-diagram.png",
         width: 1200,
         height: 630,
-        alt: "beingsde - System Design Architecture Diagrams",
+        alt: "beingsde.in - System Design Architecture Diagrams & Learning Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "beingsde.in | Master System Design",
-    description: "Ace your software engineering system design interviews with interactive hand-drawn blueprints and real-world corporate case studies.",
+    title: "beingsde.in | Master System Design Interviews",
+    description: "The #1 interactive system design prep platform. Learn HLD, LLD, databases, caching, Kafka, consistent hashing with real-world blueprints.",
     images: ["/images/redis-caching-diagram.png"],
     creator: "@beingsde",
+    site: "@beingsde",
   },
 };
 
@@ -99,6 +121,66 @@ export default function RootLayout({
           }}
         />
         <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+        {/* Organization JSON-LD — tells Google this is a real educational brand */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "@id": "https://beingsde.in/#organization",
+                  "name": "beingsde",
+                  "url": "https://beingsde.in",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://beingsde.in/images/redis-caching-diagram.png",
+                    "width": 1200,
+                    "height": 630
+                  },
+                  "description": "beingsde.in is the leading system design interview preparation platform for software engineers. Learn HLD, LLD, distributed systems, caching, and database architecture.",
+                  "sameAs": [
+                    "https://beingsde.com",
+                    "https://beingsde.in"
+                  ]
+                },
+                {
+                  "@type": "WebSite",
+                  "@id": "https://beingsde.in/#website",
+                  "url": "https://beingsde.in",
+                  "name": "beingsde.in",
+                  "description": "The #1 interactive system design interview preparation platform covering HLD, LLD, distributed databases, caching, Kafka, and scalability patterns.",
+                  "publisher": { "@id": "https://beingsde.in/#organization" },
+                  "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": { "@type": "EntryPoint", "urlTemplate": "https://beingsde.in/topics?q={search_term_string}" },
+                    "query-input": "required name=search_term_string"
+                  },
+                  "inLanguage": "en-US"
+                },
+                {
+                  "@type": "EducationalOrganization",
+                  "@id": "https://beingsde.in/#edu",
+                  "name": "beingsde — System Design Academy",
+                  "url": "https://beingsde.in",
+                  "description": "Interactive system design learning for software engineers preparing for FAANG, MAANG, and top-tier tech company interviews.",
+                  "teaches": [
+                    "System Design",
+                    "High Level Design",
+                    "Low Level Design",
+                    "Distributed Systems",
+                    "Database Architecture",
+                    "Caching Strategies",
+                    "Consistent Hashing",
+                    "Kafka Event Streaming",
+                    "Microservices Design"
+                  ]
+                }
+              ]
+            })
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans min-h-full flex flex-col bg-[#fafafa] dark:bg-[#09090b] text-[#09090b] dark:text-[#fafafa] antialiased grid-bg`}

@@ -6,30 +6,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Base routes
   const staticRoutes = [
-    "",
-    "/topics",
-    "/questions",
-    "/cheat-sheet",
-    "/subscriptions",
-    "/interviews",
-    "/login",
-    "/register",
-    "/privacy",
-    "/terms",
-    "/support"
-  ].map((route) => ({
-    url: `${baseUrl}${route}`,
+    { path: "", priority: 1.0 },
+    { path: "/topics", priority: 0.95 },
+    { path: "/questions", priority: 0.90 },
+    { path: "/cheat-sheet", priority: 0.85 },
+    { path: "/interviews", priority: 0.80 },
+    { path: "/subscriptions", priority: 0.75 },
+    { path: "/login", priority: 0.5 },
+    { path: "/register", priority: 0.5 },
+    { path: "/privacy", priority: 0.3 },
+    { path: "/terms", priority: 0.3 },
+    { path: "/support", priority: 0.4 },
+  ].map(({ path, priority }) => ({
+    url: `${baseUrl}${path}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
-    priority: route === "" ? 1.0 : route === "/topics" ? 0.9 : 0.6,
+    priority,
   }));
 
-  // Dynamic topic routes
+  // Dynamic topic routes — high priority (0.85) for all content pages
   const topicRoutes = MOCK_TOPICS.map((topic) => ({
     url: `${baseUrl}/topics/${topic.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
-    priority: 0.8,
+    priority: topic.isPremium ? 0.80 : 0.85,
   }));
 
   return [...staticRoutes, ...topicRoutes];
