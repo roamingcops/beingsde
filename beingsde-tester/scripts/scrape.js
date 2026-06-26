@@ -229,15 +229,45 @@ Options:
       const slug = generateSlug(articleData.title);
       const estimatedTime = Math.max(5, Math.ceil(articleData.wordCount / 200)); // ~200 wpm
       
+      // Determine category based on URL
+      let category = "Core Fundamentals";
+      if (url.includes("/deep-dives/")) {
+        const infraSlugs = ["kafka", "api-gateway", "flink", "zookeeper", "rate-limiter", "job-scheduler", "metrics-monitoring"];
+        if (infraSlugs.some(s => url.includes(s))) {
+          category = "Infrastructure & Messaging";
+        } else {
+          category = "Databases & Storage";
+        }
+      } else if (url.includes("/problem-breakdowns/")) {
+        const storageSlugs = ["distributed-cache", "redis", "cassandra", "dynamodb", "postgresql"];
+        const infraSlugs = ["distributed-rate-limiter", "job-scheduler", "metrics-monitoring"];
+        if (storageSlugs.some(s => url.includes(s))) {
+          category = "Databases & Storage";
+        } else if (infraSlugs.some(s => url.includes(s))) {
+          category = "Infrastructure & Messaging";
+        } else {
+          category = "System Architectures";
+        }
+      }
+
+      // Prepend category to tags if not already present
+      let rawTags = articleData.keywords.filter(k => k !== "Scraped");
+      if (rawTags.length === 0) {
+        rawTags = ["Systems"];
+      }
+      if (!rawTags.includes(category)) {
+        rawTags.unshift(category);
+      }
+
       const newTopic = {
         id: generateObjectId(),
         title: articleData.title,
         slug: slug,
         description: articleData.description,
         difficulty: "MEDIUM", // Default difficulty
-        category: "High-Level Design",
+        category: category,
         estimatedTimeMinutes: estimatedTime,
-        tags: articleData.keywords.length > 0 ? articleData.keywords : ["Scraped", "Systems"],
+        tags: rawTags,
         isPremium: params.premium,
         contentMarkdown: articleData.contentMarkdown,
         prerequisites: [],

@@ -10,6 +10,7 @@ import MOCK_TOPICS from "@/data/topics.json";
 export default function TopicsExplorer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("ALL");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [topics, setTopics] = useState(MOCK_TOPICS);
 
   useEffect(() => {
@@ -32,6 +33,8 @@ export default function TopicsExplorer() {
               const mockMatch = MOCK_TOPICS.find(m => m.slug === t.slug);
               return {
                 ...t,
+                category: mockMatch ? mockMatch.category : t.category,
+                tags: mockMatch ? mockMatch.tags : t.tags,
                 isPremium: mockMatch ? mockMatch.isPremium : true
               };
             });
@@ -53,7 +56,10 @@ export default function TopicsExplorer() {
     const matchesDifficulty = 
       selectedDifficulty === "ALL" || topic.difficulty === selectedDifficulty;
 
-    return matchesSearch && matchesDifficulty;
+    const matchesCategory = 
+      selectedCategory === "ALL" || topic.category === selectedCategory;
+
+    return matchesSearch && matchesDifficulty && matchesCategory;
   });
 
   return (
@@ -67,31 +73,50 @@ export default function TopicsExplorer() {
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input 
-              type="text" 
-              placeholder="Search by topic title or technology (e.g. Redis, Kafka)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors"
-            />
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <input 
+                type="text" 
+                placeholder="Search by topic title or technology (e.g. Redis, Kafka)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] text-sm focus:outline-none focus:border-zinc-900 dark:focus:border-zinc-100 transition-colors"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest hidden sm:inline"><Filter className="w-3.5 h-3.5 inline mr-1" /> Difficulty:</span>
+              {["ALL", "EASY", "MEDIUM", "HARD"].map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setSelectedDifficulty(diff)}
+                  className={`text-2xs font-semibold px-3 py-1.5 border uppercase tracking-wider transition-all duration-300 ${
+                    selectedDifficulty === diff 
+                      ? "bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100" 
+                      : "bg-transparent text-zinc-500 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
+                  }`}
+                >
+                  {diff}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest hidden sm:inline"><Filter className="w-3.5 h-3.5 inline mr-1" /> Filters:</span>
-            {["ALL", "EASY", "MEDIUM", "HARD"].map((diff) => (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest"><Filter className="w-3.5 h-3.5 inline mr-1" /> Category:</span>
+            {["ALL", "Core Fundamentals", "Databases & Storage", "Infrastructure & Messaging", "System Architectures"].map((cat) => (
               <button
-                key={diff}
-                onClick={() => setSelectedDifficulty(diff)}
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
                 className={`text-2xs font-semibold px-3 py-1.5 border uppercase tracking-wider transition-all duration-300 ${
-                  selectedDifficulty === diff 
+                  selectedCategory === cat 
                     ? "bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100" 
                     : "bg-transparent text-zinc-500 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
                 }`}
               >
-                {diff}
+                {cat}
               </button>
             ))}
           </div>

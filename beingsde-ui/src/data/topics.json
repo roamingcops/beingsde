@@ -5,9 +5,10 @@
     "slug": "design-distributed-caching-redis",
     "description": "Learn how to architect a fault-tolerant, horizontally scalable caching cluster.",
     "difficulty": "HARD",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 45,
     "tags": [
+      "Databases & Storage",
       "Redis",
       "Caching",
       "Distributed Systems"
@@ -28,9 +29,10 @@
     "slug": "consistent-hashing-basic",
     "description": "Deconstruct routing rings, virtual nodes, and distribution keys.",
     "difficulty": "EASY",
-    "category": "Distributed Systems",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 20,
     "tags": [
+      "Core Fundamentals",
       "Scaling",
       "Hashing",
       "Consistency"
@@ -50,9 +52,10 @@
     "slug": "design-url-shortener",
     "description": "Build a high-throughput shortener analyzing base58 encodings and database sharding.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 30,
     "tags": [
+      "System Architectures",
       "Database",
       "Scaling",
       "Microservices"
@@ -73,9 +76,10 @@
     "slug": "kafka-event-driven-scaling",
     "description": "Deep-dive into partition offsets, producer acknowledgments, and consumer groups.",
     "difficulty": "HARD",
-    "category": "Messaging Systems",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 50,
     "tags": [
+      "Infrastructure & Messaging",
       "Kafka",
       "Event Driven",
       "Microservices"
@@ -95,9 +99,10 @@
     "slug": "networking-essentials",
     "description": "Learn the important parts of networking that you'll need to know for your system design interviews",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 55,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -113,9 +118,10 @@
     "slug": "api-design",
     "description": "Learn about API design for system design interviews",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 22,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -130,13 +136,14 @@
     "slug": "data-modeling",
     "description": "Learn about data modeling for system design interviews",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 15,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
-    "contentMarkdown": "Core Concepts\n# Data Modeling\n\nLearn about data modeling for system design interviewsWatch Video Walkthrough\n\nWatch the author walk through the problem step-by-stepWatch Video Walkthrough\n\nWatch the author walk through the problem step-by-stepWatch Now\nData modeling is the process of defining how your application’s data is structured, stored, and related. In practice, this means deciding what entities exist, how they’re identified, and how they connect to one another. For a system design interview, the bar is much lower than in a dedicated data modeling interview (commonplace in data engineering loops). You’re not expected to normalize everything or produce a complete schema diagram, you’re just expected to design something clear, functional, and aligned with your system’s requirements.\nIn the Delivery framework, this comes up twice. First, during requirements gathering, you’ll identify your core entities. These usually map 1:1 with tables or collections and form the backbone of your schema. Later, in the High-Level Design step, you'll sketch a basic schema alongside your database component. Include the key fields, relationships, and a note on how you'd index or partition to support the main query patterns. That’s enough for most interviewers to see that your data model won’t crumble under expected usage.\nData Modeling in an Interview\nStill, a reasonable schema is more than box-drawing. It sets up the rest of your design, such as scaling reads and writes, preserving consistency when it matters, and answering questions about growth or auditability without backtracking. A sloppy data model can lead to painful issues later. A solid, “good enough” one lets the conversation stay focused where it belongs.\n\n## Database Model Options\n\nBefore you can design a schema, you need to pick what type of database you're working with. Different database models shape how you structure your data, so this choice affects everything that follows.\nIn interviews, the temptation is to show off by choosing exotic database types. Resist this. Most of the time, the right answer is a relational database. It's the default unless your requirements clearly signal a specialized model. Unless you have significant experience and, with it, strong opinions about another database, my recommendation is to stick with PostgreSQL.\nThat doesn’t mean other database models aren’t worth knowing. Showing you understand when they might be useful demonstrates that you’re thinking about trade-offs, not just parroting the default. Still, the star of the show is SQL, so we’ll start there before briefly touching on the alternatives.\n\n### Relational Databases (SQL)\n\nRelational databases organize data into tables with fixed schemas, where rows represent entities and columns represent attributes. They enforce relationships through foreign keys and provide ACID guarantees for transactions.\nMost system design problems map naturally onto this model. A social media app has users, posts, comments, and likes, all entities with clear relationships. An e-commerce system has users, products, orders, and payments. These fit neatly into relational tables where constraints and foreign keys preserve integrity.\n**Users table:**\nid (primary key)usernameemailcreated_at1john_doejohn@example.com2024-01-01 10:00:002jane_doejane@example.com2024-01-01 10:05:003bob_smithbob@example.com2024-01-01 10:10:00\n**Posts table:**\nid (primary key)user_id (foreign key)contentcreated_at11Hello, world!2024-01-01 10:00:0021My first post2024-01-01 10:05:0032Another post2024-01-01 10:10:00\n**Likes table:**\nid (primary key)user_id (foreign key)post_id (foreign key)created_at1112024-01-01 10:00:002122024-01-01 10:05:003232024-01-01 10:10:00\nSQL is great at handling complex queries. If you need to fetch \"all posts by users that a given user follows, ordered by recency,\" joins make that straightforward. However, be careful with multi-table joins like this - they can become performance traps at scale. In interviews, mentioning complex reporting-style queries often raises yellow flags about performance, so you'll want to think through whether they're actually performant enough or if you need denormalized views, caching, or pre-computed results. And when strong consistency is a non-functional requirement, like ensuring payments don't double-charge or inventory doesn't oversell, SQL's ACID guarantees are the right tool for the job.\nThe usual knock on relational databases is scalability, but this is often exaggerated. Modern SQL databases scale with techniques like read replicas, sharding, connection pooling, and caching. Some of the largest companies in the world (Facebook, Airbnb) rely on relational foundations. Scaling isn't just about the database you choose, but how you architect around it.\n**Example technologies include** PostgreSQL, MySQL, and SQLite.\n\n### Document Databases\n\nDocument databases store data as JSON-like documents with flexible schemas, making them good for rapidly evolving applications where you don't know all your data fields upfront. Your data modeling becomes more about nesting and embedding related information within documents rather than normalizing across tables.\nNotice how the same data from our SQL example gets restructured. Instead of separate tables, we embed posts directly within each user document. This eliminates joins but means updating a post requires finding and modifying the entire user document.\n**Users collection:**\n\n```\n `{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"posts\": [\n    {\n      \"content\": \"Hello, world!\",\n      \"created_at\": \"2024-01-01T10:00:00Z\"\n    },\n    {\n      \"content\": \"My first post\",\n      \"created_at\": \"2024-01-01T10:05:00Z\"\n    }\n  ],\n  \"created_at\": \"2024-01-01T10:00:00Z\"\n}` \n```\n\nSystem design interviews intentionally scope functional requirements to a clear, concise set. This means you're unlikely to have \"evolving schemas\" in the first place, which removes the main reason to choose document databases. Only consider them if your interviewer explicitly mentions rapidly changing data structures.\n**When to consider over SQL:** When your schema changes frequently, when you have deeply nested data that would require many joins in SQL, or when different records have vastly different structures. A user profile system where some users have extensive work histories while others have minimal data fits this pattern.\n**Data modeling impact:** You'll denormalize more aggressively, embedding related data within documents to avoid expensive lookups across collections. This trades storage space and update complexity for read performance.\n**Example technologies include** MongoDB, Firestore, and CouchDB.\n\n### Key-Value Stores\n\nKey-value stores provide simple lookups where you fetch values by exact key match. They're extremely fast but offer limited query capabilities beyond that basic operation.\n**When to consider over SQL:** For caching, session storage, feature flags, or any scenario where you only need to look up data by a single identifier. They're also good for high-write scenarios where you need maximum performance and don't need complex queries.\n\"Over SQL\" is misleading here. In practice, you'll often use both together. SQL as your source of truth with a key-value cache (like Redis) in front for hot data. This gives you fast access without sacrificing durability or complex queries.\n**Data modeling impact:** Your schema becomes very flat. You'll denormalize heavily and duplicate data across multiple keys to support different access patterns, since you can't join or query across relationships. This is great for reads but terrible for consistency when data changes.\nKey-Value Cache\n**Example technologies include** Redis, DynamoDB, and Memcached.\n\n### Wide-Column Databases\n\nWide-column databases organize data into column families where rows can have different sets of columns. They're optimized for massive write-heavy workloads and time-series data.\nWhen a user creates a new post, you add a new row keyed by (user_id, timestamp). Rows with the same partition key (user_id) are stored together, making writes fast (just append to the partition) and reads efficient (scan a contiguous range of a user's posts).\nWide-Column Database\n**When to consider over SQL:** When you have enormous write volumes, time-series data, or analytics workloads where you primarily append data and run aggregations. Think telemetry, event logging, or IoT sensor data.\n**Data modeling impact:** You'll design around query patterns even more than with SQL, often duplicating data across different column families to support various access patterns. Time becomes a first-class citizen in your modeling.\n**Example technologies include** Cassandra and HBase.\n\n### Graph Databases\n\nGraph databases store data as nodes and edges, optimizing for traversing relationships between entities.\nGraph Database\n**When to consider over SQL:** Honestly? Almost never in interviews. The classic examples are social networks and recommendation engines, but even Facebook models their social graph with MySQL. If it's good enough for the world's largest social network, it's probably good enough for your interview.\n**Example technologies include** Neo4j and Amazon Neptune.\nGraph databases are a common mistake in interviews. They sound sophisticated but add unnecessary complexity. Even \"graph-heavy\" companies like LinkedIn and Twitter use SQL for their core relationship data. Other databases can handle the primary query patterns without the operational complexity that comes with specialized graph systems.\n\n## Schema Design Fundamentals\n\nOnce you've picked your database type, you need to design a schema that supports your system's requirements.\n\n### Start with Requirements\n\nEverything flows from three key factors that require careful consideration and were likely already determined during the requirements gathering and api design phases.\n**Data volume** determines where your data can physically live. A social media app with millions of users might need data spread across multiple data stores, which drives schema design choices. If user data and post data need to live on separate systems for performance or organizational reasons, they necessarily need distinct schemas with careful consideration of how they reference each other.\n**Access patterns** are the most important factor and drive most of your design decisions. How will your data be queried? A news feed that loads \"recent posts by followed users\" suggests you'll want denormalized data or carefully designed indexes. An analytics dashboard that aggregates data across time periods might need different table structures entirely. This comes naturally from your APIs. Just ask what queries will I need to support each endpoint?\n**Consistency requirements** determine how tightly coupled your data can be. Financial transactions need strong consistency (no partial charges), which often means keeping related data in the same database with ACID guarantees. But a user's activity feed can handle eventual consistency (it's okay if a like shows up a few seconds later), which allows you to distribute that data across separate systems with different schemas optimized for different access patterns.\nIn interviews, explicitly tie your schema choices back to these factors. For example, *\"Since we need to load feeds quickly and likes can be eventually consistent, I'll denormalize like counts into the posts table.\"* That shows you're reasoning instead of memorizing patterns.\nAll of the schema design techniques that follow (entities, keys, normalization, indexes, sharding) are just tools to address these three factors.\n\n### Entities, Keys & Relationships\n\nOnce you’ve identified your core entities, the next step is to map them into tables (or collections) with clear identifiers and relationships.\nFor a social media app, you might have users, posts, comments, and likes. Each entity needs a **primary key** to identify individual records. Use system-generated IDs like user_id or post_id rather than business data like email addresses. System-generated keys stay stable even when business rules change.\n\n```\n `users: id (PK), username, email\nposts: id (PK), user_id (FK → users.id), content, created_at\ncomments: id (PK), post_id (FK → posts.id), user_id (FK → users.id), content\nlikes: user_id (FK → users.id), post_id (FK → posts.id)` \n```\n\nThis shows the core relationships: each post belongs to one user (posts.user_id), each comment belongs to one post and one user, and likes connect users to posts. The (PK) marks primary keys, (FK) marks foreign keys with arrows showing what they reference.\nIn interviews, just pick an obvious primary key and explain why. \"post_id will be our primary key so we can uniquely identify each post and reference it from comments and likes.\"\nWith entities defined, connect them with relationships:\n\n* **One-to-many (1:N):** a user has many posts, a post has many comments.\n\n* **Many-to-many (N:M):** users like many posts, posts are liked by many users.\n\n* **One-to-one (1:1):** rare in practice, often a sign that two tables should just be merged.\n\nThese relationships are enforced through **foreign keys** in SQL (e.g., posts.user_id → users.id) or by application logic in NoSQL. Foreign keys help ensure referential integrity - meaning they prevent orphaned records like a post referencing a user that doesn't exist, or comments pointing to deleted posts. However, they come at a cost because the database has to validate each insert/update. At very large scale, some companies drop them for write performance and enforce integrity at the application level. In an interview, mentioning them shows you understand the trade-off.\nFinally, layer in **constraints** like NOT NULL, UNIQUE, or CHECK. These enforce correctness at the database level (emails must be unique, prices must be positive). They protect data quality, though they also add write overhead.\nKeep your schema grounded in the problem domain: users, tweets, follows if you're modeling Twitter, not abstract \"entities\" and \"relationships.\" Then show how keys, foreign keys, and constraints keep that model correct and scalable.\n\n### Indexing for Access Patterns\n\nIndexes are data structures that help the database find records quickly without scanning every row. Think of them like the index in a book - instead of reading every page to find \"normalization,\" you look it up in the index and jump directly to page 149. While data modeling in an interview, you'll typically want to callout which columns are indexed and why.\nYour indexes should directly support your most important queries. For a social media app:\n\n* Index on posts.user_id to quickly find all posts by a user\n\n* Index on posts.created_at to load recent posts chronologically\n\n* Composite index on (user_id, created_at) to efficiently load a user's recent posts\n\nFor a deeper understanding of how indexes work under the hood, different index types (B-trees, hash indexes, etc.), and advanced indexing strategies, see our Database Indexing deep dive.\nIn interviews, connect your indexes directly to your API endpoints. \"The GET /users/{id}/posts endpoint needs an index on posts.user_id\" shows you're thinking about real query performance.\n\n### Normalization vs Denormalization\n\nNormalization means storing each piece of information in exactly one place. User data lives only in the users table, not duplicated across other tables. This prevents data anomalies where updates happen in one place but not another, leaving your system with inconsistent state.\n**Normalized:**\nidusernameemail1john_doejohn@example.com2jane_doejane@example.com\niduser_id (FK)contentcreated_at11Hello, world!2024-01-01 10:00:0021My first post2024-01-01 10:05:00\n**Denormalized:**\niduser_idusernameemailcontentcreated_at11john_doejohn@example.comHello, world!2024-01-01 10:00:0021john_doejohn@example.comMy first post2024-01-01 10:05:00\nIn the denormalized version, if a user changes their username, you'd have to update every single post they've ever made. Miss one update and you have inconsistent data.\nIn system design interviews, start with a clean normalized model and denormalize only when needed. Avoid repeating data in your schema design. Repeating data is wasteful and creates consistency problems that are much harder to solve than the performance problems you're trying to avoid.\nThere are a few key exceptions where denormalization might make sense:\n\n* **Analytics and reporting systems** where you're aggregating data that changes infrequently\n\n* **Event logs and audit trails** where you're capturing a snapshot of data at a point in time\n\n* **Heavily read-optimized systems** like search engines where consistency is less critical than speed\n\nThat said, even if you need denormalized quick access for performance, you can just put a cache in front that has a denormalized representation of the data. Your source of truth stays clean and normalized, but your cache can have pre-computed joins, aggregations, or whatever structure makes reads fast.\n\n### Scaling and Sharding\n\nWhen your data gets too large for a single database, you need to shard it across multiple machines. The key is choosing a partition strategy that keeps related data together.\n**Shard by the primary access pattern.** If you mostly query \"posts by user,\" shard by user_id. This keeps a user's posts on the same database, avoiding expensive cross-shard queries.\nBe careful with time-range sharding. While it sounds appealing for \"recent posts\" queries, all current writes hit the same shard (the latest time range), creating a hot shard. This is usually an anti-pattern for write-heavy systems. Time-range partitioning works better for archival or analytics workloads where recent data is read-heavy but writes are spread out.\n**Avoid cross-shard queries** whenever possible. If your timeline feature needs to show posts from multiple users a user follows, and you've sharded by user_id, you'll have to query multiple shards and merge results. This is expensive and complex.\nSharding\nYour choice of shard key is often permanent and affects every query. Think carefully about your primary access patterns before choosing how to shard your data.\n\n## Conclusion\n\nData modeling is a core part of system design interviews, but it's not the focus. Your goal is to show that you can design a reasonable schema that supports your system's requirements, then move on.\nStart by outlining your core entities early in the interview. Then, when introducing a database component during the high-level design:\n\n* Determine the type of database you'll use\n\n* List the columns needed to fulfill the functional requirements for each entity\n\n* Specify primary and foreign keys for each relationship\n\n* Determine which columns need indexes (if any)\n\n* Determine whether you need to denormalize for performance\n\n* Consider whether sharding is necessary. If yes, choose a shard key that matches your main access pattern.\n\nAt the end, your whiteboard should look something like this:\nFinal Whiteboard\nTest Your Knowledge\n\nAnswer the question below to find your gaps.\n\nQuestion 1 of 15Which database type should you default to in system design interviews?1Document databases with flexible schemas2Graph databases3Key-value stores4Relational databases (SQL), which handle most use cases wellQuick Reference\n\nGet a quick-reference sheet for this topic, perfect for last-minute review.View",
+    "contentMarkdown": "Core Concepts\n# Data Modeling\n\nLearn about data modeling for system design interviewsWatch Video Walkthrough\n\nWatch the author walk through the problem step-by-stepWatch Video Walkthrough\n\nWatch the author walk through the problem step-by-stepWatch Now\nData modeling is the process of defining how your application’s data is structured, stored, and related. In practice, this means deciding what entities exist, how they’re identified, and how they connect to one another. For a system design interview, the bar is much lower than in a dedicated data modeling interview (commonplace in data engineering loops). You’re not expected to normalize everything or produce a complete schema diagram, you’re just expected to design something clear, functional, and aligned with your system’s requirements.\nIn the Delivery framework, this comes up twice. First, during requirements gathering, you’ll identify your core entities. These usually map 1:1 with tables or collections and form the backbone of your schema. Later, in the High-Level Design step, you'll sketch a basic schema alongside your database component. Include the key fields, relationships, and a note on how you'd index or partition to support the main query patterns. That’s enough for most interviewers to see that your data model won’t crumble under expected usage.\nData Modeling in an Interview\nStill, a reasonable schema is more than box-drawing. It sets up the rest of your design, such as scaling reads and writes, preserving consistency when it matters, and answering questions about growth or auditability without backtracking. A sloppy data model can lead to painful issues later. A solid, “good enough” one lets the conversation stay focused where it belongs.\n\n## Database Model Options\n\nBefore you can design a schema, you need to pick what type of database you're working with. Different database models shape how you structure your data, so this choice affects everything that follows.\nIn interviews, the temptation is to show off by choosing exotic database types. Resist this. Most of the time, the right answer is a relational database. It's the default unless your requirements clearly signal a specialized model. Unless you have significant experience and, with it, strong opinions about another database, my recommendation is to stick with PostgreSQL.\nThat doesn’t mean other database models aren’t worth knowing. Showing you understand when they might be useful demonstrates that you’re thinking about trade-offs, not just parroting the default. Still, the star of the show is SQL, so we’ll start there before briefly touching on the alternatives.\n\n### Relational Databases (SQL)\n\nRelational databases organize data into tables with fixed schemas, where rows represent entities and columns represent attributes. They enforce relationships through foreign keys and provide ACID guarantees for transactions.\nMost system design problems map naturally onto this model. A social media app has users, posts, comments, and likes, all entities with clear relationships. An e-commerce system has users, products, orders, and payments. These fit neatly into relational tables where constraints and foreign keys preserve integrity.\n**Users table:**\nid (primary key)usernameemailcreated_at1john_doejohn@example.com2024-01-01 10:00:002jane_doejane@example.com2024-01-01 10:05:003bob_smithbob@example.com2024-01-01 10:10:00\n**Posts table:**\nid (primary key)user_id (foreign key)contentcreated_at11Hello, world!2024-01-01 10:00:0021My first post2024-01-01 10:05:0032Another post2024-01-01 10:10:00\n**Likes table:**\nid (primary key)user_id (foreign key)post_id (foreign key)created_at1112024-01-01 10:00:002122024-01-01 10:05:003232024-01-01 10:10:00\nSQL is great at handling complex queries. If you need to fetch \"all posts by users that a given user follows, ordered by recency,\" joins make that straightforward. However, be careful with multi-table joins like this - they can become performance traps at scale. In interviews, mentioning complex reporting-style queries often raises yellow flags about performance, so you'll want to think through whether they're actually performant enough or if you need denormalized views, caching, or pre-computed results. And when strong consistency is a non-functional requirement, like ensuring payments don't double-charge or inventory doesn't oversell, SQL's ACID guarantees are the right tool for the job.\nThe usual knock on relational databases is scalability, but this is often exaggerated. Modern SQL databases scale with techniques like read replicas, sharding, connection pooling, and caching. Some of the largest companies in the world (Facebook, Airbnb) rely on relational foundations. Scaling isn't just about the database you choose, but how you architect around it.\n**Example technologies include** PostgreSQL, MySQL, and SQLite.\n\n### Document Databases\n\nDocument databases store data as JSON-like documents with flexible schemas, making them good for rapidly evolving applications where you don't know all your data fields upfront. Your data modeling becomes more about nesting and embedding related information within documents rather than normalizing across tables.\nNotice how the same data from our SQL example gets restructured. Instead of separate tables, we embed posts directly within each user document. This eliminates joins but means updating a post requires finding and modifying the entire user document.\n**Users collection:**\n\n```\n `{\n  \"_id\": \"507f1f77bcf86cd799439011\",\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"posts\": [\n    {\n      \"content\": \"Hello, world!\",\n      \"created_at\": \"2024-01-01T10:00:00Z\"\n    },\n    {\n      \"content\": \"My first post\",\n      \"created_at\": \"2024-01-01T10:05:00Z\"\n    }\n  ],\n  \"created_at\": \"2024-01-01T10:00:00Z\"\n}` \n```\n\nSystem design interviews intentionally scope functional requirements to a clear, concise set. This means you're unlikely to have \"evolving schemas\" in the first place, which removes the main reason to choose document databases. Only consider them if your interviewer explicitly mentions rapidly changing data structures.\n**When to consider over SQL:** When your schema changes frequently, when you have deeply nested data that would require many joins in SQL, or when different records have vastly different structures. A user profile system where some users have extensive work histories while others have minimal data fits this pattern.\n**Data modeling impact:** You'll denormalize more aggressively, embedding related data within documents to avoid expensive lookups across collections. This trades storage space and update complexity for read performance.\n**Example technologies include** MongoDB, Firestore, and CouchDB.\n\n### Key-Value Stores\n\nKey-value stores provide simple lookups where you fetch values by exact key match. They're extremely fast but offer limited query capabilities beyond that basic operation.\n**When to consider over SQL:** For caching, session storage, feature flags, or any scenario where you only need to look up data by a single identifier. They're also good for high-write scenarios where you need maximum performance and don't need complex queries.\n\"Over SQL\" is misleading here. In practice, you'll often use both together. SQL as your source of truth with a key-value cache (like Redis) in front for hot data. This gives you fast access without sacrificing durability or complex queries.\n**Data modeling impact:** Your schema becomes very flat. You'll denormalize heavily and duplicate data across multiple keys to support different access patterns, since you can't join or query across relationships. This is great for reads but terrible for consistency when data changes.\nKey-Value Cache\n**Example technologies include** Redis, DynamoDB, and Memcached.\n\n### Wide-Column Databases\n\nWide-column databases organize data into column families where rows can have different sets of columns. They're optimized for massive write-heavy workloads and time-series data.\nWhen a user creates a new post, you add a new row keyed by (user_id, timestamp). Rows with the same partition key (user_id) are stored together, making writes fast (just append to the partition) and reads efficient (scan a contiguous range of a user's posts).\nWide-Column Database\n**When to consider over SQL:** When you have enormous write volumes, time-series data, or analytics workloads where you primarily append data and run aggregations. Think telemetry, event logging, or IoT sensor data.\n**Data modeling impact:** You'll design around query patterns even more than with SQL, often duplicating data across different column families to support various access patterns. Time becomes a first-class citizen in your modeling.\n**Example technologies include** Cassandra and HBase.\n\n### Graph Databases\n\nGraph databases store data as nodes and edges, optimizing for traversing relationships between entities.\nGraph Database\n**When to consider over SQL:** Honestly? Almost never in interviews. The classic examples are social networks and recommendation engines, but even Facebook models their social graph with MySQL. If it's good enough for the world's largest social network, it's probably good enough for your interview.\n**Example technologies include** Neo4j and Amazon Neptune.\nGraph databases are a common mistake in interviews. They sound sophisticated but add unnecessary complexity. Even \"graph-heavy\" companies like LinkedIn and Twitter use SQL for their core relationship data. Other databases can handle the primary query patterns without the operational complexity that comes with specialized graph systems.\n\n## Schema Design Fundamentals\n\nOnce you've picked your database type, you need to design a schema that supports your system's requirements.\n\n### Start with Requirements\n\nEverything flows from three key factors that require careful consideration and were likely already determined during the requirements gathering and api design phases.\n**Data volume** determines where your data can physically live. A social media app with millions of users might need data spread across multiple data stores, which drives schema design choices. If user data and post data need to live on separate systems for performance or organizational reasons, they necessarily need distinct schemas with careful consideration of how they reference each other.\n**Access patterns** are the most important factor and drive most of your design decisions. How will your data be queried? A news feed that loads \"recent posts by followed users\" suggests you'll want denormalized data or carefully designed indexes. An analytics dashboard that aggregates data across time periods might need different table structures entirely. This comes naturally from your APIs. Just ask what queries will I need to support each endpoint?\n**Consistency requirements** determine how tightly coupled your data can be. Financial transactions need strong consistency (no partial charges), which often means keeping related data in the same database with ACID guarantees. But a user's activity feed can handle eventual consistency (it's okay if a like shows up a few seconds later), which allows you to distribute that data across separate systems with different schemas optimized for different access patterns.\nIn interviews, explicitly tie your schema choices back to these factors. For example, *\"Since we need to load feeds quickly and likes can be eventually consistent, I'll denormalize like counts into the posts table.\"* That shows you're reasoning instead of memorizing patterns.\nAll of the schema design techniques that follow (entities, keys, normalization, indexes, sharding) are just tools to address these three factors.\n\n### Entities, Keys & Relationships\n\nOnce you’ve identified your core entities, the next step is to map them into tables (or collections) with clear identifiers and relationships.\nFor a social media app, you might have users, posts, comments, and likes. Each entity needs a **primary key** to identify individual records. Use system-generated IDs like user_id or post_id rather than business data like email addresses. System-generated keys stay stable even when business rules change.\n\n```\n `users: id (PK), username, email\nposts: id (PK), user_id (FK → users.id), content, created_at\ncomments: id (PK), post_id (FK → posts.id), user_id (FK → users.id), content\nlikes: user_id (FK → users.id), post_id (FK → posts.id)` \n```\n\nThis shows the core relationships: each post belongs to one user (posts.user_id), each comment belongs to one post and one user, and likes connect users to posts. The (PK) marks primary keys, (FK) marks foreign keys with arrows showing what they reference.\nIn interviews, just pick an obvious primary key and explain why. \"post_id will be our primary key so we can uniquely identify each post and reference it from comments and likes.\"\nWith entities defined, connect them with relationships:\n\n* **One-to-many (1:N):** a user has many posts, a post has many comments.\n\n* **Many-to-many (N:M):** users like many posts, posts are liked by many users.\n\n* **One-to-one (1:1):** rare in practice, often a sign that two tables should just be merged.\n\nThese relationships are enforced through **foreign keys** in SQL (e.g., posts.user_id → users.id) or by application logic in NoSQL. Foreign keys help ensure referential integrity - meaning they prevent orphaned records like a post referencing a user that doesn't exist, or comments pointing to deleted posts. However, they come at a cost because the database has to validate each insert/update. At very large scale, some companies drop them for write performance and enforce integrity at the application level. In an interview, mentioning them shows you understand the trade-off.\nFinally, layer in **constraints** like NOT NULL, UNIQUE, or CHECK. These enforce correctness at the database level (emails must be unique, prices must be positive). They protect data quality, though they also add write overhead.\nKeep your schema grounded in the problem domain: users, tweets, follows if you're modeling Twitter, not abstract \"entities\" and \"relationships.\" Then show how keys, foreign keys, and constraints keep that model correct and scalable.\n\n### Indexing for Access Patterns\n\nIndexes are data structures that help the database find records quickly without scanning every row. Think of them like the index in a book - instead of reading every page to find \"normalization,\" you look it up in the index and jump directly to page 149. While data modeling in an interview, you'll typically want to callout which columns are indexed and why.\nYour indexes should directly support your most important queries. For a social media app:\n\n* Index on posts.user_id to quickly find all posts by a user\n\n* Index on posts.created_at to load recent posts chronologically\n\n* Composite index on (user_id, created_at) to efficiently load a user's recent posts\n\nFor a deeper understanding of how indexes work under the hood, different index types (B-trees, hash indexes, etc.), and advanced indexing strategies, see our Database Indexing deep dive.\nIn interviews, connect your indexes directly to your API endpoints. \"The GET /users/{id}/posts endpoint needs an index on posts.user_id\" shows you're thinking about real query performance.\n\n### Normalization vs Denormalization\n\nNormalization means storing each piece of information in exactly one place. User data lives only in the users table, not duplicated across other tables. This prevents data anomalies where updates happen in one place but not another, leaving your system with inconsistent state.\n**Normalized:**\nidusernameemail1john_doejohn@example.com2jane_doejane@example.com\niduser_id (FK)contentcreated_at11Hello, world!2024-01-01 10:00:0021My first post2024-01-01 10:05:00\n**Denormalized:**\niduser_idusernameemailcontentcreated_at11john_doejohn@example.comHello, world!2024-01-01 10:00:0021john_doejohn@example.comMy first post2024-01-01 10:05:00\nIn the denormalized version, if a user changes their username, you'd have to update every single post they've ever made. Miss one update and you have inconsistent data.\nIn system design interviews, start with a clean normalized model and denormalize only when needed. Avoid repeating data in your schema design. Repeating data is wasteful and creates consistency problems that are much harder to solve than the performance problems you're trying to avoid.\nThere are a few key exceptions where denormalization might make sense:\n\n* **Analytics and reporting systems** where you're aggregating data that changes infrequently\n\n* **Event logs and audit trails** where you're capturing a snapshot of data at a point in time\n\n* **Heavily read-optimized systems** like search engines where consistency is less critical than speed\n\nThat said, even if you need denormalized quick access for performance, you can just put a cache in front that has a denormalized representation of the data. Your source of truth stays clean and normalized, but your cache can have pre-computed joins, aggregations, or whatever structure makes reads fast.\n\n### Scaling and Sharding\n\nWhen your data gets too large for a single database, you need to shard it across multiple machines. The key is choosing a partition strategy that keeps related data together.\n**Shard by the primary access pattern.** If you mostly query \"posts by user,\" shard by user_id. This keeps a user's posts on the same database, avoiding expensive cross-shard queries.\nBe careful with time-range sharding. While it sounds appealing for \"recent posts\" queries, all current writes hit the same shard (the latest time range), creating a hot shard. This is usually an anti-pattern for write-heavy systems. Time-range partitioning works better for archival or analytics workloads where recent data is read-heavy but writes are spread out.\n**Avoid cross-shard queries** whenever possible. If your timeline feature needs to show posts from multiple users a user follows, and you've sharded by user_id, you'll have to query multiple shards and merge results. This is expensive and complex.\nSharding\nYour choice of shard key is often permanent and affects every query. Think carefully about your primary access patterns before choosing how to shard your data.\n\n## Conclusion\n\nData modeling is a core part of system design interviews, but it's not the focus. Your goal is to show that you can design a reasonable schema that supports your system's requirements, then move on.\nStart by outlining your core entities early in the interview. Then, when introducing a database component during the high-level design:\n\n* Determine the type of database you'll use\n\n* List the columns needed to fulfill the functional requirements for each entity\n\n* Specify primary and foreign keys for each relationship\n\n* Determine which columns need indexes (if any)\n\n* Determine whether you need to denormalize for performance\n\n* Consider whether sharding is necessary. If yes, choose a shard key that matches your main access pattern.\n\nAt the end, your whiteboard should look something like this:\n### Final Whiteboard (Database Schema & Relationships)\n\n```\n+------------------------------------------------------------+\n|                          DATABASE LAYOUT                   |\n|                                                            |\n|  [users]                   [posts]                         |\n|  - id (PK)                 - id (PK)                       |\n|  - username (UQ)           - user_id (FK -> users.id)      |\n|  - email (UQ)              - content                       |\n|  - created_at              - created_at (Indexed)          |\n|        |                         |                         |\n|        | (1)                     | (1)                     |\n|        |                         |                         |\n|        v (N)                     v (N)                     |\n|  [likes]                   [comments]                      |\n|  - user_id (FK)            - id (PK)                       |\n|  - post_id (FK)            - post_id (FK -> posts.id)      |\n|  - created_at              - user_id (FK -> users.id)      |\n|                            - content                       |\n|                            - created_at                    |\n+------------------------------------------------------------+\n```\n\n#### SQL Schema Definition\n```sql\nCREATE TABLE users (\n  id BIGSERIAL PRIMARY KEY,\n  username VARCHAR(50) UNIQUE NOT NULL,\n  email VARCHAR(100) UNIQUE NOT NULL,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE posts (\n  id BIGSERIAL PRIMARY KEY,\n  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,\n  content TEXT NOT NULL,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX idx_posts_user_created ON posts(user_id, created_at DESC);\n\nCREATE TABLE comments (\n  id BIGSERIAL PRIMARY KEY,\n  post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,\n  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,\n  content TEXT NOT NULL,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE likes (\n  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,\n  post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,\n  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (user_id, post_id)\n);\n```\n\n#### Indexing & Sharding Strategy Notes\n1. **Index**: Create a composite index on `posts(user_id, created_at DESC)` to load a user's recent timeline in single-digit milliseconds.\n2. **Sharding Key**: Shard database instances using `user_id` as the partition key. This guarantees that all comments, posts, and likes authored by a user map to the same database partition node, preventing cross-network queries.\nTest Your Knowledge\n\nAnswer the question below to find your gaps.\n\nQuestion 1 of 15Which database type should you default to in system design interviews?1Document databases with flexible schemas2Graph databases3Key-value stores4Relational databases (SQL), which handle most use cases wellQuick Reference\n\nGet a quick-reference sheet for this topic, perfect for last-minute review.View",
     "prerequisites": [],
     "videoUrl": "",
     "pdfUrl": ""
@@ -147,9 +154,10 @@
     "slug": "caching",
     "description": "Learn about caching and when to use it in system design interviews.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 17,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -164,9 +172,10 @@
     "slug": "sharding",
     "description": "Learn about sharding and when to use it in system design interviews.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 19,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -181,9 +190,10 @@
     "slug": "consistent-hashing",
     "description": "What problem does consistent hashing solve, how does it work, and how can you use it in an interview.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 11,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -198,9 +208,10 @@
     "slug": "cap-theorem",
     "description": "Master the fundamental tradeoffs between consistency and availability in distributed systems.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 8,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -215,9 +226,10 @@
     "slug": "database-indexing",
     "description": "Learn about how database indexing works and how to optimize your queries",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 8,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -232,9 +244,10 @@
     "slug": "numbers-to-know",
     "description": "Learn about the numbers you need to know for system design interviews.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -249,9 +262,10 @@
     "slug": "real-time-updates",
     "description": "Learn about methods for triggering real-time updates in your system design",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -266,9 +280,10 @@
     "slug": "dealing-with-contention",
     "description": "Learn about how to deal with high contention in your system design interview.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -283,9 +298,10 @@
     "slug": "multi-step-processes",
     "description": "Learn about multi-step processes and how to handle them in your system design with sagas, workflow systems, and durable execution.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -300,9 +316,10 @@
     "slug": "scaling-reads",
     "description": "Learn about how to scale reads in your system design interview.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -317,9 +334,10 @@
     "slug": "scaling-writes",
     "description": "Learn about how to scale writes in your system design interview.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -334,9 +352,10 @@
     "slug": "handling-large-blobs",
     "description": "Learn about how to handle large blobs in your system design interview.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -351,9 +370,10 @@
     "slug": "managing-long-running-tasks",
     "description": "Learn about the long running tasks pattern and how to use it in your system design",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -368,9 +388,10 @@
     "slug": "redis",
     "description": "Learn about how you can use Redis to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 21,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -385,9 +406,10 @@
     "slug": "elasticsearch",
     "description": "Learn about how you can use Elasticsearch to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 32,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -402,9 +424,10 @@
     "slug": "kafka",
     "description": "Learn about how you can use Kafka to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 26,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": false,
@@ -419,9 +442,10 @@
     "slug": "api-gateway",
     "description": "Learn when and how to effectively incorporate API Gateways into your system design interviews.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 9,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": false,
@@ -436,9 +460,10 @@
     "slug": "cassandra",
     "description": "Learn about how you can use Cassandra to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 28,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -453,9 +478,10 @@
     "slug": "dynamodb",
     "description": "Learn about how you can use DynamoDB to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 25,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -470,9 +496,10 @@
     "slug": "postgresql",
     "description": "Learn when and how to use PostgreSQL in your system design interviews",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -487,9 +514,10 @@
     "slug": "flink",
     "description": "Learn about how you can use Flink to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": false,
@@ -504,9 +532,10 @@
     "slug": "zookeeper",
     "description": "Learn about how you can use ZooKeeper to solve a large number of problems in System Design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": false,
@@ -521,9 +550,10 @@
     "slug": "proximity-search",
     "description": "Learn how production systems index latitude and longitude for fast nearby queries, from spatial trees to encoded keys like geohash, S2, and H3.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 17,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -538,9 +568,10 @@
     "slug": "time-series-databases",
     "description": "Learn the concepts behind time-series databases like LSM trees, append-only storage, and delta encoding.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 21,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -555,9 +586,10 @@
     "slug": "data-structures-for-big-data",
     "description": "Learn about data structures for processing and storing large amounts of data in System Design interviews.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Core Fundamentals",
     "estimatedTimeMinutes": 6,
     "tags": [
+      "Core Fundamentals",
       "Systems"
     ],
     "isPremium": false,
@@ -572,9 +604,10 @@
     "slug": "vector-databases",
     "description": "Learn how vector databases power similarity search, recommendations, and AI applications in system design.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": false,
@@ -589,9 +622,10 @@
     "slug": "bitly",
     "description": "System design answer key for designing a URL shortener like Bitly, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 19,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -606,9 +640,10 @@
     "slug": "dropbox",
     "description": "System design answer key for designing a file storage and synchronization service like Dropbox, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 32,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -624,9 +659,10 @@
     "slug": "local-delivery-service",
     "description": "System design answer key for designing a local delivery service like Gopuff or Kozmo, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 17,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -641,9 +677,10 @@
     "slug": "ticketmaster",
     "description": "System design answer key for designing a ticket booking service like Ticketmaster, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 24,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -658,9 +695,10 @@
     "slug": "fb-news-feed",
     "description": "System design answer key for designing a social media news feed like Facebook's, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 22,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -675,9 +713,10 @@
     "slug": "tinder",
     "description": "System design answer key for designing a dating application like Tinder, built by FAANG managers and staff engineers.",
     "difficulty": "HARD",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 45,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -692,9 +731,10 @@
     "slug": "leetcode",
     "description": "System design answer key for designing a coding practice platform like LeetCode, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 45,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -709,9 +749,10 @@
     "slug": "whatsapp",
     "description": "System design answer key for designing a messaging application like WhatsApp, built by FAANG managers and staff engineers.",
     "difficulty": "HARD",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 45,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -726,9 +767,10 @@
     "slug": "rate-limiter",
     "description": "System design answer key for designing a distributed rate limiter, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 27,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": true,
@@ -743,9 +785,10 @@
     "slug": "fb-live-comments",
     "description": "System design answer key for designing a real-time commenting system like Facebook Live, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 19,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -760,9 +803,10 @@
     "slug": "fb-post-search",
     "description": "System design answer key for designing a social media post search feature like Facebook's, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 18,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -777,9 +821,10 @@
     "slug": "youtube-top-k",
     "description": "System design answer key for designing a feature to find the most popular videos like YouTube's trending section, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 34,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -794,9 +839,10 @@
     "slug": "uber",
     "description": "System design answer key for designing a ride-sharing service like Uber, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 24,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -811,9 +857,10 @@
     "slug": "youtube",
     "description": "System design answer key for designing a video streaming platform like YouTube, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 24,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -828,9 +875,10 @@
     "slug": "web-crawler",
     "description": "System design answer key for designing a web crawler like Google, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 31,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -845,9 +893,10 @@
     "slug": "ad-click-aggregator",
     "description": "System design answer key for designing an ad click data aggregation system, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 18,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -862,9 +911,10 @@
     "slug": "news-aggregator",
     "description": "System design answer key for designing a news aggregator like Google News, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -879,9 +929,10 @@
     "slug": "yelp",
     "description": "System design answer key for designing a local business review site like Yelp, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -896,9 +947,10 @@
     "slug": "strava",
     "description": "System design answer key for designing a fitness tracking application like Strava, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -913,9 +965,10 @@
     "slug": "online-auction",
     "description": "System design answer key for designing an online auction platform like eBay, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -930,9 +983,10 @@
     "slug": "price-tracking-service",
     "description": "System design answer key for designing a price tracking service like CamelCamelCamel, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -947,9 +1001,10 @@
     "slug": "instagram",
     "description": "System design answer key for designing a photo sharing platform like Instagram, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -964,9 +1019,10 @@
     "slug": "robinhood",
     "description": "System design answer key for designing a stock trading platform like Robinhood, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -981,9 +1037,10 @@
     "slug": "google-docs",
     "description": "System design answer key for designing a collaborative document editor like Google Docs, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -998,9 +1055,10 @@
     "slug": "distributed-cache",
     "description": "System design answer key for designing a distributed in-memory cache like Redis, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Databases & Storage",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Databases & Storage",
       "Systems"
     ],
     "isPremium": true,
@@ -1015,9 +1073,10 @@
     "slug": "job-scheduler",
     "description": "System design answer key for designing a distributed job scheduler like Apache Airflow, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": true,
@@ -1032,9 +1091,10 @@
     "slug": "payment-system",
     "description": "System design answer key for designing a payment system like Stripe, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,
@@ -1049,9 +1109,10 @@
     "slug": "metrics-monitoring",
     "description": "System design answer key for designing a metrics monitoring and alerting platform like Datadog or Prometheus, built by FAANG managers and staff engineers.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "Infrastructure & Messaging",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "Infrastructure & Messaging",
       "Systems"
     ],
     "isPremium": true,
@@ -1066,9 +1127,10 @@
     "slug": "chatgpt",
     "description": "ChatGPT is a conversational AI product where users send prompts in natural language and receive streamed responses from a large language model. Focus on a basic version that handles chat threads, incremental response streaming, and persistent history for a limited but growing user base.",
     "difficulty": "MEDIUM",
-    "category": "High-Level Design",
+    "category": "System Architectures",
     "estimatedTimeMinutes": 5,
     "tags": [
+      "System Architectures",
       "Systems"
     ],
     "isPremium": true,

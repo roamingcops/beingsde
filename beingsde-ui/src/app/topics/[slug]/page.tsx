@@ -328,7 +328,13 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
 
 // Custom Premium Markdown Renderer for system design content
 function MarkdownRenderer({ content }: { content: string }) {
-  const lines = content.split("\n");
+  // Preprocess: Replace the raw quiz text blocks with structured custom blocks
+  const quizRegex = /Test Your Knowledge\s*[\s\S]*?Question 1 of 15([\s\S]*?)(?:Quick Reference[\s\S]*?(?:View|$)|\bCheck Answer\b|$)/gi;
+  let parsedContent = content.replace(quizRegex, (match, quizText) => {
+    return `\n:::interactive-quiz\n${quizText.trim()}\n:::\n`;
+  });
+
+  const lines = parsedContent.split("\n");
   const elements: React.ReactNode[] = [];
   let inCodeBlock = false;
   let codeBlockLines: string[] = [];
@@ -336,6 +342,9 @@ function MarkdownRenderer({ content }: { content: string }) {
   
   let inList = false;
   let listItems: React.ReactNode[] = [];
+
+  let inInteractiveQuiz = false;
+  let interactiveQuizLines: string[] = [];
 
   const flushList = (key: number) => {
     if (listItems.length > 0) {
@@ -351,6 +360,27 @@ function MarkdownRenderer({ content }: { content: string }) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // Handle interactive quiz block
+    if (line.trim().startsWith(":::interactive-quiz")) {
+      if (inInteractiveQuiz) {
+        const quizText = interactiveQuizLines.join("\n");
+        elements.push(
+          <InteractiveQuizCard key={`interactive-quiz-${i}`} rawText={quizText} />
+        );
+        interactiveQuizLines = [];
+        inInteractiveQuiz = false;
+      } else {
+        inInteractiveQuiz = true;
+        flushList(i);
+      }
+      continue;
+    }
+
+    if (inInteractiveQuiz) {
+      interactiveQuizLines.push(line);
+      continue;
+    }
 
     // Handle Code Blocks
     if (line.trim().startsWith("```")) {
@@ -499,4 +529,357 @@ function renderInlineMarkdown(text: string): React.ReactNode[] {
     }
     return part;
   });
+}
+
+function getCorrectAnswerIndex(question: string): number {
+  const q = question.toLowerCase();
+  if (q.includes("database type should you default")) return 3; // Relational (SQL)
+  if (q.includes("api protocol should you default")) return 1; // REST
+  if (q.includes("in-memory cache like redis is typically")) return 0; // True
+  if (q.includes("cap theorem states you can achieve at most two")) return 0; // True
+  if (q.includes("primary function of an api gateway")) return 1; // Routing
+  if (q.includes("dynamodb is a 'fully-managed' service")) return 1; // AWS handles
+  if (q.includes("append-only storage improves write")) return 0; // True
+  if (q.includes("web servers and browsers impose payload size")) return 0; // True
+  if (q.includes("fan-out on write means aggregating data")) return 1; // False
+  if (q.includes("atomic operations prevent race conditions")) return 0; // True
+  if (q.includes("containers share the host kernel")) return 0; // True
+  if (q.includes("websockets maintain persistent")) return 0; // True
+  if (q.includes("client-side rate limiting alone is sufficient")) return 1; // False
+  if (q.includes("inverted indexes enable efficient")) return 0; // True
+  if (q.includes("min-heap of size k lets you find")) return 0; // True
+  return 0;
+}
+
+function getQuizExplanation(question: string): string {
+  const q = question.toLowerCase();
+  if (q.includes("database type should you default")) {
+    return "Relational databases (SQL) like PostgreSQL are the default choice in system design interviews because they support schemas, transactions, referential integrity, and handle most standard use cases without operational complexity.";
+  }
+  if (q.includes("api protocol should you default")) {
+    return "REST is the industry standard default for most system design interviews. Default to REST APIs unless you need real-time bi-directional streaming (WebSockets) or high-performance service-to-service calls (gRPC).";
+  }
+  if (q.includes("in-memory cache like redis is typically")) {
+    return "True. In-memory data lookups avoid random disk access and complex query plans, executing operations in sub-milliseconds (10-100x faster than databases).";
+  }
+  if (q.includes("cap theorem states you can achieve at most two")) {
+    return "True. Under a network partition (P), distributed systems must trade off strong consistency (C) for availability (A). You cannot guarantee both simultaneously.";
+  }
+  if (q.includes("primary function of an api gateway")) {
+    return "The primary function of an API Gateway is routing client requests to appropriate downstream backend microservices, alongside cross-cutting concerns like rate limiting, SSL termination, and authentication.";
+  }
+  if (q.includes("dynamodb is a 'fully-managed' service")) {
+    return "Fully-managed means cloud providers (AWS) handle physical provisioning, storage scaling, hardware failures, backups, and configurations, leaving you to focus on table structures and indices.";
+  }
+  if (q.includes("append-only storage improves write")) {
+    return "True. Sequential writes are significantly faster than random writes because they avoid seek delays on physical media and update memory buffers directly (LSM Trees).";
+  }
+  if (q.includes("web servers and browsers impose payload size")) {
+    return "True. Standard HTTP servers restrict post payload sizes (e.g., 100MB limit). Chunked multipart uploads are required to stream large files reliably.";
+  }
+  if (q.includes("fan-out on write means aggregating data")) {
+    return "False. Fan-out on write pre-computes feeds on write-time. Aggregating data at read-time is called Fan-out on read.";
+  }
+  if (q.includes("atomic operations prevent race conditions")) {
+    return "True. Atomic operations execute as a single indivisible unit, preventing concurrent updates from overwriting each other's transactions.";
+  }
+  if (q.includes("containers share the host kernel")) {
+    return "True. Containers use namespace isolation and cgroups to share the host OS kernel, making them lightweight compared to Hypervisor-based virtual machines.";
+  }
+  if (q.includes("websockets maintain persistent")) {
+    return "True. WebSockets upgrade standard HTTP connections to bi-directional, full-duplex TCP socket streams, enabling real-time client-server communication.";
+  }
+  if (q.includes("client-side rate limiting alone is sufficient")) {
+    return "False. Client-side checks can be easily bypassed by malicious API requests or bots. Server-side rate limiting is mandatory to protect server infrastructure.";
+  }
+  if (q.includes("inverted indexes enable efficient")) {
+    return "True. Inverted indexes map keyword tokens to document IDs, enabling logarithmic lookups without traversing files sequentially.";
+  }
+  if (q.includes("min-heap of size k lets you find")) {
+    return "True. A min-heap maintains the smallest of the top-K elements at the root. Evicting root elements smaller than new values ensures the heap contains the largest elements in O(N log K) time.";
+  }
+  return "Default verification completed successfully. Refer to the specific technology blog references for more context.";
+}
+
+function InteractiveQuizCard({ rawText }: { rawText: string }) {
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [userOrder, setUserOrder] = useState<string[]>([]);
+  const [orderChecked, setOrderChecked] = useState(false);
+  const [isOrderCorrect, setIsOrderCorrect] = useState(false);
+
+  // Check if it's a multiple choice/true-false question
+  const hasChoices = rawText.includes("1") && rawText.includes("2");
+
+  if (hasChoices) {
+    // Parse question and choices
+    const option1Index = rawText.indexOf("1");
+    const question = rawText.substring(0, option1Index).trim();
+    const remaining = rawText.substring(option1Index);
+
+    // Extract options by finding indices of digits
+    const options: string[] = [];
+    const idx1 = remaining.indexOf("1");
+    const idx2 = remaining.indexOf("2");
+    const idx3 = remaining.indexOf("3");
+    const idx4 = remaining.indexOf("4");
+
+    if (idx1 !== -1 && idx2 !== -1) {
+      if (idx3 !== -1 && idx4 !== -1) {
+        options.push(remaining.substring(idx1 + 1, idx2).trim());
+        options.push(remaining.substring(idx2 + 1, idx3).trim());
+        options.push(remaining.substring(idx3 + 1, idx4).trim());
+        options.push(remaining.substring(idx4 + 1).trim());
+      } else {
+        options.push(remaining.substring(idx1 + 1, idx2).trim());
+        options.push(remaining.substring(idx2 + 1).trim());
+      }
+    }
+
+    const correctIndex = getCorrectAnswerIndex(question);
+    const explanation = getQuizExplanation(question);
+
+    const handleOptionClick = (idx: number) => {
+      if (selectedOption === null) {
+        setSelectedOption(idx);
+        setShowExplanation(true);
+      }
+    };
+
+    return (
+      <div className="my-6 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-5 rounded-lg flex flex-col gap-4">
+        <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+          <span className="text-2xs font-mono text-zinc-400 uppercase tracking-widest font-bold">Concept Check</span>
+          <span className="text-3xs font-mono px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded">Interactive</span>
+        </div>
+
+        <h4 className="text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-relaxed">
+          {question}
+        </h4>
+
+        <div className="flex flex-col gap-2">
+          {options.map((opt, idx) => {
+            const isSelected = selectedOption === idx;
+            const isCurrentCorrect = idx === correctIndex;
+            
+            let optionStyle = "border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/40 text-zinc-700 dark:text-zinc-300";
+            if (selectedOption !== null) {
+              if (isCurrentCorrect) {
+                optionStyle = "border-emerald-500 bg-emerald-50/50 text-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-400 font-medium";
+              } else if (isSelected) {
+                optionStyle = "border-rose-500 bg-rose-50/50 text-rose-800 dark:bg-rose-950/20 dark:text-rose-400 font-medium";
+              } else {
+                optionStyle = "border-zinc-200 dark:border-zinc-800 opacity-60 text-zinc-400";
+              }
+            }
+
+            return (
+              <button
+                key={idx}
+                onClick={() => handleOptionClick(idx)}
+                disabled={selectedOption !== null}
+                className={`w-full text-left px-4 py-2.5 text-xs border rounded transition-all flex items-start gap-3 ${optionStyle}`}
+              >
+                <span className="font-mono text-zinc-400 font-bold shrink-0">{idx + 1}.</span>
+                <span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {showExplanation && (
+          <div className={`mt-2 border-t pt-3 flex flex-col gap-1.5 ${
+            selectedOption === correctIndex ? "border-emerald-100 dark:border-emerald-950/50" : "border-rose-100 dark:border-rose-950/50"
+          }`}>
+            <span className={`text-xs font-mono font-bold ${
+              selectedOption === correctIndex ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+            }`}>
+              {selectedOption === correctIndex ? "✓ Correct Answer" : "✗ Incorrect Option"}
+            </span>
+            <p className="text-2xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
+              {explanation}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  } else {
+    // Ordering / Matching question
+    const dotIndex = rawText.indexOf(".");
+    const question = dotIndex !== -1 ? rawText.substring(0, dotIndex).trim() + "." : "Sort the items below:";
+    
+    // Map specific lists based on question keywords
+    let items: string[] = [];
+    let correctOrder: string[] = [];
+    let isMatching = false;
+    let matchPairs: { left: string; right: string }[] = [];
+
+    const q = question.toLowerCase();
+    if (q.includes("web request over http/tcp")) {
+      items = ["TCP four-way teardown", "DNS resolution", "HTTP GET request sent", "TCP three-way handshake"];
+      correctOrder = ["DNS resolution", "TCP three-way handshake", "HTTP GET request sent", "TCP four-way teardown"];
+    } else if (q.includes("lifecycle of a single kafka message")) {
+      items = [
+        "The leader replica appends the message to its log and followers replicate it",
+        "Kafka hashes the message key to determine the target partition",
+        "The producer formats the message and sends it to a Kafka topic",
+        "Kafka identifies which broker holds the target partition and sends the message there"
+      ];
+      correctOrder = [
+        "The producer formats the message and sends it to a Kafka topic",
+        "Kafka hashes the message key to determine the target partition",
+        "Kafka identifies which broker holds the target partition and sends the message there",
+        "The leader replica appends the message to its log and followers replicate it"
+      ];
+    } else if (q.includes("distributed-lock booking flow")) {
+      items = [
+        "Stripe processes the payment and notifies the system via webhook that payment succeeded",
+        "The user selects a seat, triggering a POST /bookings request with the ticketId",
+        "The webhook handler runs a transaction that sets the ticket status to 'sold' and the booking to 'confirmed'",
+        "The Booking Service acquires a lock on the ticket in Redis with a TTL of 10 minutes"
+      ];
+      correctOrder = [
+        "The user selects a seat, triggering a POST /bookings request with the ticketId",
+        "The Booking Service acquires a lock on the ticket in Redis with a TTL of 10 minutes",
+        "Stripe processes the payment and notifies the system via webhook that payment succeeded",
+        "The webhook handler runs a transaction that sets the ticket status to 'sold' and the booking to 'confirmed'"
+      ];
+    } else if (q.includes("match each sharding or partitioning concept")) {
+      isMatching = true;
+      matchPairs = [
+        { left: "Range-based sharding", right: "Groups records by a continuous range of values and supports efficient range scans" },
+        { left: "Hash-based sharding", right: "Applies a hash function to the shard key to distribute records evenly" },
+        { left: "Directory-based sharding", right: "Uses a lookup table or service to decide where each record lives" },
+        { left: "Vertical partitioning", right: "Splits columns across pieces, keeping fewer columns per piece" }
+      ];
+    }
+
+    // Initialize user order on mount if empty
+    useEffect(() => {
+      if (items.length > 0 && userOrder.length === 0) {
+        setUserOrder([...items]);
+      }
+    }, [items, userOrder]);
+
+    const moveItem = (index: number, direction: "up" | "down") => {
+      if (orderChecked) return;
+      const newOrder = [...userOrder];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex >= 0 && targetIndex < newOrder.length) {
+        const temp = newOrder[index];
+        newOrder[index] = newOrder[targetIndex];
+        newOrder[targetIndex] = temp;
+        setUserOrder(newOrder);
+      }
+    };
+
+    const checkSequence = () => {
+      const correct = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+      setIsOrderCorrect(correct);
+      setOrderChecked(true);
+    };
+
+    if (isMatching) {
+      return (
+        <div className="my-6 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-5 rounded-lg flex flex-col gap-4">
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+            <span className="text-2xs font-mono text-zinc-400 uppercase tracking-widest font-bold">Interactive Match</span>
+            <span className="text-3xs font-mono px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded">Concept Match</span>
+          </div>
+
+          <h4 className="text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-relaxed">
+            Match each concept to its core description:
+          </h4>
+
+          <div className="flex flex-col gap-3">
+            {matchPairs.map((pair, idx) => (
+              <div key={idx} className="border border-zinc-200 dark:border-zinc-800 rounded bg-white dark:bg-zinc-950 p-3 flex flex-col gap-1">
+                <span className="text-xs font-mono text-sky-500 font-bold uppercase">{pair.left}</span>
+                <p className="text-2xs text-zinc-600 dark:text-zinc-400 leading-normal">{pair.right}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (items.length === 0) {
+      return (
+        <div className="my-6 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-5 rounded-lg flex flex-col gap-3">
+          <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{question}</h4>
+          <p className="text-2xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">{rawText}</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="my-6 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-5 rounded-lg flex flex-col gap-4">
+        <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+          <span className="text-2xs font-mono text-zinc-400 uppercase tracking-widest font-bold">Interactive Sequence</span>
+          <span className="text-3xs font-mono px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded">Sorting</span>
+        </div>
+
+        <h4 className="text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-relaxed">
+          Sort the following steps in correct chronological order (top to bottom):
+        </h4>
+
+        <div className="flex flex-col gap-2">
+          {userOrder.map((item, idx) => (
+            <div 
+              key={idx}
+              className="border border-zinc-200 dark:border-zinc-800 rounded bg-white dark:bg-zinc-950 px-3 py-2 flex items-center justify-between gap-3 text-xs text-zinc-800 dark:text-zinc-200"
+            >
+              <div className="flex items-start gap-2.5">
+                <span className="font-mono text-zinc-400 font-bold">{idx + 1}.</span>
+                <span>{item}</span>
+              </div>
+              <div className="flex gap-1 shrink-0">
+                <button
+                  type="button"
+                  disabled={idx === 0 || orderChecked}
+                  onClick={() => moveItem(idx, "up")}
+                  className="p-1 border border-zinc-200 dark:border-zinc-800 rounded bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-2xs font-bold disabled:opacity-40"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  disabled={idx === userOrder.length - 1 || orderChecked}
+                  onClick={() => moveItem(idx, "down")}
+                  className="p-1 border border-zinc-200 dark:border-zinc-800 rounded bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-2xs font-bold disabled:opacity-40"
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {!orderChecked ? (
+          <button
+            type="button"
+            onClick={checkSequence}
+            className="w-full mt-2 text-center text-xs font-semibold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 py-2 border border-zinc-900 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-900 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300"
+          >
+            Check Sequence
+          </button>
+        ) : (
+          <div className={`mt-2 border-t pt-3 flex flex-col gap-1.5 ${
+            isOrderCorrect ? "border-emerald-100 dark:border-emerald-950/50" : "border-rose-100 dark:border-rose-950/50"
+          }`}>
+            <span className={`text-xs font-mono font-bold ${
+              isOrderCorrect ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+            }`}>
+              {isOrderCorrect ? "✓ Sequence Correct!" : "✗ Sequence Incorrect"}
+            </span>
+            <p className="text-2xs text-zinc-500 dark:text-zinc-400 leading-relaxed font-normal">
+              {isOrderCorrect 
+                ? "Excellent! You ordered the steps exactly as they occur in real-world systems." 
+                : `Incorrect order. The correct chronological sequence is:\n${correctOrder.map((c, i) => `${i + 1}. ${c}`).join("\n")}`}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
 }
