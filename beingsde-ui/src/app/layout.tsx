@@ -57,6 +57,9 @@ export const metadata: Metadata = {
   publisher: "beingsde",
   category: "Education",
   classification: "System Design Interview Preparation",
+  verification: {
+    google: "_-ZX6XQ6EPuXzDaJ0G4lrwySkbdYDvTrm9G_LhPinug",
+  },
   robots: {
     index: true,
     follow: true,
