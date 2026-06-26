@@ -329,7 +329,7 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
 // Custom Premium Markdown Renderer for system design content
 function MarkdownRenderer({ content }: { content: string }) {
   // Preprocess: Replace the raw quiz text blocks with structured custom blocks
-  const quizRegex = /Test Your Knowledge\s*[\s\S]*?Question 1 of 15([\s\S]*?)(?:Quick Reference[\s\S]*?(?:View|$)|\bCheck Answer\b|$)/gi;
+  const quizRegex = /Test Your Knowledge\s*[\s\S]*?Question 1 of 15([\s\S]*?)(?:Quick Reference[\s\S]*?(?:\bView\b|$)|\bCheck Answer\b|$)/gi;
   let parsedContent = content.replace(quizRegex, (match, quizText) => {
     return `\n:::interactive-quiz\n${quizText.trim()}\n:::\n`;
   });
@@ -362,7 +362,7 @@ function MarkdownRenderer({ content }: { content: string }) {
     const line = lines[i];
 
     // Handle interactive quiz block
-    if (line.trim().startsWith(":::interactive-quiz")) {
+    if (line.trim().startsWith(":::interactive-quiz") || (inInteractiveQuiz && line.trim() === ":::")) {
       if (inInteractiveQuiz) {
         const quizText = interactiveQuizLines.join("\n");
         elements.push(
