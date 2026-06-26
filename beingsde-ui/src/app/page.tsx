@@ -1,12 +1,34 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, BookOpen, Layers, Users, Zap } from "lucide-react";
 
+export const metadata: Metadata = {
+  title: "beingsde.in | Master System Design Interviews & Architectures",
+  description: "A premium interactive learning platform to master HLD, LLD, caching, consistent hashing, and database sharding. Build scalable software architectures and pass FAANG interviews.",
+};
+
 export default function LandingPage() {
   return (
     <div className="flex flex-col items-center justify-center gap-20 py-10 overflow-x-hidden">
+      {/* Schema.org JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "beingsde.in",
+            "url": "https://beingsde.in",
+            "description": "Learn system design, high-level design (HLD), low-level design (LLD), caching, and consistent hashing with interactive hand-drawn blueprints and real-world corporate case studies.",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://beingsde.in/topics?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }),
+        }}
+      />
       
       {/* HERO SECTION */}
       <section className="relative w-full max-w-4xl text-center flex flex-col items-center gap-6 mt-10">

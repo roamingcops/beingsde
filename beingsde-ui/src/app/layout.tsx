@@ -16,8 +16,65 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "beingsde.com | Master System Design",
-  description: "A premium interactive learning platform to master HLD, LLD, and scale distributed architectures.",
+  metadataBase: new URL("https://beingsde.in"),
+  title: {
+    default: "beingsde.in | Master System Design Interviews & Architectures",
+    template: "%s | beingsde.in"
+  },
+  description: "A premium interactive learning platform to master High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and consistent hashing. Ace your FAANG software engineering system design interviews.",
+  keywords: [
+    "beingsde",
+    "beingsde.in",
+    "beingsde.com",
+    "system design",
+    "system design interview",
+    "high level design",
+    "low level design",
+    "distributed systems",
+    "system design guide",
+    "FAANG system design interview",
+    "software engineering scalability"
+  ],
+  authors: [{ name: "beingsde Team" }],
+  creator: "beingsde",
+  publisher: "beingsde",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://beingsde.in",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://beingsde.in",
+    title: "beingsde.in | Master System Design Interviews & Architectures",
+    description: "Learn High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and scalable architecture with interactive blueprints.",
+    siteName: "beingsde",
+    images: [
+      {
+        url: "/images/redis-caching-diagram.png",
+        width: 1200,
+        height: 630,
+        alt: "beingsde - System Design Architecture Diagrams",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "beingsde.in | Master System Design",
+    description: "Ace your software engineering system design interviews with interactive hand-drawn blueprints and real-world corporate case studies.",
+    images: ["/images/redis-caching-diagram.png"],
+    creator: "@beingsde",
+  },
 };
 
 export default function RootLayout({
