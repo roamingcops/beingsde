@@ -119,12 +119,9 @@ export default function RootLayout({
               <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Questions
               </Link>
-              <Link href="/subscriptions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                Subscriptions
-              </Link>
-              <Link href="/interviews" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                Mock Interviews
-              </Link>
+              {/* Subscriptions, Mock Interviews — hidden until activation */}
+              {/* <Link href="/subscriptions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Subscriptions</Link> */}
+              {/* <Link href="/interviews" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Mock Interviews</Link> */}
             </nav>
 
             <div className="flex items-center gap-4">
