@@ -13,6 +13,11 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
   
   const [activeTab, setActiveTab] = useState<"notes" | "video" | "pdf">("notes");
   const [isPremiumUser, setIsPremiumUser] = useState(false);
+  
+  // Interactive Workbench States
+  const [workbenchUserId, setWorkbenchUserId] = useState("user_8472");
+  const [rolloutPercentage, setRolloutPercentage] = useState(50);
+  const [hashAlgorithm, setHashAlgorithm] = useState("fnv1a");
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
@@ -22,6 +27,32 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
   // Retrieve topic info matching slug
   const topic = MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1];
   const isLocked = topic.isPremium && !isPremiumUser;
+
+  // Hashing calculation logic for the workbench
+  let calculatedHash = 0;
+  if (hashAlgorithm === "fnv1a") {
+    let hash = 2166136261;
+    for (let i = 0; i < workbenchUserId.length; i++) {
+      hash ^= workbenchUserId.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    calculatedHash = Math.abs(hash);
+  } else if (hashAlgorithm === "djb2") {
+    let hash = 5381;
+    for (let i = 0; i < workbenchUserId.length; i++) {
+      hash = (hash * 33) ^ workbenchUserId.charCodeAt(i);
+    }
+    calculatedHash = Math.abs(hash);
+  } else {
+    let sum = 0;
+    for (let i = 0; i < workbenchUserId.length; i++) {
+      sum += workbenchUserId.charCodeAt(i);
+    }
+    calculatedHash = sum;
+  }
+
+  const calculatedBucket = calculatedHash % 100;
+  const isRolloutActive = calculatedBucket < rolloutPercentage;
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto py-4">
@@ -217,14 +248,73 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
               </ul>
             </div>
 
-            <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">Evaluation Workbench</h3>
-              <p className="text-2xs text-zinc-500 leading-relaxed">
-                Use this sandbox to test percentage evaluations locally. This course configuration evaluates on active client profiles.
-              </p>
-              <div className="flex items-center gap-2 text-3xs font-mono border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 p-2.5 rounded mt-3 text-zinc-400">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Active SDK evaluation matches client consistent rollout bucket key.
+            <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+              <div>
+                <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Evaluation Workbench</h3>
+                <p className="text-2xs text-zinc-500 leading-relaxed">
+                  Test consistent hashing and rollout allocation in real time. Simulate how request routing decides if a client sees a new feature or replica.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-3xs font-mono uppercase text-zinc-400">Client / User ID</label>
+                  <input
+                    type="text"
+                    value={workbenchUserId}
+                    onChange={(e) => setWorkbenchUserId(e.target.value)}
+                    className="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
+                    placeholder="e.g. user_8472"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
+                    <span>Rollout Target</span>
+                    <span>{rolloutPercentage}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={rolloutPercentage}
+                    onChange={(e) => setRolloutPercentage(Number(e.target.value))}
+                    className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-3xs font-mono uppercase text-zinc-400">Hashing Function</label>
+                  <select
+                    value={hashAlgorithm}
+                    onChange={(e) => setHashAlgorithm(e.target.value)}
+                    className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400 text-ellipsis overflow-hidden"
+                  >
+                    <option value="fnv1a">FNV-1a (Recommended)</option>
+                    <option value="djb2">DJB2 (XOR-shift)</option>
+                    <option value="simple">Sum-Of-Chars</option>
+                  </select>
+                </div>
+
+                <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-3xs font-mono">
+                    <span className="text-zinc-400">Hash Result:</span>
+                    <span className="text-zinc-700 dark:text-zinc-300 font-semibold text-ellipsis overflow-hidden max-w-[120px]">{calculatedHash}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-3xs font-mono">
+                    <span className="text-zinc-400">Bucket (Hash % 100):</span>
+                    <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{calculatedBucket}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 pt-2 text-3xs font-mono">
+                    <span className="text-zinc-400">Rollout Status:</span>
+                    <span className={`inline-flex items-center gap-1 font-bold ${
+                      isRolloutActive ? "text-emerald-500" : "text-rose-500"
+                    }`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${isRolloutActive ? "bg-emerald-500" : "bg-rose-500"}`} />
+                      {isRolloutActive ? "ACTIVE" : "INACTIVE"}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
