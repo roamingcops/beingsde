@@ -1464,17 +1464,18 @@ function CheatSheetWidget() {
         <FileText className="w-5 h-5 text-sky-500 shrink-0" />
         <div>
           <h4 className="text-xs font-bold font-mono uppercase tracking-wider">Cheat Sheet Utility</h4>
-          <p className="text-3xs text-zinc-400 mt-0.5 leading-normal">Download a concise system design reference card.</p>
+          <p className="text-3xs text-zinc-400 mt-0.5 leading-normal">View and print a concise system design reference card.</p>
         </div>
       </div>
       <a
-        href="https://cdn.beingsde.com/cheat-sheets/system_design_cheat_sheet.pdf"
+        href="/cheat-sheet"
         target="_blank"
         rel="noopener noreferrer"
         className="w-full text-center text-3xs font-semibold uppercase tracking-wider border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 px-3 py-2 rounded bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors font-mono"
       >
-        Download Reference PDF
+        View Reference Sheet →
       </a>
     </div>
   );
 }
+
