@@ -14,11 +14,6 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
   const [activeTab, setActiveTab] = useState<"notes" | "video" | "pdf">("notes");
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   
-  // Interactive Workbench States
-  const [workbenchUserId, setWorkbenchUserId] = useState("user_8472");
-  const [rolloutPercentage, setRolloutPercentage] = useState(50);
-  const [hashAlgorithm, setHashAlgorithm] = useState("fnv1a");
-
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     setIsPremiumUser(role === "PREMIUM_USER" || role === "ADMIN");
@@ -27,32 +22,6 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
   // Retrieve topic info matching slug
   const topic = MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1];
   const isLocked = topic.isPremium && !isPremiumUser;
-
-  // Hashing calculation logic for the workbench
-  let calculatedHash = 0;
-  if (hashAlgorithm === "fnv1a") {
-    let hash = 2166136261;
-    for (let i = 0; i < workbenchUserId.length; i++) {
-      hash ^= workbenchUserId.charCodeAt(i);
-      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-    }
-    calculatedHash = Math.abs(hash);
-  } else if (hashAlgorithm === "djb2") {
-    let hash = 5381;
-    for (let i = 0; i < workbenchUserId.length; i++) {
-      hash = (hash * 33) ^ workbenchUserId.charCodeAt(i);
-    }
-    calculatedHash = Math.abs(hash);
-  } else {
-    let sum = 0;
-    for (let i = 0; i < workbenchUserId.length; i++) {
-      sum += workbenchUserId.charCodeAt(i);
-    }
-    calculatedHash = sum;
-  }
-
-  const calculatedBucket = calculatedHash % 100;
-  const isRolloutActive = calculatedBucket < rolloutPercentage;
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto py-4">
@@ -248,75 +217,7 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
               </ul>
             </div>
 
-            <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
-              <div>
-                <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Evaluation Workbench</h3>
-                <p className="text-2xs text-zinc-500 leading-relaxed">
-                  Test consistent hashing and rollout allocation in real time. Simulate how request routing decides if a client sees a new feature or replica.
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-3xs font-mono uppercase text-zinc-400">Client / User ID</label>
-                  <input
-                    type="text"
-                    value={workbenchUserId}
-                    onChange={(e) => setWorkbenchUserId(e.target.value)}
-                    className="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
-                    placeholder="e.g. user_8472"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
-                    <span>Rollout Target</span>
-                    <span>{rolloutPercentage}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={rolloutPercentage}
-                    onChange={(e) => setRolloutPercentage(Number(e.target.value))}
-                    className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-3xs font-mono uppercase text-zinc-400">Hashing Function</label>
-                  <select
-                    value={hashAlgorithm}
-                    onChange={(e) => setHashAlgorithm(e.target.value)}
-                    className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400 text-ellipsis overflow-hidden"
-                  >
-                    <option value="fnv1a">FNV-1a (Recommended)</option>
-                    <option value="djb2">DJB2 (XOR-shift)</option>
-                    <option value="simple">Sum-Of-Chars</option>
-                  </select>
-                </div>
-
-                <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded flex flex-col gap-2">
-                  <div className="flex items-center justify-between text-3xs font-mono">
-                    <span className="text-zinc-400">Hash Result:</span>
-                    <span className="text-zinc-700 dark:text-zinc-300 font-semibold text-ellipsis overflow-hidden max-w-[120px]">{calculatedHash}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-3xs font-mono">
-                    <span className="text-zinc-400">Bucket (Hash % 100):</span>
-                    <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{calculatedBucket}</span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 pt-2 text-3xs font-mono">
-                    <span className="text-zinc-400">Rollout Status:</span>
-                    <span className={`inline-flex items-center gap-1 font-bold ${
-                      isRolloutActive ? "text-emerald-500" : "text-rose-500"
-                    }`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${isRolloutActive ? "bg-emerald-500" : "bg-rose-500"}`} />
-                      {isRolloutActive ? "ACTIVE" : "INACTIVE"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {renderTopicSpecificSidebar(topic.slug, topic.category, topic.tags || [])}
           </div>
 
         </section>
@@ -882,4 +783,698 @@ function InteractiveQuizCard({ rawText }: { rawText: string }) {
       </div>
     );
   }
+}
+
+// Sidebar dispatcher to render topic-specific workbenches
+function renderTopicSpecificSidebar(slug: string, category: string, tags: string[]) {
+  const lowercaseSlug = slug.toLowerCase();
+  const lowercaseCategory = category.toLowerCase();
+  
+  if (lowercaseSlug.includes("consistent-hashing") || lowercaseSlug.includes("sharding")) {
+    return <HashingWorkbench />;
+  }
+  
+  if (lowercaseSlug.includes("caching") || lowercaseSlug.includes("redis") || lowercaseSlug.includes("cache")) {
+    return <CachingSimulator />;
+  }
+  
+  if (lowercaseSlug.includes("rate-limiter") || lowercaseSlug.includes("api-gateway") || lowercaseSlug.includes("ticketmaster")) {
+    return <RateLimiterSimulator />;
+  }
+  
+  if (lowercaseSlug.includes("kafka")) {
+    return <KafkaPartitionSimulator />;
+  }
+  
+  if (
+    lowercaseCategory.includes("database") ||
+    lowercaseCategory.includes("storage") ||
+    lowercaseSlug.includes("modeling") ||
+    lowercaseSlug.includes("cassandra") ||
+    lowercaseSlug.includes("dynamodb") ||
+    lowercaseSlug.includes("postgresql")
+  ) {
+    return <StorageCalculator />;
+  }
+
+  // Fallback to related topics and cheat sheet
+  return (
+    <div className="flex flex-col gap-6">
+      <RelatedTopicsPanel currentSlug={slug} currentCategory={category} currentTags={tags} />
+      <CheatSheetWidget />
+    </div>
+  );
+}
+
+// 1. Consistent Hashing / Rollout Workbench
+function HashingWorkbench() {
+  const [workbenchUserId, setWorkbenchUserId] = useState("user_8472");
+  const [rolloutPercentage, setRolloutPercentage] = useState(50);
+  const [hashAlgorithm, setHashAlgorithm] = useState("fnv1a");
+
+  let calculatedHash = 0;
+  if (hashAlgorithm === "fnv1a") {
+    let hash = 2166136261;
+    for (let i = 0; i < workbenchUserId.length; i++) {
+      hash ^= workbenchUserId.charCodeAt(i);
+      hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+    }
+    calculatedHash = Math.abs(hash);
+  } else if (hashAlgorithm === "djb2") {
+    let hash = 5381;
+    for (let i = 0; i < workbenchUserId.length; i++) {
+      hash = (hash * 33) ^ workbenchUserId.charCodeAt(i);
+    }
+    calculatedHash = Math.abs(hash);
+  } else {
+    let sum = 0;
+    for (let i = 0; i < workbenchUserId.length; i++) {
+      sum += workbenchUserId.charCodeAt(i);
+    }
+    calculatedHash = sum;
+  }
+
+  const calculatedBucket = calculatedHash % 100;
+  const isRolloutActive = calculatedBucket < rolloutPercentage;
+
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+      <div>
+        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Evaluation Workbench</h3>
+        <p className="text-2xs text-zinc-500 leading-relaxed">
+          Test consistent hashing and rollout allocation in real time. Simulate how request routing decides if a client sees a new feature or replica.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+        <div className="flex flex-col gap-1">
+          <label className="text-3xs font-mono uppercase text-zinc-400">Client / User ID</label>
+          <input
+            type="text"
+            value={workbenchUserId}
+            onChange={(e) => setWorkbenchUserId(e.target.value)}
+            className="px-2 py-1.5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
+            placeholder="e.g. user_8472"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
+            <span>Rollout Target</span>
+            <span>{rolloutPercentage}%</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={rolloutPercentage}
+            onChange={(e) => setRolloutPercentage(Number(e.target.value))}
+            className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-3xs font-mono uppercase text-zinc-400">Hashing Function</label>
+          <select
+            value={hashAlgorithm}
+            onChange={(e) => setHashAlgorithm(e.target.value)}
+            className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400 text-ellipsis overflow-hidden"
+          >
+            <option value="fnv1a">FNV-1a (Recommended)</option>
+            <option value="djb2">DJB2 (XOR-shift)</option>
+            <option value="simple">Sum-Of-Chars</option>
+          </select>
+        </div>
+
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded flex flex-col gap-2">
+          <div className="flex items-center justify-between text-3xs font-mono">
+            <span className="text-zinc-400">Hash Result:</span>
+            <span className="text-zinc-700 dark:text-zinc-300 font-semibold text-ellipsis overflow-hidden max-w-[120px]">{calculatedHash}</span>
+          </div>
+          <div className="flex items-center justify-between text-3xs font-mono">
+            <span className="text-zinc-400">Bucket (Hash % 100):</span>
+            <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{calculatedBucket}</span>
+          </div>
+          <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 pt-2 text-3xs font-mono">
+            <span className="text-zinc-400">Rollout Status:</span>
+            <span className={`inline-flex items-center gap-1 font-bold ${
+              isRolloutActive ? "text-emerald-500" : "text-rose-500"
+            }`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${isRolloutActive ? "bg-emerald-500" : "bg-rose-500"}`} />
+              {isRolloutActive ? "ACTIVE" : "INACTIVE"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 2. Cache-Aside Simulator
+function CachingSimulator() {
+  const [cache, setCache] = useState<{ [key: string]: string }>({
+    "user_101": "{\"name\":\"Alice\",\"tier\":\"premium\"}",
+    "settings_global": "{\"theme\":\"dark\",\"maintenance\":false}"
+  });
+  const [readKey, setReadKey] = useState("user_101");
+  const [writeKey, setWriteKey] = useState("user_102");
+  const [writeValue, setWriteValue] = useState("{\"name\":\"Bob\",\"tier\":\"free\"}");
+  const [logs, setLogs] = useState<{ text: string; type: "hit" | "miss" | "write" }[]>([]);
+
+  const handleRead = () => {
+    if (!readKey.trim()) return;
+    const hit = cache[readKey] !== undefined;
+    if (hit) {
+      setLogs((prev) => [
+        { text: `Read '${readKey}' - CACHE HIT (Latency: <1ms)`, type: "hit" },
+        ...prev.slice(0, 4)
+      ]);
+    } else {
+      const dbValue = readKey === "user_102" ? "{\"name\":\"Bob\",\"tier\":\"free\"}" : "{\"id\":\"" + readKey + "\",\"status\":\"active\"}";
+      setCache((prev) => ({ ...prev, [readKey]: dbValue }));
+      setLogs((prev) => [
+        { text: `Read '${readKey}' - CACHE MISS (Fetched from DB: ~80ms, written to Cache)`, type: "miss" },
+        ...prev.slice(0, 4)
+      ]);
+    }
+  };
+
+  const handleWrite = () => {
+    if (!writeKey.trim()) return;
+    setCache((prev) => {
+      const next = { ...prev };
+      delete next[writeKey];
+      return next;
+    });
+    setLogs((prev) => [
+      { text: `Write '${writeKey}' to DB (Invalidated cache entry to ensure consistency)`, type: "write" },
+      ...prev.slice(0, 4)
+    ]);
+  };
+
+  const clearCache = () => {
+    setCache({});
+    setLogs([]);
+  };
+
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+      <div>
+        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Caching Simulator</h3>
+        <p className="text-2xs text-zinc-500 leading-relaxed">
+          Simulate Cache-Aside logic. See how cache misses trigger database reads (slow) and populate cache, while writes invalidate entries.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-3xs font-mono uppercase text-zinc-400">Read Cache Key</label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={readKey}
+              onChange={(e) => setReadKey(e.target.value)}
+              className="flex-1 px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+              placeholder="e.g. user_101"
+            />
+            <button
+              onClick={handleRead}
+              className="px-3 py-1 bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-2xs font-semibold rounded hover:opacity-90 transition-opacity uppercase font-mono"
+            >
+              Read
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-3xs font-mono uppercase text-zinc-400">Write DB Key & Value</label>
+          <div className="flex flex-col gap-2">
+            <input
+              type="text"
+              value={writeKey}
+              onChange={(e) => setWriteKey(e.target.value)}
+              className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+              placeholder="Key: e.g. user_102"
+            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={writeValue}
+                onChange={(e) => setWriteValue(e.target.value)}
+                className="flex-1 px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                placeholder="JSON Value"
+              />
+              <button
+                onClick={handleWrite}
+                className="px-3 py-1 bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-2xs font-semibold rounded hover:opacity-90 transition-opacity uppercase font-mono"
+              >
+                Write
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded flex flex-col gap-2">
+          <div className="flex items-center justify-between text-3xs font-mono border-b border-zinc-200 dark:border-zinc-800 pb-1">
+            <span className="text-zinc-400 font-bold">Active Cache Store:</span>
+            <button onClick={clearCache} className="text-zinc-400 hover:text-rose-500 text-3xs underline">Flush All</button>
+          </div>
+          {Object.keys(cache).length === 0 ? (
+            <span className="text-3xs font-mono text-zinc-400 italic">Cache is empty</span>
+          ) : (
+            <div className="max-h-[80px] overflow-y-auto space-y-1 font-mono text-3xs">
+              {Object.entries(cache).map(([k, v]) => (
+                <div key={k} className="flex justify-between items-start text-zinc-700 dark:text-zinc-300 gap-2 border-b border-zinc-100 dark:border-zinc-900 pb-0.5 last:border-0">
+                  <span className="font-semibold shrink-0 text-sky-500">{k}:</span>
+                  <span className="truncate max-w-[120px]">{v}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <span className="text-3xs font-mono uppercase text-zinc-400">Simulation Logs</span>
+          <div className="h-[90px] overflow-y-auto border border-zinc-200 dark:border-zinc-800 bg-zinc-950 p-2 rounded space-y-1">
+            {logs.length === 0 ? (
+              <p className="text-3xs font-mono text-zinc-600 italic">No events logged yet...</p>
+            ) : (
+              logs.map((log, idx) => (
+                <p key={idx} className={`text-3xs font-mono leading-tight ${
+                  log.type === "hit" ? "text-emerald-400" :
+                  log.type === "miss" ? "text-amber-400" : "text-sky-400"
+                }`}>
+                  &gt; {log.text}
+                </p>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 3. Token Bucket Rate Limiter Simulator
+function RateLimiterSimulator() {
+  const [tokens, setTokens] = useState(8);
+  const maxTokens = 10;
+  const [refillInterval, setRefillInterval] = useState(1500);
+  const [requests, setRequests] = useState<{ id: number; allowed: boolean; timestamp: string }[]>([]);
+  const [reqCounter, setReqCounter] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTokens((prev) => Math.min(maxTokens, prev + 1));
+    }, refillInterval);
+    return () => clearInterval(timer);
+  }, [refillInterval]);
+
+  const handleRequest = () => {
+    const timestamp = new Date().toLocaleTimeString();
+    const id = reqCounter;
+    setReqCounter((prev) => prev + 1);
+
+    if (tokens >= 1) {
+      setTokens((prev) => prev - 1);
+      setRequests((prev) => [
+        { id, allowed: true, timestamp },
+        ...prev.slice(0, 4)
+      ]);
+    } else {
+      setRequests((prev) => [
+        { id, allowed: false, timestamp },
+        ...prev.slice(0, 4)
+      ]);
+    }
+  };
+
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+      <div>
+        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Rate Limiter Simulator</h3>
+        <p className="text-2xs text-zinc-500 leading-relaxed">
+          Simulate a Token Bucket algorithm. Requests consume 1 token. Tokens refill at a steady interval. When empty, further requests are blocked (HTTP 429).
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
+            <span>Bucket Capacity ({tokens}/{maxTokens} tokens)</span>
+            <span className="text-emerald-500 font-bold">Refilling</span>
+          </div>
+          <div className="h-6 w-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 rounded p-0.5 flex gap-1 items-center">
+            {Array.from({ length: maxTokens }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`h-full flex-1 rounded-sm transition-all duration-300 ${
+                  idx < tokens 
+                    ? "bg-emerald-500 dark:bg-emerald-600 shadow-sm" 
+                    : "bg-zinc-200 dark:bg-zinc-800 opacity-20"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-3xs font-mono uppercase text-zinc-400">Token Refill Speed</label>
+          <select
+            value={refillInterval}
+            onChange={(e) => setRefillInterval(Number(e.target.value))}
+            className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+          >
+            <option value={800}>Fast Refill (1 token / 800ms)</option>
+            <option value={1500}>Normal Refill (1 token / 1.5s)</option>
+            <option value={3000}>Slow Refill (1 token / 3s)</option>
+          </select>
+        </div>
+
+        <button
+          onClick={handleRequest}
+          className="w-full mt-2 text-center text-xs font-semibold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 py-2.5 border border-zinc-900 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-900 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300 font-mono"
+        >
+          Send Client Request
+        </button>
+
+        <div className="flex flex-col gap-1 mt-2">
+          <span className="text-3xs font-mono uppercase text-zinc-400">Request Logs</span>
+          <div className="h-[90px] overflow-y-auto border border-zinc-200 dark:border-zinc-800 bg-zinc-950 p-2 rounded space-y-1">
+            {requests.length === 0 ? (
+              <p className="text-3xs font-mono text-zinc-600 italic">Click the button to send traffic...</p>
+            ) : (
+              requests.map((r) => (
+                <div key={r.id} className="flex justify-between items-center text-3xs font-mono leading-tight">
+                  <span className="text-zinc-500">[{r.timestamp}] Req #{r.id}</span>
+                  <span className={`font-bold ${r.allowed ? "text-emerald-400" : "text-rose-400"}`}>
+                    {r.allowed ? "200 OK" : "429 TOO MANY REQ"}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 4. Kafka Partition Broker Simulator
+function KafkaPartitionSimulator() {
+  const [partitions, setPartitions] = useState<{ [id: number]: { key: string; payload: string; offset: number }[] }>({
+    0: [],
+    1: [],
+    2: []
+  });
+  const [messageKey, setMessageKey] = useState("user_8472");
+  const [messagePayload, setMessagePayload] = useState("LOGIN_EVENT");
+  const [routingAlgorithm, setRoutingAlgorithm] = useState<"hash" | "rr">("hash");
+  const [rrCounter, setRrCounter] = useState(0);
+
+  const produceMessage = () => {
+    let targetPartition = 0;
+    if (routingAlgorithm === "hash") {
+      let hash = 0;
+      for (let i = 0; i < messageKey.length; i++) {
+        hash += messageKey.charCodeAt(i);
+      }
+      targetPartition = hash % 3;
+    } else {
+      targetPartition = rrCounter % 3;
+      setRrCounter((prev) => prev + 1);
+    }
+
+    setPartitions((prev) => {
+      const pList = prev[targetPartition] || [];
+      const newOffset = pList.length > 0 ? pList[pList.length - 1].offset + 1 : 0;
+      return {
+        ...prev,
+        [targetPartition]: [...pList, { key: messageKey, payload: messagePayload, offset: newOffset }]
+      };
+    });
+  };
+
+  const clearPartitions = () => {
+    setPartitions({ 0: [], 1: [], 2: [] });
+    setRrCounter(0);
+  };
+
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+      <div>
+        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Kafka Partition Broker</h3>
+        <p className="text-2xs text-zinc-500 leading-relaxed">
+          Simulate how a Kafka producer hashes message keys (e.g. `user_id`) to assign events to partitions, maintaining ordering per partition.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+        <div className="flex flex-col gap-1">
+          <label className="text-3xs font-mono uppercase text-zinc-400">Partition Routing Algorithm</label>
+          <select
+            value={routingAlgorithm}
+            onChange={(e) => setRoutingAlgorithm(e.target.value as "hash" | "rr")}
+            className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+          >
+            <option value="hash">Key Hashing (hash(key) % 3)</option>
+            <option value="rr">Round-Robin Rotation</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1">
+            <label className="text-3xs font-mono uppercase text-zinc-400">Message Key (e.g. User ID)</label>
+            <input
+              type="text"
+              value={messageKey}
+              onChange={(e) => setMessageKey(e.target.value)}
+              className="px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+              placeholder="e.g. user_8472"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-3xs font-mono uppercase text-zinc-400">Message Payload</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={messagePayload}
+                onChange={(e) => setMessagePayload(e.target.value)}
+                className="flex-1 px-2 py-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs rounded font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                placeholder="e.g. LOGIN_EVENT"
+              />
+              <button
+                onClick={produceMessage}
+                className="px-3 py-1 bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 text-2xs font-semibold rounded hover:opacity-90 transition-opacity uppercase font-mono"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between items-center text-3xs font-mono uppercase text-zinc-400">
+            <span>Broker Partitions</span>
+            <button onClick={clearPartitions} className="text-zinc-400 hover:text-rose-500 text-3xs underline normal-case">Reset Topics</button>
+          </div>
+          <div className="grid grid-cols-3 gap-1 border border-zinc-200 dark:border-zinc-800 rounded bg-zinc-950 p-2 min-h-[100px] max-h-[160px] overflow-y-auto">
+            {[0, 1, 2].map((pid) => (
+              <div key={pid} className="flex flex-col gap-1 border-r border-zinc-800 last:border-0 pr-1 last:pr-0">
+                <span className="text-[9px] font-mono text-zinc-400 font-bold border-b border-zinc-800 pb-0.5 text-center">Part {pid}</span>
+                <div className="flex flex-col-reverse gap-1 overflow-y-auto">
+                  {partitions[pid]?.length === 0 ? (
+                    <span className="text-[8px] font-mono text-zinc-600 text-center italic">empty</span>
+                  ) : (
+                    partitions[pid]?.map((msg, index) => (
+                      <div key={index} className="bg-zinc-900 border border-zinc-800 p-1 rounded-sm text-[8px] font-mono text-sky-400 truncate">
+                        <span className="text-zinc-500 font-bold">Offset {msg.offset}:</span> {msg.key}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 5. Database Storage & Capacity Calculator
+function StorageCalculator() {
+  const [dau, setDau] = useState(10);
+  const [readRatio, setReadRatio] = useState(90);
+  const [payloadSize, setPayloadSize] = useState(500);
+
+  const writeRatio = 100 - readRatio;
+  const dauRaw = dau * 1000000;
+  
+  const writesPerDay = dauRaw * 5 * (writeRatio / 100);
+  const readsPerDay = dauRaw * 5 * (readRatio / 100);
+  
+  const writeQps = Math.round(writesPerDay / 86400);
+  const readQps = Math.round(readsPerDay / 86400);
+  const totalQps = writeQps + readQps;
+
+  const writeBandwidthMB = (writeQps * payloadSize) / (1024 * 1024);
+  const readBandwidthMB = (readQps * payloadSize * 2) / (1024 * 1024);
+
+  const dbStorageYearGB = Math.round((writesPerDay * payloadSize * 365) / 1000000000);
+
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+      <div>
+        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Capacity Calculator</h3>
+        <p className="text-2xs text-zinc-500 leading-relaxed">
+          Estimate QPS, bandwidth, and database sizing in real time based on active users and payload characteristics.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
+            <span>Daily Active Users (DAU)</span>
+            <span className="font-bold text-zinc-700 dark:text-zinc-300">{dau}M</span>
+          </div>
+          <input
+            type="range"
+            min="1"
+            max="200"
+            value={dau}
+            onChange={(e) => setDau(Number(e.target.value))}
+            className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
+            <span>Read Ratio vs Write Ratio</span>
+            <span className="font-bold text-zinc-700 dark:text-zinc-300">{readRatio}% / {writeRatio}%</span>
+          </div>
+          <input
+            type="range"
+            min="50"
+            max="99"
+            value={readRatio}
+            onChange={(e) => setReadRatio(Number(e.target.value))}
+            className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex justify-between text-3xs font-mono uppercase text-zinc-400">
+            <span>Payload Size (Bytes)</span>
+            <span className="font-bold text-zinc-700 dark:text-zinc-300">{payloadSize} B</span>
+          </div>
+          <input
+            type="range"
+            min="100"
+            max="5000"
+            step="100"
+            value={payloadSize}
+            onChange={(e) => setPayloadSize(Number(e.target.value))}
+            className="w-full h-1 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-900 dark:accent-zinc-100"
+          />
+        </div>
+
+        <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded flex flex-col gap-2 font-mono text-3xs">
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Average Read QPS:</span>
+            <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{readQps.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Average Write QPS:</span>
+            <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{writeQps.toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-1.5">
+            <span className="text-zinc-400 font-bold">Total Request QPS:</span>
+            <span className="text-sky-500 font-bold">{totalQps.toLocaleString()} req/s</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Write Bandwidth:</span>
+            <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{writeBandwidthMB.toFixed(2)} MB/s</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Read Bandwidth:</span>
+            <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{readBandwidthMB.toFixed(2)} MB/s</span>
+          </div>
+          <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 pt-1.5 text-2xs">
+            <span className="text-zinc-400 font-bold">Storage / Year:</span>
+            <span className="text-emerald-500 font-bold">{dbStorageYearGB} GB/yr</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 6. Related Topics Sidebar Panel
+function RelatedTopicsPanel({ currentSlug, currentCategory, currentTags }: { currentSlug: string; currentCategory: string; currentTags: string[] }) {
+  const related = MOCK_TOPICS.filter((t) => {
+    if (t.slug === currentSlug) return false;
+    const sameCategory = t.category === currentCategory;
+    const sharedTags = t.tags?.some((tag) => currentTags?.includes(tag));
+    return sameCategory || sharedTags;
+  }).slice(0, 3);
+
+  if (related.length === 0) return null;
+
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-4">
+      <div>
+        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1">Related Topics</h3>
+        <p className="text-2xs text-zinc-500 leading-relaxed">
+          Expand your knowledge by learning about adjacent concepts in system design.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
+        {related.map((topic) => (
+          <Link
+            key={topic.slug}
+            href={`/topics/${topic.slug}`}
+            className="flex flex-col gap-1.5 p-2 rounded-sm border border-zinc-100 dark:border-zinc-900 bg-zinc-50/50 dark:bg-zinc-900/30 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-all duration-300"
+          >
+            <div className="flex justify-between items-center text-3xs font-mono font-semibold uppercase text-zinc-400">
+              <span>{topic.category}</span>
+              <span className={`text-[9px] px-1.5 py-0.5 border rounded-sm ${
+                topic.difficulty === "EASY" ? "border-emerald-200 text-emerald-600 bg-emerald-50/20 dark:border-emerald-950 text-emerald-500" :
+                topic.difficulty === "MEDIUM" ? "border-amber-200 text-amber-600 bg-amber-50/20 dark:border-amber-950 text-amber-500" :
+                "border-rose-200 text-rose-600 bg-rose-50/20 dark:border-rose-950 text-rose-500"
+              }`}>
+                {topic.difficulty}
+              </span>
+            </div>
+            <h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 line-clamp-1">{topic.title}</h4>
+            <p className="text-3xs text-zinc-400 line-clamp-2 leading-relaxed">{topic.description}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 7. General System Design Cheat Sheet Widget
+function CheatSheetWidget() {
+  return (
+    <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md flex flex-col gap-3">
+      <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
+        <FileText className="w-5 h-5 text-sky-500 shrink-0" />
+        <div>
+          <h4 className="text-xs font-bold font-mono uppercase tracking-wider">Cheat Sheet Utility</h4>
+          <p className="text-3xs text-zinc-400 mt-0.5 leading-normal">Download a concise system design reference card.</p>
+        </div>
+      </div>
+      <a
+        href="https://cdn.beingsde.com/cheat-sheets/system_design_cheat_sheet.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="w-full text-center text-3xs font-semibold uppercase tracking-wider border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 px-3 py-2 rounded bg-zinc-50 dark:bg-zinc-950 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors font-mono"
+      >
+        Download Reference PDF
+      </a>
+    </div>
+  );
 }
