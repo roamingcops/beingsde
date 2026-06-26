@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download } from "lucide-react";
 
 import MOCK_TOPICS from "@/data/topics.json";
@@ -147,8 +148,29 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
             <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md shadow-sm min-h-[300px]">
               
               {activeTab === "notes" && (
-                <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line text-zinc-700 dark:text-zinc-300">
-                  {topic.contentMarkdown}
+                <div className="flex flex-col gap-6">
+                  {/* Explanation Diagram Block */}
+                  {topic.imageUrl && (
+                    <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-lg flex flex-col gap-3">
+                      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                        <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">System Architecture Diagram</span>
+                        <span className="text-3xs font-mono px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded">Interactive Zoom</span>
+                      </div>
+                      <div className="relative w-full aspect-[4/3] max-h-[480px] overflow-hidden rounded bg-black flex items-center justify-center group cursor-pointer border border-zinc-200 dark:border-zinc-800">
+                        <Image
+                          src={topic.imageUrl}
+                          alt={`${topic.title} architecture diagram`}
+                          fill
+                          className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                          sizes="(max-w-768px) 100vw, 800px"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="prose dark:prose-invert max-w-none">
+                    <MarkdownRenderer content={topic.contentMarkdown} />
+                  </div>
                 </div>
               )}
 
@@ -212,4 +234,179 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
 
     </div>
   );
+}
+
+// Custom Premium Markdown Renderer for system design content
+function MarkdownRenderer({ content }: { content: string }) {
+  const lines = content.split("\n");
+  const elements: React.ReactNode[] = [];
+  let inCodeBlock = false;
+  let codeBlockLines: string[] = [];
+  let codeLanguage = "";
+  
+  let inList = false;
+  let listItems: React.ReactNode[] = [];
+
+  const flushList = (key: number) => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={`list-${key}`} className="list-disc pl-5 my-4 space-y-1.5 text-zinc-600 dark:text-zinc-400">
+          {listItems}
+        </ul>
+      );
+      listItems = [];
+      inList = false;
+    }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Handle Code Blocks
+    if (line.trim().startsWith("```")) {
+      if (inCodeBlock) {
+        // End of code block
+        const codeText = codeBlockLines.join("\n");
+        elements.push(
+          <div key={`code-${i}`} className="my-6 rounded-md overflow-hidden border border-zinc-200 dark:border-zinc-800">
+            <div className="bg-zinc-50 dark:bg-zinc-900 px-4 py-1.5 text-3xs font-mono text-zinc-400 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800">
+              <span>{codeLanguage || "code"}</span>
+              <button 
+                onClick={() => navigator.clipboard.writeText(codeText)}
+                className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+              >
+                Copy
+              </button>
+            </div>
+            <pre className="bg-zinc-950 p-4 overflow-x-auto text-xs font-mono text-zinc-300">
+              <code>{codeText}</code>
+            </pre>
+          </div>
+        );
+        codeBlockLines = [];
+        inCodeBlock = false;
+      } else {
+        // Start of code block
+        inCodeBlock = true;
+        codeLanguage = line.trim().substring(3).trim();
+        flushList(i);
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBlockLines.push(line);
+      continue;
+    }
+
+    // Handle Headings
+    if (line.startsWith("# ")) {
+      flushList(i);
+      const text = line.substring(2);
+      elements.push(
+        <h1 key={`h1-${i}`} className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 border-b border-zinc-100 dark:border-zinc-800 pb-2 mt-8 mb-4">
+          {renderInlineMarkdown(text)}
+        </h1>
+      );
+      continue;
+    }
+
+    if (line.startsWith("## ")) {
+      flushList(i);
+      const text = line.substring(3);
+      elements.push(
+        <h2 key={`h2-${i}`} className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-6 mb-3">
+          {renderInlineMarkdown(text)}
+        </h2>
+      );
+      continue;
+    }
+
+    if (line.startsWith("### ")) {
+      flushList(i);
+      const text = line.substring(4);
+      elements.push(
+        <h3 key={`h3-${i}`} className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-4 mb-2">
+          {renderInlineMarkdown(text)}
+        </h3>
+      );
+      continue;
+    }
+
+    // Handle Bullet Lists
+    if (line.trim().startsWith("* ") || line.trim().startsWith("- ")) {
+      inList = true;
+      const cleanLine = line.trim().substring(2);
+      listItems.push(
+        <li key={`li-${i}-${listItems.length}`} className="text-sm leading-relaxed">
+          {renderInlineMarkdown(cleanLine)}
+        </li>
+      );
+      continue;
+    }
+
+    // If it was a list and this line is not a list item, flush it
+    if (inList && line.trim() === "") {
+      flushList(i);
+      continue;
+    }
+
+    // Handle horizontal rule (---)
+    if (line.trim() === "---") {
+      flushList(i);
+      elements.push(
+        <hr key={`hr-${i}`} className="border-t border-zinc-200 dark:border-zinc-800 my-6" />
+      );
+      continue;
+    }
+
+    // Handle empty line (adds spacing)
+    if (line.trim() === "") {
+      flushList(i);
+      continue;
+    }
+
+    // Normal paragraph line
+    flushList(i);
+    elements.push(
+      <p key={`p-${i}`} className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4">
+        {renderInlineMarkdown(line)}
+      </p>
+    );
+  }
+
+  // Final flush
+  flushList(lines.length);
+
+  return <div className="space-y-2">{elements}</div>;
+}
+
+// Function to handle bold (**text**), code (`text`), and link ([text](url)) inline formatting
+function renderInlineMarkdown(text: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*|`.*?`|\[.*?\]\(.*?\))/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={idx} className="font-bold text-zinc-900 dark:text-zinc-50">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return <code key={idx} className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 font-mono text-xs">{part.slice(1, -1)}</code>;
+    }
+    const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+    if (linkMatch) {
+      const linkText = linkMatch[1];
+      const linkUrl = linkMatch[2];
+      return (
+        <a 
+          key={idx} 
+          href={linkUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300 underline transition-colors"
+        >
+          {linkText}
+        </a>
+      );
+    }
+    return part;
+  });
 }
