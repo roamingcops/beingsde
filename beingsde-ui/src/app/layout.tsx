@@ -116,6 +116,9 @@ export default function RootLayout({
               <Link href="/topics" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Topics
               </Link>
+              <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                Questions
+              </Link>
               <Link href="/subscriptions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Subscriptions
               </Link>
