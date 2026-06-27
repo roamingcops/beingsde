@@ -35,13 +35,15 @@ public class SessionStore {
      * Called at login — this is what invalidates all other active sessions.
      */
     public void save(String email, String sessionId) {
-        try {
-            redis.opsForValue().set(key(email), sessionId, SESSION_TTL_DAYS, TimeUnit.DAYS);
-            log.debug("Session saved for {}: {}", email, sessionId);
-        } catch (Exception e) {
-            // If Redis is down we fail open (log but don't block login)
-            log.error("Redis unavailable — could not save session for {}: {}", email, e.getMessage());
-        }
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                redis.opsForValue().set(key(email), sessionId, SESSION_TTL_DAYS, TimeUnit.DAYS);
+                log.debug("Session saved for {}: {}", email, sessionId);
+            } catch (Exception e) {
+                // If Redis is down we fail open (log but don't block login)
+                log.error("Redis unavailable — could not save session for {}: {}", email, e.getMessage());
+            }
+        });
     }
 
     /**

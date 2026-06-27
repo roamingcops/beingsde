@@ -13,9 +13,12 @@ spring:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:ENC(5U0lYfICDMDbGC2qUuFAVMG8vlOH7+WnOD0L2ll6rmJ2Y8WbXfT7fRTNnE9tTJmxRoeUy7s1OIoNsgX8kpFgDpOv0tFf+X/BQQ0rsdpa9i53NV/7bC7DKVXrbzJGlFCXEywJfaGOqCM=)}
       database: beingsde
+      auto-index-creation: true
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
+      timeout: 250ms
+      connect-timeout: 250ms
 
 app:
   jwt:
