@@ -58,6 +58,9 @@ export default function LoginPage() {
       localStorage.setItem("userRole", data.role);
       localStorage.setItem("userEmail", email);
 
+      // Sync state globally in the window
+      window.dispatchEvent(new Event("auth-state-change"));
+
       // Redirect to Topics explorer page
       router.push("/topics");
       router.refresh();

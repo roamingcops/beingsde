@@ -108,6 +108,9 @@ export default function RegisterPage() {
           localStorage.setItem("userRole", loginData.role);
           localStorage.setItem("userEmail", email);
           
+          // Sync state globally in the window
+          window.dispatchEvent(new Event("auth-state-change"));
+
           router.push("/topics");
           router.refresh();
           return;

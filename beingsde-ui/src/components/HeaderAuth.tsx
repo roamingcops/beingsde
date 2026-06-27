@@ -13,13 +13,19 @@ export default function HeaderAuth() {
     const token = localStorage.getItem("accessToken");
     setIsAuthenticated(!!token);
     
-    // Listen for storage changes to sync state across pages/actions
-    const handleStorageChange = () => {
+    const handleSync = () => {
       setIsAuthenticated(!!localStorage.getItem("accessToken"));
     };
     
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    // Listen for storage changes (multi-tab sync)
+    window.addEventListener("storage", handleSync);
+    // Listen for same-tab custom event
+    window.addEventListener("auth-state-change", handleSync);
+    
+    return () => {
+      window.removeEventListener("storage", handleSync);
+      window.removeEventListener("auth-state-change", handleSync);
+    };
   }, []);
 
   const handleSignOut = () => {
@@ -27,10 +33,9 @@ export default function HeaderAuth() {
     localStorage.removeItem("userRole");
     localStorage.removeItem("userEmail");
     setIsAuthenticated(false);
+    window.dispatchEvent(new Event("auth-state-change"));
     router.push("/login");
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
+    router.refresh();
   };
 
   if (isAuthenticated) {
