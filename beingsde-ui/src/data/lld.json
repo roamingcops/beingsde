@@ -1,0 +1,562 @@
+[
+  {
+    "id": 1,
+    "title": "Tic Tac Toe",
+    "difficulty": "Easy",
+    "tag": "Game Design",
+    "patterns": ["Singleton"],
+    "summary": "Design a modular Tic Tac Toe game supporting two players on an N x N board with dynamic win-checking.",
+    "requirements": [
+      "Support customizable board sizes (default 3x3).",
+      "Alternating turn sequence for Player X and Player O.",
+      "Check win condition in O(1) time after each move.",
+      "Detect draw states when all cells are filled without a winner."
+    ],
+    "classes": [
+      "Board (Holds grid cells)",
+      "Player (Symbol: X or O, Name)",
+      "GameEngine (Runs turn iterations and checks states)"
+    ],
+    "codeSkeleton": "public enum Symbol { X, O, EMPTY }\n\npublic class Board {\n    private Symbol[][] grid;\n    private int size;\n\n    public Board(int size) {\n        this.size = size;\n        grid = new Symbol[size][size];\n        for (int i = 0; i < size; i++)\n            for (int j = 0; j < size; j++)\n                grid[i][j] = Symbol.EMPTY;\n    }\n\n    public boolean makeMove(int row, int col, Symbol sym) {\n        if (row < 0 || row >= size || col < 0 || col >= size || grid[row][col] != Symbol.EMPTY) {\n            return false;\n        }\n        grid[row][col] = sym;\n        return true;\n    }\n}\n\npublic class GameEngine {\n    private Board board;\n    private Player p1, p2;\n    private Player activePlayer;\n\n    public boolean playTurn(int row, int col) {\n        if (board.makeMove(row, col, activePlayer.getSymbol())) {\n            if (checkWinner(row, col)) {\n                System.out.println(activePlayer.getName() + \" wins!\");\n            }\n            activePlayer = (activePlayer == p1) ? p2 : p1;\n            return true;\n        }\n        return false;\n    }\n\n    private boolean checkWinner(int r, int c) { return false; /* O(1) algorithm checks rows/cols/diags */ }\n}",
+    "approach": "To check wins in O(1) time, keep rows and cols count arrays for each player symbol, along with main and anti-diagonal counters."
+  },
+  {
+    "id": 2,
+    "title": "Traffic Signal",
+    "difficulty": "Easy",
+    "tag": "State / Control",
+    "patterns": ["State", "Singleton"],
+    "summary": "Design a Traffic Signal Controller that transitions between Red, Yellow, and Green states with dynamic durations.",
+    "requirements": [
+      "Maintain active signal light status (Red, Yellow, Green).",
+      "Process state transitions sequentially: Red -> Green -> Yellow -> Red.",
+      "Allow dynamic duration override configurations for active states."
+    ],
+    "classes": [
+      "TrafficLight (Context class)",
+      "SignalState (State interface)",
+      "RedState, GreenState, YellowState (Concrete states)",
+      "TrafficSignalController (Singleton orchestrating intersections)"
+    ],
+    "codeSkeleton": "public interface SignalState {\n    void changeState(TrafficLight light);\n    int getDuration();\n}\n\npublic class RedState implements SignalState {\n    public void changeState(TrafficLight light) {\n        light.setState(new GreenState());\n    }\n    public int getDuration() { return 30; } // default 30s\n}\n\npublic class TrafficLight {\n    private SignalState state = new RedState();\n\n    public void setState(SignalState state) { this.state = state; }\n    public void run() {\n        System.out.println(\"Current state: \" + state.getClass().getSimpleName());\n        state.changeState(this);\n    }\n}",
+    "approach": "Use the State pattern to prevent massive switch-case statements. Each state holds its display rules and references the next state in sequence."
+  },
+  {
+    "id": 3,
+    "title": "Chess Clock",
+    "difficulty": "Easy",
+    "tag": "State / Behavioral",
+    "patterns": ["Observer", "State"],
+    "summary": "Design a two-player Chess Clock tracking match timing, dynamic increments (Fischer delay), and flags.",
+    "requirements": [
+      "Dual timers tracking Player 1 and Player 2 remaining time.",
+      "Switch active clock cleanly on player turn switch.",
+      "Support time increment increments (adds N seconds after move).",
+      "Trigger notifications if a player's timer runs out (Flagged)."
+    ],
+    "classes": [
+      "ChessClock (Main wrapper)",
+      "Timer (Active thread / counter)",
+      "ClockState (ActivePlayer1, ActivePlayer2, Paused, Flagged)"
+    ],
+    "codeSkeleton": "public class PlayerTimer {\n    private long remainingMs;\n    private long incrementMs;\n\n    public void start() { /* Timer thread decrement cycle */ }\n    public void pause() { /* Stop decrement */ }\n    public void commitMove() { remainingMs += incrementMs; }\n}\n\npublic class ChessClock {\n    private PlayerTimer p1Timer;\n    private PlayerTimer p2Timer;\n    private boolean isP1Turn = true;\n\n    public void pressClock() {\n        if (isP1Turn) {\n            p1Timer.commitMove();\n            p1Timer.pause();\n            p2Timer.start();\n        } else {\n            p2Timer.commitMove();\n            p2Timer.pause();\n            p1Timer.start();\n        }\n        isP1Turn = !isP1Turn;\n    }\n}",
+    "approach": "Implement thread-safe pause/resume triggers. Protect state mutations from multiple button presses during intense time scrambles."
+  },
+  {
+    "id": 4,
+    "title": "Logger",
+    "difficulty": "Easy",
+    "tag": "Behavioral",
+    "patterns": ["Chain of Responsibility", "Singleton"],
+    "summary": "Design a log framework supporting info, debug, and error levels directing messages to console, files, or database targets.",
+    "requirements": [
+      "Levels: INFO, DEBUG, ERROR.",
+      "Each logger in chain handles messages based on threshold levels.",
+      "Support multiple sinks: File, Console, and Database."
+    ],
+    "classes": [
+      "Logger (Abstract base handler)",
+      "InfoLogger, DebugLogger, ErrorLogger (Concrete handlers)",
+      "LogSubject / LogSink (ConsoleSink, FileSink)"
+    ],
+    "codeSkeleton": "public abstract class Logger {\n    public static int INFO = 1;\n    public static int DEBUG = 2;\n    public static int ERROR = 3;\n\n    protected int level;\n    protected Logger nextLogger;\n\n    public void setNextLogger(Logger next) { this.nextLogger = next; }\n\n    public void logMessage(int level, String message) {\n        if (this.level <= level) {\n            write(message);\n        }\n        if (nextLogger != null) {\n            nextLogger.logMessage(level, message);\n        }\n    }\n    protected abstract void write(String msg);\n}",
+    "approach": "Implement the Chain of Responsibility pattern. Link standard log handlers (Info -> Debug -> Error) so request propagation is automatic."
+  },
+  {
+    "id": 5,
+    "title": "Coffee Machine",
+    "difficulty": "Easy",
+    "tag": "State / Behavioral",
+    "patterns": ["State", "Singleton"],
+    "summary": "Design a Coffee Machine controller that selects recipes, validates ingredients inventory, accepts payments, and dispenses coffee.",
+    "requirements": [
+      "Support multiple recipes (Espresso, Latte, Cappuccino).",
+      "Check ingredients levels (water, milk, beans) before starting brew.",
+      "Lock machine during dispensing and update inventory levels."
+    ],
+    "classes": [
+      "CoffeeMachine (Context)",
+      "CoffeeState (Idle, CheckingInventory, Dispensing, RefillNeeded)",
+      "Recipe (Coffee beans weight, milk vol, water vol, cost)"
+    ],
+    "codeSkeleton": "public class Recipe {\n    private String name;\n    private double cost;\n    private int requiredBeans;\n    private int requiredMilk;\n}\n\npublic class CoffeeMachine {\n    private Map<String, Integer> ingredientInventory = new HashMap<>();\n    private CoffeeState state;\n\n    public synchronized boolean makeCoffee(Recipe recipe, double cash) {\n        if (cash < recipe.getCost()) return false;\n        for (String item : ingredientInventory.keySet()) {\n            // validate and subtract inventory\n        }\n        return true;\n    }\n}",
+    "approach": "Represent structural recipes as immutable objects. Protect updates to the shared ingredients map using synchronized blocks or concurrent maps."
+  },
+  {
+    "id": 6,
+    "title": "Vending Machine",
+    "difficulty": "Easy",
+    "tag": "State Pattern / Behavioral",
+    "patterns": ["State"],
+    "summary": "Design a Vending Machine that transitions cleanly between states: Idle, Waiting for Coins, Dispensing, Out of Stock.",
+    "requirements": [
+      "Display items with prices and quantities.",
+      "Accept coins/cash inputs, calculate balance, and return change.",
+      "Ensure transaction safety: don't release items unless funds are confirmed."
+    ],
+    "classes": [
+      "VendingMachine (Context class)",
+      "State (Interface with selectProduct, insertCoin, pressButton, dispense)",
+      "IdleState, HasMoneyState, DispensingState, SoldOutState (Concrete states)",
+      "Inventory & Product"
+    ],
+    "codeSkeleton": "public interface State {\n    void insertCoin(VendingMachine machine, double amount);\n    void selectProduct(VendingMachine machine, String code);\n    void dispense(VendingMachine machine);\n}\n\npublic class IdleState implements State {\n    public void insertCoin(VendingMachine machine, double amount) {\n        machine.addBalance(amount);\n        machine.setState(new HasMoneyState());\n    }\n    public void selectProduct(VendingMachine machine, String code) {\n        System.out.println(\"Insert coin first.\");\n    }\n    public void dispense(VendingMachine machine) {\n        System.out.println(\"Nothing selected.\");\n    }\n}\n\npublic class VendingMachine {\n    private State currentState = new IdleState();\n    private double balance = 0.0;\n    private Inventory inventory;\n\n    public void setState(State state) { this.currentState = state; }\n    public void addBalance(double amount) { this.balance += amount; }\n    public void selectProduct(String code) { currentState.selectProduct(this, code); }\n    public void dispense() { currentState.dispense(this); }\n}",
+    "approach": "Use the State pattern to represent machine phases. The context object (VendingMachine) delegates all action calls to the current state object, which controls state changes based on logic rules."
+  },
+  {
+    "id": 7,
+    "title": "Parking Lot System",
+    "difficulty": "Medium",
+    "tag": "Object-Oriented Design",
+    "patterns": ["Singleton", "Factory Method"],
+    "summary": "Design a multi-level parking lot that can accommodate different vehicle types, handle ticketing, and process billing dynamically.",
+    "requirements": [
+      "Support multiple floors and spot types (Compact, Large, Motorcycle).",
+      "Process vehicle check-in (issue ticket, assign spot) and check-out (compute fee, release spot).",
+      "Thread-safe singleton control for the main ParkingLot instance.",
+      "Support dynamic fare calculation based on hour counts and vehicle types."
+    ],
+    "classes": [
+      "ParkingLot (Singleton)",
+      "ParkingFloor (List of Spots)",
+      "ParkingSpot (Base class for CompactSpot, LargeSpot, etc.)",
+      "Vehicle (Base class for Car, Motorcycle, Truck)",
+      "ParkingTicket (Tracks entry/exit times and spot references)"
+    ],
+    "codeSkeleton": "public enum VehicleType { CAR, MOTORCYCLE, TRUCK }\n\npublic abstract class Vehicle {\n    private String licensePlate;\n    private VehicleType type;\n    public Vehicle(String licensePlate, VehicleType type) { \n        this.licensePlate = licensePlate; \n        this.type = type; \n    }\n    public VehicleType getType() { return type; }\n}\n\npublic class Car extends Vehicle {\n    public Car(String licensePlate) { super(licensePlate, VehicleType.CAR); }\n}\n\npublic class ParkingSpot {\n    private int id;\n    private boolean isFree = true;\n    private VehicleType supportedType;\n\n    public boolean canFit(Vehicle v) { return v.getType() == supportedType; }\n    public synchronized void park(Vehicle v) { isFree = false; }\n    public synchronized void release() { isFree = true; }\n}\n\npublic class ParkingLot {\n    private static ParkingLot instance;\n    private List<ParkingFloor> floors;\n\n    private ParkingLot() { floors = new ArrayList<>(); }\n    \n    public static synchronized ParkingLot getInstance() {\n        if (instance == null) {\n            instance = new ParkingLot();\n        }\n        return instance;\n    }\n\n    public synchronized boolean parkVehicle(Vehicle v) {\n        for (ParkingFloor floor : floors) {\n            if (floor.park(v)) return true;\n        }\n        return false;\n    }\n}",
+    "approach": "Define a clean class hierarchy for Vehicles and ParkingSpots. Ensure concurrency control on spot allocation (synchronized methods) so multiple gates don't double-book the same physical spot."
+  },
+  {
+    "id": 8,
+    "title": "Snake & Ladder",
+    "difficulty": "Medium",
+    "tag": "OOD / Game",
+    "patterns": ["Singleton"],
+    "summary": "Design a modular Snake and Ladder board game supporting multiple players and custom board dimensions.",
+    "requirements": [
+      "Board contains Snakes and Ladders at randomized positions.",
+      "Process turns iteratively using a dice (1-6 rolls).",
+      "Winning condition: Player lands exactly on slot 100."
+    ],
+    "classes": [
+      "Board (Grid of BoardCells)",
+      "BoardCell (Contains optional Snake or Ladder pointer)",
+      "Player (Tracks current index position)",
+      "Dice (Generates random values in [1, 6])",
+      "Game (Engine loop routing turns)"
+    ],
+    "codeSkeleton": "public class BoardCell {\n    private int position;\n    private int nextDestination; // Set different from position for snakes/ladders\n\n    public BoardCell(int position) {\n        this.position = position;\n        this.nextDestination = position;\n    }\n    public int getDestination() { return nextDestination; }\n    public void setJumpDestination(int dest) { this.nextDestination = dest; }\n}\n\npublic class Game {\n    private Board board;\n    private Queue<Player> players;\n    private Dice dice;\n\n    public void playTurn() {\n        Player currentPlayer = players.poll();\n        int roll = dice.roll();\n        int target = currentPlayer.getPosition() + roll;\n\n        if (target <= 100) {\n            BoardCell cell = board.getCell(target);\n            currentPlayer.setPosition(cell.getDestination());\n        }\n\n        if (currentPlayer.getPosition() == 100) {\n            System.out.println(currentPlayer.getName() + \" wins!\");\n            return;\n        }\n        players.offer(currentPlayer); // Put back to the end of the queue\n    }\n}",
+    "approach": "Use a Queue to manage player turn sequences. Model snakes and ladders as jumping destinations on BoardCell nodes to keep board rendering and trajectory computation decoupled."
+  },
+  {
+    "id": 9,
+    "title": "Library Management System",
+    "difficulty": "Medium",
+    "tag": "CRUD / OOD",
+    "patterns": ["Factory", "SearchStrategy"],
+    "summary": "Design a library cataloging system tracking book stock, borrowing status, user fines, and custom search filters.",
+    "requirements": [
+      "Support books with multiple copies (each copy has a unique Barcode).",
+      "Search catalog by title, author, subject, or publication date.",
+      "Enforce maximum loan limits (e.g., 5 books for 14 days) and compute daily late fees."
+    ],
+    "classes": [
+      "Book & BookLending (Book copies tracker)",
+      "Member & Librarian (User actors)",
+      "SearchIndex (Faceted search maps)"
+    ],
+    "codeSkeleton": "public class BookCopy {\n    private String barcode;\n    private String bookId;\n    private boolean isLent;\n    private Date dueDate;\n}\n\npublic class LibraryCard {\n    private String id;\n    private int activeLendingsCount;\n\n    public boolean canBorrow() {\n        return activeLendingsCount < 5;\n    }\n}\n\npublic class Library {\n    private Map<String, List<BookCopy>> catalog = new HashMap<>();\n    \n    public synchronized BookCopy lendBook(LibraryCard card, String title) {\n        if (!card.canBorrow()) return null;\n        List<BookCopy> copies = catalog.get(title);\n        for (BookCopy copy : copies) {\n            if (!copy.isLent()) {\n                copy.setLent(true);\n                return copy;\n            }\n        }\n        return null;\n    }\n}",
+    "approach": "Implement search strategies using indexes on HashMaps to enable fast retrieval. Synchronize the lending action to handle concurrent checkout attempts of the last book copy."
+  },
+  {
+    "id": 10,
+    "title": "Cricbuzz",
+    "difficulty": "Medium",
+    "tag": "Publisher / Subscriber",
+    "patterns": ["Observer", "Strategy"],
+    "summary": "Design Cricbuzz/Cricinfo to display live cricket match scorecards, player statistics, and run notifications.",
+    "requirements": [
+      "Provide real-time updates of overs, runs, wickets, and run rates.",
+      "Push scoreboard modifications immediately to observers (web dashboard, SMS notifier).",
+      "Compute statistics (Strike rate, economy, target runs) dynamically."
+    ],
+    "classes": [
+      "Match (Matches state and statistics)",
+      "Innings (Overs, wickets tracking)",
+      "Observer (Interface for scorecard, notification listener)"
+    ],
+    "codeSkeleton": "public interface Observer {\n    void update(Scorecard score);\n}\n\npublic class Match {\n    private List<Observer> observers = new ArrayList<>();\n    private Scorecard currentScore;\n\n    public void addObserver(Observer ob) { observers.add(ob); }\n    \n    public void updateScore(int runs, int wickets) {\n        currentScore.addRuns(runs);\n        currentScore.addWicket(wickets);\n        notifyObservers();\n    }\n\n    private void notifyObservers() {\n        for (Observer ob : observers) {\n            ob.update(currentScore);\n        }\n    }\n}",
+    "approach": "Use the Observer pattern to decouple Match engine updates from dashboard rendering layouts. Compute statistics on the fly inside the Scorecard model."
+  },
+  {
+    "id": 11,
+    "title": "Restaurant",
+    "difficulty": "Medium",
+    "tag": "Object-Oriented Design",
+    "patterns": ["Factory", "Observer"],
+    "summary": "Design a Restaurant management system handling table reservations, dining orders, chef notifications, and bills.",
+    "requirements": [
+      "Support dynamic table status mapping (Free, Reserved, Occupied).",
+      "Process orders containing multiple menu items and customize chef alerts.",
+      "Calculate checks with optional tax, service fee, and discount vouchers."
+    ],
+    "classes": [
+      "Table (Capacity, State)",
+      "Order (List of items, table reference, status)",
+      "MenuItem (Name, Price, Category)",
+      "Bill (Calculations, payments status)"
+    ],
+    "codeSkeleton": "public enum TableStatus { FREE, RESERVED, OCCUPIED }\n\npublic class Table {\n    private int tableId;\n    private int seatCapacity;\n    private TableStatus status = TableStatus.FREE;\n\n    public synchronized boolean reserve() {\n        if (status == TableStatus.FREE) {\n            status = TableStatus.RESERVED;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class Order {\n    private int orderId;\n    private Table table;\n    private List<MenuItem> items = new ArrayList<>();\n    private double total;\n\n    public void addItem(MenuItem item) {\n        items.add(item);\n        total += item.getPrice();\n    }\n}",
+    "approach": "Table booking must be thread-safe to prevent double reservation. Use Observer to push active kitchen order updates directly to the chefs' display."
+  },
+  {
+    "id": 12,
+    "title": "Cache (LRU / LFU)",
+    "difficulty": "Medium",
+    "tag": "Structural",
+    "patterns": ["Proxy"],
+    "summary": "Design a thread-safe in-memory cache supporting eviction policies like Least Recently Used (LRU) or Least Frequently Used (LFU).",
+    "requirements": [
+      "Constant time complexity O(1) for get and put operations.",
+      "Clean eviction trigger once the cache reaches max capacity limit.",
+      "Full thread-safety under concurrent reads and writes."
+    ],
+    "classes": [
+      "Cache (Interface)",
+      "LRUCache (LinkedListNode, DoublyLinkedList, Map)",
+      "Node (Key, Value, Prev, Next)"
+    ],
+    "codeSkeleton": "public class Node {\n    int key, value;\n    Node prev, next;\n}\n\npublic class LRUCache {\n    private int capacity;\n    private Map<Integer, Node> map = new ConcurrentHashMap<>();\n    private Node head, tail;\n\n    public synchronized int get(int key) {\n        if (!map.containsKey(key)) return -1;\n        Node node = map.get(key);\n        moveToHead(node);\n        return node.value;\n    }\n\n    public synchronized void put(int key, int value) {\n        if (map.containsKey(key)) {\n            Node node = map.get(key);\n            node.value = value;\n            moveToHead(node);\n        } else {\n            if (map.size() >= capacity) {\n                map.remove(tail.key);\n                removeNode(tail);\n            }\n            Node newNode = new Node();\n            newNode.key = key;\n            newNode.value = value;\n            addNode(newNode);\n            map.put(key, newNode);\n        }\n    }\n    private void moveToHead(Node n) {} \n    private void removeNode(Node n) {} \n    private void addNode(Node n) {}\n}",
+    "approach": "Combine a HashMap (for O(1) lookups) with a custom Doubly Linked List (for O(1) updates/removals). Protect operations using locks or synchronization blocks."
+  },
+  {
+    "id": 13,
+    "title": "File System",
+    "difficulty": "Medium",
+    "tag": "Structural Design",
+    "patterns": ["Composite"],
+    "summary": "Design an in-memory Directory and File management system that processes nesting structures and size computations.",
+    "requirements": [
+      "Directories can contain files or other nested directories.",
+      "Calculate directory sizes dynamically (sum of all nested contents).",
+      "Support standard actions like list, delete, and search."
+    ],
+    "classes": [
+      "FileSystemEntry (Base abstract component)",
+      "File (Leaf component)",
+      "Directory (Composite component containing children)"
+    ],
+    "codeSkeleton": "public abstract class FileSystemEntry {\n    protected String name;\n    public abstract int getSize();\n    public abstract void print(String indent);\n}\n\npublic class File extends FileSystemEntry {\n    private int size;\n    public File(String name, int size) { this.name = name; this.size = size; }\n    public int getSize() { return size; }\n    public void print(String indent) { System.out.println(indent + \"- \" + name); }\n}\n\npublic class Directory extends FileSystemEntry {\n    private List<FileSystemEntry> children = new ArrayList<>();\n\n    public void add(FileSystemEntry entry) { children.add(entry); }\n    \n    public int getSize() {\n        int total = 0;\n        for (FileSystemEntry child : children) {\n            total += child.getSize();\n        }\n        return total;\n    }\n    \n    public void print(String indent) {\n        System.out.println(indent + \"[\" + name + \"]\");\n        for (FileSystemEntry child : children) {\n            child.print(indent + \"  \");\n        }\n    }\n}",
+    "approach": "Implement the Composite design pattern. Ensure directories and files inherit from the same base class to process sizes and listing routines uniformly."
+  },
+  {
+    "id": 14,
+    "title": "Amazon Locker",
+    "difficulty": "Medium",
+    "tag": "OOD / Allocation",
+    "patterns": ["Strategy", "Factory"],
+    "summary": "Design a package delivery locker system that matches packages to available lockers, manages security PINs, and handles returns.",
+    "requirements": [
+      "Locker sizes must match package dimensions (Small, Medium, Large).",
+      "Generate a secure 6-digit PIN on package delivery for customer pickup.",
+      "Enforce pickup timeout limits (release locker if not claimed in 3 days)."
+    ],
+    "classes": [
+      "LockerService (Coordinator)",
+      "Locker (ID, size, availability, PIN, expiry)",
+      "Package (Size, Tracking ID)"
+    ],
+    "codeSkeleton": "public enum LockerSize { SMALL, MEDIUM, LARGE }\n\npublic class Locker {\n    private String id;\n    private LockerSize size;\n    private String securePin;\n    private boolean isAvailable = true;\n    private Long expiryTime;\n\n    public boolean assignPackage(Package pkg, String pin) {\n        if (!isAvailable) return false;\n        this.securePin = pin;\n        this.isAvailable = false;\n        this.expiryTime = System.currentTimeMillis() + (72 * 3600 * 1000); // 3 days\n        return true;\n    }\n    \n    public boolean verifyPinAndRelease(String pin) {\n        if (!isAvailable && securePin.equals(pin)) {\n            isAvailable = true;\n            securePin = null;\n            return true;\n        }\n        return false;\n    }\n}",
+    "approach": "Optimize matching using dynamic strategies (first fit, best fit). Use background cron processes to clean expired locks and flag unclaimed lockers."
+  },
+  {
+    "id": 15,
+    "title": "Online Auction System",
+    "difficulty": "Medium",
+    "tag": "Publisher / Subscriber",
+    "patterns": ["Observer", "State"],
+    "summary": "Design an online auction platform that handles dynamic item listings, real-time bidding, and notifications.",
+    "requirements": [
+      "Auctions transition from Created -> Active -> Completed -> Cancelled.",
+      "Bid validation: incoming bid must exceed current highest bid by minimum increment.",
+      "Broadcast updates to all active bidders when a higher bid is accepted."
+    ],
+    "classes": [
+      "AuctionItem (ID, startingPrice, currentBid, status)",
+      "Bidder (User implementation subscribing to items)",
+      "AuctionController (Handles bidding state rules)"
+    ],
+    "codeSkeleton": "public class Bid {\n    private double amount;\n    private String bidderId;\n    private long timestamp;\n}\n\npublic class AuctionItem {\n    private String itemId;\n    private double currentHighestBid;\n    private List<Observer> bidders = new ArrayList<>();\n\n    public synchronized boolean placeBid(String bidderId, double amount) {\n        if (amount > currentHighestBid) {\n            currentHighestBid = amount;\n            notifyBidders(bidderId, amount);\n            return true;\n        }\n        return false;\n    }\n\n    private void notifyBidders(String currentBidder, double amount) {\n        // push bid updates to registered bidders\n    }\n}",
+    "approach": "Use synchronizations on bid actions to solve race conditions when bids arrive simultaneously in the final seconds of an auction."
+  },
+  {
+    "id": 16,
+    "title": "BookMyShow (Movie Ticket Booking)",
+    "difficulty": "Hard",
+    "tag": "Concurrency / Transactional",
+    "patterns": ["Observer", "Strategy"],
+    "summary": "Design a movie ticket booking platform handling massive concurrent seat selection, payments, and notifications.",
+    "requirements": [
+      "Allow users to browse shows in specific theaters.",
+      "Ensure seat allocation is highly concurrent: lock seat temporarily (e.g., 5 mins) during payment checkout.",
+      "Release seat locks if checkout session expires or payment fails.",
+      "Support multiple payment gateways."
+    ],
+    "classes": [
+      "Theater & Screen",
+      "Show (Movie, Screen, timings)",
+      "Seat (Gold, Silver, status: FREE, LOCKED, BOOKED)",
+      "Booking (Seat references, User, Show, Status)"
+    ],
+    "codeSkeleton": "public enum SeatStatus { FREE, LOCKED, BOOKED }\n\npublic class Seat {\n    private String seatId;\n    private SeatStatus status = SeatStatus.FREE;\n    private Long lockTimestamp;\n\n    public synchronized boolean lockSeat() { \n        if (status == SeatStatus.FREE) {\n            status = SeatStatus.LOCKED;\n            lockTimestamp = System.currentTimeMillis();\n            return true;\n        }\n        return false;\n    }\n\n    public synchronized void releaseSeat() {\n        if (status == SeatStatus.LOCKED) {\n            status = SeatStatus.FREE;\n            lockTimestamp = null;\n        }\n    }\n\n    public synchronized void bookSeat() {\n        if (status == SeatStatus.LOCKED) {\n            status = SeatStatus.BOOKED;\n        }\n    }\n}\n\npublic class Show {\n    private String id;\n    private Movie movie;\n    private List<Seat> seats;\n\n    public List<Seat> getAvailableSeats() {\n        List<Seat> freeSeats = new ArrayList<>();\n        for (Seat seat : seats) {\n            // Drop expired locks during lookup\n            if (seat.isLockExpired()) seat.releaseSeat();\n            if (seat.getStatus() == SeatStatus.FREE) freeSeats.add(seat); \n        }\n        return freeSeats;\n    }\n}",
+    "approach": "Implement optimistic or pessimistic locking on seats to prevent double booking. Use a Redis-based cache to store temporary seat locks with TTLs (Time-To-Live) corresponding to payment checkout timers."
+  },
+  {
+    "id": 17,
+    "title": "Splitwise (Expense Sharing App)",
+    "difficulty": "Hard",
+    "tag": "Object-Oriented Design",
+    "patterns": ["Strategy", "Factory"],
+    "summary": "Design Splitwise to add expenses, share balances among friends, and optimize debt simplification.",
+    "requirements": [
+      "Users can log group expenses split equally, unequally, or by percentages.",
+      "Automatically compute balances between users.",
+      "Provide a debt-simplification algorithm (minimize transactions between members)."
+    ],
+    "classes": [
+      "User (Name, Email, Balance Sheet)",
+      "Expense (Base class for EqualExpense, UnequalExpense)",
+      "Split (Maps User to split amount)",
+      "Group (Tracks users and expenses list)"
+    ],
+    "codeSkeleton": "public abstract class Expense {\n    private String id;\n    private User paidBy;\n    private double totalAmount;\n    private List<Split> splits;\n\n    public abstract boolean validate();\n}\n\npublic class EqualExpense extends Expense {\n    public boolean validate() {\n        double splitAmount = getTotalAmount() / getSplits().size();\n        for (Split split : getSplits()) {\n            if (Math.abs(split.getAmount() - splitAmount) > 0.01) return false;\n        }\n        return true;\n    }\n}\n\npublic class BalanceSheet {\n    // Map of User -> Net Balance (Positive means they are owed money, negative means they owe)\n    private Map<User, Double> balances = new HashMap<>();\n\n    public void updateBalance(User debtor, User creditor, double amount) {\n        balances.put(debtor, balances.getOrDefault(debtor, 0.0) - amount);\n        balances.put(creditor, balances.getOrDefault(creditor, 0.0) + amount);\n    }\n}",
+    "approach": "Compute net balance sheets for all users. Run a greedy optimization algorithm (using a Min Heap for debtors and a Max Heap for creditors) to iteratively settle the largest debts, minimizing the total number of transactions."
+  },
+  {
+    "id": 18,
+    "title": "Elevator System",
+    "difficulty": "Hard",
+    "tag": "System Design / State",
+    "patterns": ["State", "Strategy (Dispatching)"],
+    "summary": "Design a controller for a bank of elevators optimizing request handling, speed, and energy across multiple floors.",
+    "requirements": [
+      "Elevators must go Up, Down, or stay Idle.",
+      "Dispatch algorithm should pick the optimal elevator for internal and external requests.",
+      "Handle state transitions cleanly (doors opening, closing, moving, emergency stops).",
+      "Support request queues with direction optimization (e.g. SCAN algorithm)."
+    ],
+    "classes": [
+      "ElevatorController (Manages multiple cars)",
+      "ElevatorCar (Current state, floor, direction)",
+      "Request (Source floor, target floor, direction)",
+      "ElevatorState (Interface for IdleState, MovingState, StoppedState)"
+    ],
+    "codeSkeleton": "public enum Direction { UP, DOWN, IDLE }\n\npublic interface ElevatorState {\n    void handleRequest(ElevatorCar car, int floor);\n}\n\npublic class IdleState implements ElevatorState {\n    public void handleRequest(ElevatorCar car, int floor) {\n        car.setTargetFloor(floor);\n        car.setDirection(floor > car.getCurrentFloor() ? Direction.UP : Direction.DOWN);\n        car.setState(new MovingState());\n    }\n}\n\npublic class ElevatorCar {\n    private int id;\n    private int currentFloor = 0;\n    private Direction direction = Direction.IDLE;\n    private ElevatorState state = new IdleState();\n    private TreeSet<Integer> upQueue = new TreeSet<>();\n    private TreeSet<Integer> downQueue = new TreeSet<>(Collections.reverseOrder());\n\n    public void processRequest(int floor) {\n        state.handleRequest(this, floor);\n    }\n    public void setState(ElevatorState state) { this.state = state; }\n    // Getters and Setters...\n}\n\npublic class ElevatorController {\n    private List<ElevatorCar> elevators;\n    \n    public void dispatch(Request req) {\n        // Find best elevator using distance, direction, and current load\n        ElevatorCar optimalCar = findBestCar(req);\n        optimalCar.processRequest(req.getTargetFloor());\n    }\n}",
+    "approach": "Use the State pattern to decouple direction & floor transition logics from the main Elevator class. Maintain separate sorted sets (upQueue and downQueue) for SCAN-based request handling."
+  },
+  {
+    "id": 19,
+    "title": "Chess",
+    "difficulty": "Hard",
+    "tag": "OOD / Game",
+    "patterns": ["Factory Method", "Command"],
+    "summary": "Design a chess engine supporting pieces behavior, move validations, board states, checkmate rules, and move rollbacks.",
+    "requirements": [
+      "White and Black players execute turn-based moves.",
+      "Pieces (King, Queen, Pawn) validate their legal trajectories.",
+      "Checkmate/stalemate validation algorithms.",
+      "Support transaction history/undo moves."
+    ],
+    "classes": [
+      "Board (8x8 grid of Cells)",
+      "Cell (Tracks Row, Column, and current Piece)",
+      "Piece (Base class defining getLegalMoves)",
+      "Move (Tracks start and end Cells, capturing history)",
+      "Game (Manages turn history, game status)"
+    ],
+    "codeSkeleton": "public abstract class Piece {\n    private boolean isWhite;\n    public Piece(boolean isWhite) { this.isWhite = isWhite; }\n    public boolean isWhite() { return isWhite; }\n    \n    public abstract boolean canMove(Board board, Cell start, Cell end);\n}\n\npublic class Knight extends Piece {\n    public Knight(boolean isWhite) { super(isWhite); }\n    public boolean canMove(Board board, Cell start, Cell end) {\n        int x = Math.abs(start.getX() - end.getX());\n        int y = Math.abs(start.getY() - end.getY());\n        return x * y == 2; // Knight movement multiplier (2x1 L-shape)\n    }\n}\n\npublic class Move {\n    private Player player;\n    private Cell start;\n    private Cell end;\n    private Piece pieceMoved;\n    private Piece pieceKilled;\n\n    public Move(Player p, Cell start, Cell end) {\n        this.player = p;\n        this.start = start; \n        this.end = end;\n        this.pieceMoved = start.getPiece();\n    }\n}",
+    "approach": "Model Chess pieces by subclassing a base Piece class with custom canMove rules. Use the Command pattern for Move objects to support action validation, turn logs, and undo actions."
+  },
+  {
+    "id": 20,
+    "title": "ATM Machine",
+    "difficulty": "Hard",
+    "tag": "State / Concurrency",
+    "patterns": ["State", "Chain of Responsibility"],
+    "summary": "Design an ATM controller that processes cards, verifies security PINs, updates accounts, and dispenses cash.",
+    "requirements": [
+      "ATM transitions: Idle -> HasCard -> PinEntered -> Dispensing -> TransactionComplete.",
+      "Support multiple currency denominations ($10, $20, $50, $100).",
+      "Implement ATM cash limits and roll back transactions if dispenser fails."
+    ],
+    "classes": [
+      "ATM (Main context class)",
+      "ATMState (State interfaces)",
+      "CashDispenser (Base link handler in Chain of Responsibility)"
+    ],
+    "codeSkeleton": "public abstract class CashDispenser {\n    protected CashDispenser nextDispenser;\n    public void setNext(CashDispenser next) { this.nextDispenser = next; }\n    public abstract void dispense(double amount);\n}\n\npublic class HundredDispenser extends CashDispenser {\n    public void dispense(double amount) {\n        int numNotes = (int)(amount / 100);\n        if (numNotes > 0) {\n            System.out.println(\"Dispensing \" + numNotes + \" $100 notes\");\n            amount %= 100;\n        }\n        if (amount > 0 && nextDispenser != null) {\n            nextDispenser.dispense(amount);\n        }\n    }\n}",
+    "approach": "Combine the State pattern (for card handling steps) with Chain of Responsibility (for resolving cash dispensing counts of bills)."
+  },
+  {
+    "id": 21,
+    "title": "Hotel Management",
+    "difficulty": "Hard",
+    "tag": "Transactional / OOD",
+    "patterns": ["Factory", "Observer"],
+    "summary": "Design a hotel management dashboard managing rooms, dynamic pricing, service bookings, and checkouts.",
+    "requirements": [
+      "Rooms categories: Single, Double, Suite, Deluxe.",
+      "Dynamic price adjustment based on occupancy, season, and room class.",
+      "Support reservation lifecycle: Booked, CheckedIn, CheckedOut, Cancelled."
+    ],
+    "classes": [
+      "Hotel (Rooms map, reservations)",
+      "Room (Room number, Category, Status: Free, Occupied, OutOfOrder)",
+      "Reservation (Customer, Room, Duration, Bill)"
+    ],
+    "codeSkeleton": "public enum RoomCategory { SINGLE, DOUBLE, SUITE }\npublic enum RoomStatus { FREE, OCCUPIED, MAINTENANCE }\n\npublic class Room {\n    private String roomNo;\n    private RoomCategory category;\n    private RoomStatus status = RoomStatus.FREE;\n\n    public synchronized boolean checkIn() {\n        if (status == RoomStatus.FREE) {\n            status = RoomStatus.OCCUPIED;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class HotelService {\n    private List<Room> rooms = new ArrayList<>();\n    \n    public synchronized Reservation bookRoom(Customer c, RoomCategory cat, Date start, Date end) {\n        // find free room of category, set room status to occupied\n        return null;\n    }\n}",
+    "approach": "Separate Reservation entities from Room entities. Use state patterns for Room cleaning flows, and lock rooms during booking transactions."
+  },
+  {
+    "id": 22,
+    "title": "Uber",
+    "difficulty": "Hard",
+    "tag": "Proximity / Dispatch",
+    "patterns": ["Observer", "Strategy"],
+    "summary": "Design the class system for Uber/Lyft matching rider queries to optimal local drivers in real-time.",
+    "requirements": [
+      "Riders input source and destination coordinates to request trip.",
+      "Find closest active driver within N miles (e.g. using spatial matching).",
+      "Dynamic trip pricing strategies (surge based on active trip demand/drivers count)."
+    ],
+    "classes": [
+      "Rider & Driver (Actor models)",
+      "Trip (Source, Destination, Driver, Rider, Fare, Status)",
+      "Dispatcher (Coordinates vehicle assignments)"
+    ],
+    "codeSkeleton": "public enum TripStatus { REQUESTED, DRIVER_ASSIGNED, IN_PROGRESS, COMPLETED, CANCELLED }\n\npublic class Trip {\n    private String tripId;\n    private Rider rider;\n    private Driver driver;\n    private Location startLocation;\n    private Location endLocation;\n    private TripStatus status = TripStatus.REQUESTED;\n    private double fare;\n\n    public void assignDriver(Driver d) {\n        this.driver = d;\n        this.status = TripStatus.DRIVER_ASSIGNED;\n    }\n}\n\npublic class Dispatcher {\n    public synchronized void matchRider(Rider r, Location start, Location end, PricingStrategy pricing) {\n        double fare = pricing.calculateFare(start, end);\n        Trip trip = new Trip();\n        // Query spatial indices for local drivers, pick nearest, send notification\n    }\n}",
+    "approach": "Match drivers using spatial grid grids (like geohash/S2 cells). Decouple surge calculations into Strategy patterns for easy live testing overrides."
+  },
+  {
+    "id": 23,
+    "title": "Google Docs",
+    "difficulty": "Hard",
+    "tag": "Concurrency / Realtime",
+    "patterns": ["Command", "Observer"],
+    "summary": "Design a collaborative real-time document editor class system managing operational transforms and cursor syncing.",
+    "requirements": [
+      "Support concurrent text edits from multiple user connections.",
+      "Resolve edit conflicts using Operational Transformation (OT) or Conflict-free Replicated Data Types (CRDT).",
+      "Broadcast updates to active participants dynamically."
+    ],
+    "classes": [
+      "Document (Character list, version history)",
+      "Operation (Insert/Delete character, Position, Version)",
+      "OTEngine (Transforms operations so they execute consistently)",
+      "UserSession (Tracks connection socket and cursor position)"
+    ],
+    "codeSkeleton": "public class TextOperation {\n    public enum Type { INSERT, DELETE }\n    private Type type;\n    private char character;\n    private int position;\n    private int clientVersion;\n}\n\npublic class Document {\n    private String docId;\n    private StringBuilder content = new StringBuilder();\n    private List<TextOperation> history = new ArrayList<>();\n\n    public synchronized void applyOperation(TextOperation op) {\n        // Transform operation if version matches historic operations\n        if (op.getType() == TextOperation.Type.INSERT) {\n            content.insert(op.getPosition(), op.getCharacter());\n        } else {\n            content.deleteCharAt(op.getPosition());\n        }\n        history.add(op);\n    }\n}",
+    "approach": "Maintain absolute index offsets on operations. Transform indices on concurrent inserts using standard client-server sequence IDs to maintain convergence."
+  },
+  {
+    "id": 24,
+    "title": "Airline Reservation",
+    "difficulty": "Hard",
+    "tag": "Transactional / Concurrency",
+    "patterns": ["Factory", "Observer"],
+    "summary": "Design an airline reservation system processing flight schedules, aircraft seats allocation, and payment locks.",
+    "requirements": [
+      "Manage airline inventories (flights, seats by class: Economy, Business).",
+      "Process seat reserves using pessimistic concurrency control.",
+      "Generate passenger flight schedules, boarding passes, and ticket updates."
+    ],
+    "classes": [
+      "FlightInstance (Specific departure date, seat status map)",
+      "Seat (Seat number, class, status)",
+      "Reservation (Flight details, Passengers list, Status)"
+    ],
+    "codeSkeleton": "public class FlightSeat {\n    private String seatNo;\n    private String classType;\n    private boolean isReserved;\n\n    public synchronized boolean reserve() {\n        if (!isReserved) {\n            isReserved = true;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class FlightInstance {\n    private String flightNumber;\n    private Date departureTime;\n    private List<FlightSeat> seats;\n\n    public synchronized boolean bookSeat(String seatNo) {\n        for (FlightSeat seat : seats) {\n            if (seat.getSeatNo().equals(seatNo)) {\n                return seat.reserve();\n            }\n        }\n        return false;\n    }\n}",
+    "approach": "Use database row-level locking (`SELECT ... FOR UPDATE`) during seat selection to avoid overbooking the same physical aircraft seats."
+  },
+  {
+    "id": 25,
+    "title": "WhatsApp / Chat System",
+    "difficulty": "Hard",
+    "tag": "Distributed OOD",
+    "patterns": ["Observer", "Strategy"],
+    "summary": "Design a chat application managing real-time connections, chat history, and dynamic user statuses.",
+    "requirements": [
+      "Deliver messages in real-time when recipient is online.",
+      "Queue messages for offline users and deliver them once they connect.",
+      "Support read receipts (Sent -> Delivered -> Read status)."
+    ],
+    "classes": [
+      "User (ID, active status, contacts)",
+      "Message (Sender, Recipient, timestamp, contents, status)",
+      "MessageService (Queues, routes messages)"
+    ],
+    "codeSkeleton": "public enum MessageStatus { SENT, DELIVERED, READ }\n\npublic class Message {\n    private String id;\n    private String senderId;\n    private String recipientId;\n    private String content;\n    private MessageStatus status = MessageStatus.SENT;\n}\n\npublic class ChatGateway {\n    private Map<String, UserConnection> activeConnections = new ConcurrentHashMap<>();\n    private Map<String, Queue<Message>> offlineQueues = new ConcurrentHashMap<>();\n\n    public void sendMessage(Message msg) {\n        if (activeConnections.containsKey(msg.getRecipientId())) {\n            activeConnections.get(msg.getRecipientId()).send(msg);\n            msg.setStatus(MessageStatus.DELIVERED);\n        } else {\n            offlineQueues.computeIfAbsent(msg.getRecipientId(), k -> new ConcurrentLinkedQueue<>()).add(msg);\n        }\n    }\n}",
+    "approach": "Protect the active connections directory using concurrent collections. Use message queues to isolate offline delivery logic from active socket threads."
+  },
+  {
+    "id": 26,
+    "title": "Inventory System",
+    "difficulty": "Hard",
+    "tag": "Transactional / OOD",
+    "patterns": ["Strategy", "Observer"],
+    "summary": "Design a warehouse inventory system tracking stock levels, processing order picks, and alerting low stock events.",
+    "requirements": [
+      "Track quantities of products across different warehouse layouts.",
+      "Reserve stock immediately during checkout checkout checkout.",
+      "Trigger notifications to suppliers once inventory falls below a threshold."
+    ],
+    "classes": [
+      "ProductItem (Item details, sku)",
+      "StockLevel (Quantity available, reserved counts)",
+      "Order (List of items, packing status)",
+      "Warehouse (Locations, replenishment policy)"
+    ],
+    "codeSkeleton": "public class InventoryItem {\n    private String sku;\n    private int quantityAvailable;\n    private int quantityReserved;\n\n    public synchronized boolean reserveStock(int count) {\n        if (quantityAvailable >= count) {\n            quantityAvailable -= count;\n            quantityReserved += count;\n            return true;\n        }\n        return false;\n    }\n\n    public synchronized void commitStock(int count) {\n        quantityReserved -= count;\n    }\n}\n\npublic class InventoryService {\n    private Map<String, InventoryItem> stockTable = new ConcurrentHashMap<>();\n    \n    public boolean processOrder(String sku, int count) {\n        InventoryItem item = stockTable.get(sku);\n        return item != null && item.reserveStock(count);\n    }\n}",
+    "approach": "Apply pessimistic locks to individual inventory SKU rows to prevent transaction race conditions during popular flash sales."
+  },
+  {
+    "id": 27,
+    "title": "Ride Sharing",
+    "difficulty": "Hard",
+    "tag": "OOD / Concurrency",
+    "patterns": ["Strategy", "Observer"],
+    "summary": "Design a ride-sharing pool system (similar to Uber Pool) where riders share a trip and split fares dynamically.",
+    "requirements": [
+      "Match riders travelling along similar routes (coordinate routes checks).",
+      "Calculate fare dynamically based on distance, time, and active splits.",
+      "Real-time coordination of driver pick-up sequences."
+    ],
+    "classes": [
+      "PoolTrip (Multiple Rider list, Driver, Route mapping)",
+      "Route (Sequence of pick-up and drop-off coordinates)",
+      "FareSplitter (Strategy for split rates)"
+    ],
+    "codeSkeleton": "public class PoolTrip {\n    private List<Rider> riders = new ArrayList<>();\n    private Driver driver;\n    private List<Location> sequenceOfStops = new ArrayList<>();\n    private double totalDistance;\n\n    public synchronized boolean joinPool(Rider r, Location start, Location end) {\n        if (riders.size() < 4) {\n            riders.add(r);\n            // Recalculate routing sequences\n            sequenceOfStops.add(start);\n            sequenceOfStops.add(end);\n            return true;\n        }\n        return false;\n    }\n}",
+    "approach": "Model routing as a directed graph traversal problem. Decouple pickup sequences from driver location tracking using a modular route manager."
+  }
+]
