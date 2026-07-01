@@ -202,6 +202,9 @@ export default function RootLayout({
               <Link href="/topics" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 HLD
               </Link>
+              <Link href="/lld" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                LLD
+              </Link>
               <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 TOP HLD Questions
               </Link>
