@@ -4,8 +4,8 @@ import Image from "next/image";
 import { ArrowRight, BookOpen, Layers, Users, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "beingsde.in | Master System Design Interviews & Architectures",
-  description: "A premium interactive learning platform to master HLD, LLD, caching, consistent hashing, and database sharding. Build scalable software architectures and pass FAANG interviews.",
+  title: "Being SDE — Master System Design Interviews & Architectures | beingsde.in",
+  description: "Being SDE (beingsde.in) is a premium interactive learning platform to master HLD, LLD, caching, consistent hashing, and database sharding. Build scalable software architectures and pass FAANG interviews.",
   alternates: {
     canonical: "https://beingsde.in",
   },
@@ -49,7 +49,7 @@ export default function LandingPage() {
 
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-[#ffffff] dark:bg-[#18181b] text-xs font-medium tracking-wide">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          Production-Ready System Design Platform
+          Being SDE — Production-Ready System Design Platform
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-none text-zinc-950 dark:text-zinc-50 max-w-3xl">
@@ -129,7 +129,7 @@ export default function LandingPage() {
       <section className="w-full max-w-5xl flex flex-col gap-10">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight uppercase text-zinc-400 font-mono">CORE ADVANTAGES</h2>
-          <p className="text-sm text-zinc-500 mt-2">Why engineers choose beingsde.in to pass MAANG interviews</p>
+          <p className="text-sm text-zinc-500 mt-2">Why engineers choose Being SDE (beingsde.in) to pass MAANG interviews</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

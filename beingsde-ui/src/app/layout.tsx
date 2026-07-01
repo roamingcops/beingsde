@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://beingsde.in"),
   title: {
-    default: "beingsde.in | #1 System Design Interview Prep Platform",
-    template: "%s | beingsde.in"
+    default: "Being SDE — #1 System Design Interview Prep Platform | beingsde.in",
+    template: "%s | Being SDE (beingsde.in)"
   },
-  description: "beingsde.in is the leading interactive platform to master System Design interviews — HLD, LLD, distributed databases, caching, Kafka, consistent hashing, and sharding. Used by engineers at Google, Amazon, Meta, and top startups.",
+  description: "Being SDE (beingsde.in) is the leading interactive platform to master System Design interviews — HLD, LLD, distributed databases, caching, Kafka, consistent hashing, and sharding. Used by engineers at Google, Amazon, Meta, and top startups.",
   keywords: [
     "beingsde",
     "beingsde.in",
@@ -80,22 +80,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://beingsde.in",
-    title: "beingsde.in | #1 System Design Interview Prep Platform",
-    description: "Master High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and scalable architecture. The most comprehensive system design learning platform for FAANG interviews.",
-    siteName: "beingsde.in",
+    title: "Being SDE — #1 System Design Interview Prep Platform | beingsde.in",
+    description: "Master High-Level Design (HLD), Low-Level Design (LLD), database sharding, caching, and scalable architecture. The most comprehensive system design learning platform for FAANG interviews by Being SDE.",
+    siteName: "Being SDE (beingsde.in)",
     images: [
       {
         url: "/images/redis-caching-diagram.png",
         width: 1200,
         height: 630,
-        alt: "beingsde.in - System Design Architecture Diagrams & Learning Platform",
+        alt: "Being SDE - System Design Architecture Diagrams & Learning Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "beingsde.in | Master System Design Interviews",
-    description: "The #1 interactive system design prep platform. Learn HLD, LLD, databases, caching, Kafka, consistent hashing with real-world blueprints.",
+    title: "Being SDE — Master System Design Interviews | beingsde.in",
+    description: "The #1 interactive system design prep platform. Learn HLD, LLD, databases, caching, Kafka, consistent hashing with real-world blueprints on Being SDE.",
     images: ["/images/redis-caching-diagram.png"],
     creator: "@beingsde",
     site: "@beingsde",
@@ -134,7 +134,8 @@ export default function RootLayout({
                 {
                   "@type": "Organization",
                   "@id": "https://beingsde.in/#organization",
-                  "name": "beingsde",
+                  "name": "Being SDE",
+                  "alternateName": "beingsde",
                   "url": "https://beingsde.in",
                   "logo": {
                     "@type": "ImageObject",
@@ -142,7 +143,7 @@ export default function RootLayout({
                     "width": 1200,
                     "height": 630
                   },
-                  "description": "beingsde.in is the leading system design interview preparation platform for software engineers. Learn HLD, LLD, distributed systems, caching, and database architecture.",
+                  "description": "Being SDE (beingsde.in) is the leading system design interview preparation platform for software engineers. Learn HLD, LLD, distributed systems, caching, and database architecture.",
                   "sameAs": [
                     "https://beingsde.in"
                   ]
@@ -151,8 +152,9 @@ export default function RootLayout({
                   "@type": "WebSite",
                   "@id": "https://beingsde.in/#website",
                   "url": "https://beingsde.in",
-                  "name": "beingsde.in",
-                  "description": "The #1 interactive system design interview preparation platform covering HLD, LLD, distributed databases, caching, Kafka, and scalability patterns.",
+                  "name": "Being SDE",
+                  "alternateName": "beingsde.in",
+                  "description": "The #1 interactive system design interview preparation platform by Being SDE, covering HLD, LLD, distributed databases, caching, Kafka, and scalability patterns.",
                   "publisher": { "@id": "https://beingsde.in/#organization" },
                   "potentialAction": {
                     "@type": "SearchAction",
@@ -164,9 +166,9 @@ export default function RootLayout({
                 {
                   "@type": "EducationalOrganization",
                   "@id": "https://beingsde.in/#edu",
-                  "name": "beingsde — System Design Academy",
+                  "name": "Being SDE — System Design Academy",
                   "url": "https://beingsde.in",
-                  "description": "Interactive system design learning for software engineers preparing for FAANG, MAANG, and top-tier tech company interviews.",
+                  "description": "Interactive system design learning by Being SDE for software engineers preparing for FAANG, MAANG, and top-tier tech company interviews.",
                   "teaches": [
                     "System Design",
                     "High Level Design",
