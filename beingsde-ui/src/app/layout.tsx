@@ -200,10 +200,10 @@ export default function RootLayout({
 
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
               <Link href="/topics" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                Topics
+                HLD
               </Link>
               <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                Questions
+                TOP HLD Questions
               </Link>
               <Link href="/dsa" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 DSA

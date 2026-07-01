@@ -89,7 +89,7 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
                 href="/topics"
                 className="w-full sm:w-auto text-xs font-semibold uppercase tracking-wider bg-transparent text-zinc-600 hover:text-zinc-900 border border-zinc-200 dark:border-zinc-800 px-6 py-3 hover:border-zinc-400 transition-colors"
               >
-                Try Free Topics
+                Try Free HLD Topics
               </Link>
             </div>
           </div>

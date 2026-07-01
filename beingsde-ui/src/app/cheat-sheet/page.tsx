@@ -13,7 +13,7 @@ export default function CheatSheetPage() {
           className="flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          Back to Topics
+          Back to HLD
         </Link>
         <button
           onClick={() => window.print()}
