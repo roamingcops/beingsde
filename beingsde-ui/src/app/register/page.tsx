@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { KeyRound, Mail, AlertTriangle, User, Eye, EyeOff, CheckCircle2, Circle } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
 function PasswordStrength({ password }: { password: string }) {
   const checks = useMemo(() => [
@@ -83,46 +84,79 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Registration failed. Please try again.");
-      }
-
-      // Auto-login immediately
-      try {
-        const loginRes = await fetch(`${API_BASE}/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+      if (isSupabaseConfigured()) {
+        const { data, error: supError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name: name,
+            },
+          },
         });
 
-        if (loginRes.ok) {
-          const loginData = await loginRes.json();
-          localStorage.setItem("accessToken", loginData.accessToken);
-          localStorage.setItem("userRole", loginData.role);
+        if (supError) {
+          throw new Error(supError.message);
+        }
+
+        if (data.session) {
+          // Logged in immediately
+          localStorage.setItem("accessToken", data.session.access_token);
+          localStorage.setItem("userRole", "FREE_USER");
           localStorage.setItem("userEmail", email);
           
-          // Sync state globally in the window
           window.dispatchEvent(new Event("auth-state-change"));
-
           router.push("/topics");
           router.refresh();
           return;
+        } else {
+          // Requires email confirmation or pending registration status
+          router.push("/login?registered=true");
+          router.refresh();
+          return;
         }
-      } catch (loginErr) {
-        // Log error and fall back to regular login redirection
-        console.error("Auto-login failed:", loginErr);
-      }
+      } else {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        });
 
-      // Fallback redirection to login page with registered flag
-      router.push("/login?registered=true");
-      router.refresh();
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || "Registration failed. Please try again.");
+        }
+
+        // Auto-login immediately
+        try {
+          const loginRes = await fetch(`${API_BASE}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (loginRes.ok) {
+            const loginData = await loginRes.json();
+            localStorage.setItem("accessToken", loginData.accessToken);
+            localStorage.setItem("userRole", loginData.role);
+            localStorage.setItem("userEmail", email);
+            
+            // Sync state globally in the window
+            window.dispatchEvent(new Event("auth-state-change"));
+
+            router.push("/topics");
+            router.refresh();
+            return;
+          }
+        } catch (loginErr) {
+          // Log error and fall back to regular login redirection
+          console.error("Auto-login failed:", loginErr);
+        }
+
+        // Fallback redirection to login page with registered flag
+        router.push("/login?registered=true");
+        router.refresh();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {

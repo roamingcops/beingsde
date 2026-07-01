@@ -148,11 +148,11 @@ public class PasswordResetEmailService {
                         <td style="padding:20px 40px;border-top:1px solid #e4e4e7;
                                    background:#fafafa;">
                           <p style="margin:0;font-size:11px;color:#a1a1aa;line-height:1.5;">
-                            &copy; 2026 beingsde.com &mdash; Built for System Architects.<br>
+                            &copy; 2026 beingsde.in &mdash; Built for System Architects.<br>
                             Questions? Email us at
-                            <a href="mailto:support@beingsde.com"
+                            <a href="mailto:support@beingsde.in"
                                style="color:#71717a;text-decoration:underline;">
-                              support@beingsde.com
+                              support@beingsde.in
                             </a>
                           </p>
                         </td>

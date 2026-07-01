@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
 export default function HeaderAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,7 +29,10 @@ export default function HeaderAuth() {
     };
   }, []);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    if (isSupabaseConfigured()) {
+      await supabase.auth.signOut().catch(() => {});
+    }
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userRole");
     localStorage.removeItem("userEmail");

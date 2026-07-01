@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | beingsde.com",
-  description: "Learn how beingsde collects, uses, and protects your personal information.",
+  title: "Privacy Policy | beingsde.in",
+  description: "Learn how beingsde.in collects, uses, and protects your personal information.",
+  alternates: {
+    canonical: "https://beingsde.in/privacy",
+  },
 };
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -26,19 +29,19 @@ export default function PrivacyPolicyPage() {
         <span className="text-xs font-semibold uppercase tracking-widest font-mono text-zinc-400">Legal</span>
         <h1 className="text-4xl font-black tracking-tight">Privacy Policy</h1>
         <p className="text-sm text-zinc-500">
-          Last updated: <strong>June 2026</strong>. This policy explains how beingsde.com handles your data.
+          Last updated: <strong>June 2026</strong>. This policy explains how beingsde.in handles your data.
         </p>
       </div>
 
       {/* Intro */}
       <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-        At <strong>beingsde.com</strong>, we take your privacy seriously. This Privacy Policy describes what
+        At <strong>beingsde.in</strong>, we take your privacy seriously. This Privacy Policy describes what
         information we collect, how we use it, and the choices you have regarding your data. By using our
         platform you agree to the practices described below.
       </p>
 
       <Section title="1. Information We Collect">
-        <p>We collect the following categories of information when you use beingsde.com:</p>
+        <p>We collect the following categories of information when you use beingsde.in:</p>
         <ul className="list-disc list-inside flex flex-col gap-1.5 ml-2">
           <li><strong>Account data</strong> — your name, email address, and encrypted password when you register.</li>
           <li><strong>Usage data</strong> — pages visited, topics viewed, practice sessions completed, and time spent on the platform, collected automatically via server logs and analytics.</li>
@@ -49,7 +52,7 @@ export default function PrivacyPolicyPage() {
 
       <Section title="2. How We Use Your Information">
         <ul className="list-disc list-inside flex flex-col gap-1.5 ml-2">
-          <li>To provide, operate, and improve the beingsde learning platform.</li>
+          <li>To provide, operate, and improve the beingsde.in learning platform.</li>
           <li>To authenticate you and keep your account secure.</li>
           <li>To process subscription payments and send billing receipts.</li>
           <li>To send transactional emails (e.g., email verification, password reset). We do not send marketing emails without your consent.</li>
@@ -110,7 +113,7 @@ export default function PrivacyPolicyPage() {
 
       <Section title="8. Children's Privacy">
         <p>
-          beingsde.com is not directed at children under 13 years of age. We do not knowingly collect
+          beingsde.in is not directed at children under 13 years of age. We do not knowingly collect
           personal information from children. If you believe a child has provided us with personal data,
           please contact us immediately and we will delete it.
         </p>

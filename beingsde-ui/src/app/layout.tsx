@@ -144,7 +144,6 @@ export default function RootLayout({
                   },
                   "description": "beingsde.in is the leading system design interview preparation platform for software engineers. Learn HLD, LLD, distributed systems, caching, and database architecture.",
                   "sameAs": [
-                    "https://beingsde.com",
                     "https://beingsde.in"
                   ]
                 },
@@ -204,6 +203,9 @@ export default function RootLayout({
               <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Questions
               </Link>
+              <Link href="/dsa" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                DSA
+              </Link>
               <Link href="/subscriptions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Subscriptions
               </Link>
@@ -228,7 +230,7 @@ export default function RootLayout({
         <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 py-8 bg-[#fafafa]/50 dark:bg-[#09090b]/50">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-500">
             <div>
-              &copy; {new Date().getFullYear()} beingsde.com. All rights reserved. Built for System Architects.
+              &copy; {new Date().getFullYear()} beingsde.in. All rights reserved. Built for System Architects.
             </div>
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Privacy Policy</Link>

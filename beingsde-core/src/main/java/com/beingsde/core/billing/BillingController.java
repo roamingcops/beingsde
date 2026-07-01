@@ -33,6 +33,7 @@ public class BillingController {
     private final IdempotencyKeyRepository idempotencyRepo;
     private final JwtTokenProvider tokenProvider;
     private final SessionStore sessionStore;
+    private final SupabaseBillingService supabaseService;
 
     @Value("${app.razorpay.key-id}")
     private String keyId;
@@ -48,13 +49,15 @@ public class BillingController {
                              PaymentRepository paymentRepo,
                              IdempotencyKeyRepository idempotencyRepo,
                              JwtTokenProvider tokenProvider,
-                             SessionStore sessionStore) {
+                             SessionStore sessionStore,
+                             SupabaseBillingService supabaseService) {
         this.userRepo = userRepo;
         this.subscriptionRepo = subscriptionRepo;
         this.paymentRepo = paymentRepo;
         this.idempotencyRepo = idempotencyRepo;
         this.tokenProvider = tokenProvider;
         this.sessionStore = sessionStore;
+        this.supabaseService = supabaseService;
     }
 
     @PostMapping("/razorpay/order")
@@ -84,8 +87,6 @@ public class BillingController {
                 razorpayOrderId = order.get("id");
             }
 
-            // Keep existing subscriptions intact for history
-
             Payment payment = Payment.builder()
                     .userId(user.getId())
                     .razorpayOrderId(razorpayOrderId)
@@ -96,6 +97,7 @@ public class BillingController {
                     .build();
 
             paymentRepo.save(payment);
+            supabaseService.savePayment(payment);
 
             return ResponseEntity.ok(Map.of(
                     "orderId", razorpayOrderId,
@@ -133,9 +135,7 @@ public class BillingController {
                 razorpaySubscriptionId = subscription.get("id");
             }
 
-            // Keep existing subscriptions intact for history
-
-            // Create a pending subscription in MongoDB
+            // Create a pending subscription record
             Subscription subscription = Subscription.builder()
                     .userId(user.getId())
                     .tier("PREMIUM")
@@ -147,6 +147,7 @@ public class BillingController {
                     .createdAt(Instant.now())
                     .build();
             subscriptionRepo.save(subscription);
+            supabaseService.saveSubscription(subscription);
 
             return ResponseEntity.ok(Map.of(
                     "subscriptionId", razorpaySubscriptionId,
@@ -166,6 +167,19 @@ public class BillingController {
         String currentUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepo.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
+
+        if (supabaseService.isConfigured()) {
+            List<Subscription> subs = supabaseService.getSubscriptions(user.getId());
+            if (!subs.isEmpty()) {
+                Subscription sub = subs.get(0);
+                return ResponseEntity.ok(Map.of(
+                        "status", sub.getStatus(),
+                        "tier", sub.getTier(),
+                        "autoRenew", sub.isAutoRenew(),
+                        "expiresAt", sub.getExpiresAt() != null ? sub.getExpiresAt().toString() : ""
+                ));
+            }
+        }
 
         List<Subscription> subs = subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
         if (!subs.isEmpty()) {
@@ -188,7 +202,10 @@ public class BillingController {
         User user = userRepo.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
 
-        List<Subscription> subs = subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+        List<Subscription> subs = supabaseService.isConfigured() ?
+                supabaseService.getSubscriptions(user.getId()) :
+                subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
+
         Subscription sub = subs.isEmpty() ? null : subs.get(0);
         if (sub == null) {
             throw new RuntimeException("Active subscription not found for user");
@@ -213,6 +230,7 @@ public class BillingController {
         sub.setAutoRenew(false);
         sub.setStatus("CANCELLED");
         subscriptionRepo.save(sub);
+        supabaseService.saveSubscription(sub);
 
         return ResponseEntity.ok(Map.of("message", "Subscription auto-renewal has been cancelled. Premium access remains active until the end of your billing cycle."));
     }
@@ -222,6 +240,15 @@ public class BillingController {
         String currentUserEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepo.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("Authenticated user context not found"));
+
+        if (supabaseService.isConfigured()) {
+            List<Subscription> subscriptions = supabaseService.getSubscriptions(user.getId());
+            List<Payment> payments = supabaseService.getPayments(user.getId());
+            return ResponseEntity.ok(Map.of(
+                    "subscriptions", subscriptions,
+                    "payments", payments
+            ));
+        }
 
         List<Subscription> subscriptions = subscriptionRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
         List<Payment> payments = paymentRepo.findAllByUserIdOrderByCreatedAtDesc(user.getId());
@@ -267,12 +294,14 @@ public class BillingController {
                         .getJSONObject("subscription")
                         .getJSONObject("entity");
                 String subId = entityObj.optString("id");
+                
                 Optional<Subscription> subOpt = subscriptionRepo.findByRazorpaySubscriptionId(subId);
                 if (subOpt.isPresent()) {
                     Subscription sub = subOpt.get();
                     sub.setStatus("CANCELLED");
                     sub.setAutoRenew(false);
                     subscriptionRepo.save(sub);
+                    supabaseService.saveSubscription(sub);
                 }
             } else if ("subscription.charged".equals(event) || "order.paid".equals(event) || "payment.captured".equals(event)) {
                 JSONObject entityObj = jsonPayload.getJSONObject("payload")
@@ -295,6 +324,7 @@ public class BillingController {
                     payment.setPaymentMethod(method);
                     payment.setStatus("CAPTURED");
                     paymentRepo.save(payment);
+                    supabaseService.savePayment(payment);
 
                     upgradeUserRole(payment.getUserId(), null);
                 } else {
@@ -316,6 +346,7 @@ public class BillingController {
                                     .createdAt(Instant.now())
                                     .build();
                             paymentRepo.save(payment);
+                            supabaseService.savePayment(payment);
 
                             upgradeUserRole(user.getId(), null);
                         }
@@ -388,6 +419,7 @@ public class BillingController {
                 payment.setRazorpaySignature(signature);
                 payment.setStatus("CAPTURED");
                 paymentRepo.save(payment);
+                supabaseService.savePayment(payment);
 
                 upgradeUserRole(user.getId(), null);
             } else {
@@ -407,6 +439,7 @@ public class BillingController {
                 sub.setStatus("ACTIVE");
                 sub.setAutoRenew(true);
                 subscriptionRepo.save(sub);
+                supabaseService.saveSubscription(sub);
 
                 // Create a payment record as well
                 Payment payment = Payment.builder()
@@ -420,6 +453,7 @@ public class BillingController {
                         .createdAt(Instant.now())
                         .build();
                 paymentRepo.save(payment);
+                supabaseService.savePayment(payment);
 
                 upgradeUserRole(user.getId(), subscriptionId);
             }
@@ -449,7 +483,8 @@ public class BillingController {
             user.setRole(UserRole.PREMIUM_USER);
             userRepo.save(user);
 
-            // Keep existing subscriptions intact for history
+            // Also sync user role to Supabase Auth Admin API
+            supabaseService.updateSupabaseUserRole(userId, "PREMIUM_USER");
 
             // Save Subscription record
             Subscription subscription = Subscription.builder()
@@ -468,6 +503,7 @@ public class BillingController {
                 subscription.setRazorpaySubscriptionId("sub_sim_" + UUID.randomUUID().toString().substring(0, 12));
             }
             subscriptionRepo.save(subscription);
+            supabaseService.saveSubscription(subscription);
         }
     }
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { KeyRound, Mail, AlertTriangle, CheckCircle, ShieldAlert } from "lucide-react";
+import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,25 +39,48 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      if (isSupabaseConfigured()) {
+        const { data, error: supError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "Invalid email or password");
+        if (supError) {
+          throw new Error(supError.message);
+        }
+
+        if (!data.session) {
+          throw new Error("No session returned from Supabase Auth.");
+        }
+
+        // Store JWT token for API calls
+        localStorage.setItem("accessToken", data.session.access_token);
+        
+        // Extract user role from app_metadata or default to FREE_USER
+        const role = data.user?.app_metadata?.role || "FREE_USER";
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("userEmail", email);
+      } else {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || "Invalid email or password");
+        }
+
+        const data = await res.json();
+        
+        // Store JWT token for API calls
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("userRole", data.role);
+        localStorage.setItem("userEmail", email);
       }
-
-      const data = await res.json();
-      
-      // Store JWT token for API calls
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("userRole", data.role);
-      localStorage.setItem("userEmail", email);
 
       // Sync state globally in the window
       window.dispatchEvent(new Event("auth-state-change"));

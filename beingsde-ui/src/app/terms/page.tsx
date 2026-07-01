@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | beingsde.com",
-  description: "Read the terms and conditions that govern your use of beingsde.com.",
+  title: "Terms of Service | beingsde.in",
+  description: "Read the terms and conditions that govern your use of beingsde.in.",
+  alternates: {
+    canonical: "https://beingsde.in/terms",
+  },
 };
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -31,14 +34,14 @@ export default function TermsOfServicePage() {
       </div>
 
       <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-        These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of <strong>beingsde.com</strong> (the
+        These Terms of Service (&ldquo;Terms&rdquo;) govern your access to and use of <strong>beingsde.in</strong> (the
         &ldquo;Platform&rdquo;), operated by the beingsde team (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;). By creating an account or
         using the Platform, you agree to be bound by these Terms.
       </p>
 
       <Section title="1. Eligibility">
         <p>
-          You must be at least 13 years old to use beingsde.com. By using the Platform you represent that
+          You must be at least 13 years old to use beingsde.in. By using the Platform you represent that
           you meet this requirement. If you are using the Platform on behalf of an organisation, you
           represent that you are authorised to bind that organisation to these Terms.
         </p>
@@ -56,7 +59,7 @@ export default function TermsOfServicePage() {
 
       <Section title="3. Subscriptions & Payments">
         <p>
-          beingsde.com offers free and paid subscription tiers. Paid features are available upon
+          beingsde.in offers free and paid subscription tiers. Paid features are available upon
           subscribing to a plan.
         </p>
         <ul className="list-disc list-inside flex flex-col gap-1.5 ml-2">
@@ -86,8 +89,8 @@ export default function TermsOfServicePage() {
 
       <Section title="5. Intellectual Property">
         <p>
-          All content on beingsde.com — including text, diagrams, code samples, illustrations, and system
-          design exercises — is owned by or licensed to beingsde.com and is protected by copyright law.
+          All content on beingsde.in — including text, diagrams, code samples, illustrations, and system
+          design exercises — is owned by or licensed to beingsde.in and is protected by copyright law.
         </p>
         <p>
           You are granted a limited, non-exclusive, non-transferable licence to access and use the content
@@ -116,7 +119,7 @@ export default function TermsOfServicePage() {
 
       <Section title="8. Limitation of Liability">
         <p>
-          To the maximum extent permitted by applicable law, beingsde.com and its team members shall not
+          To the maximum extent permitted by applicable law, beingsde.in and its team members shall not
           be liable for any indirect, incidental, special, or consequential damages arising from your use
           of (or inability to use) the Platform, including loss of data, loss of earnings, or loss of
           business opportunities. Our total liability for any claim shall not exceed the amount you paid

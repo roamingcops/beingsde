@@ -95,7 +95,7 @@ public class InterviewEmailService {
                 </table>
                 <p>Make sure to prepare notes on the topic beforehand. Good luck!</p>
                 <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.com &mdash; Built for System Architects.</p>
+                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.in &mdash; Built for System Architects.</p>
             </div>
             """.formatted(candidateName, interviewerName, topic, formatDateTime(scheduledAt), meetingLink);
 
@@ -129,7 +129,7 @@ public class InterviewEmailService {
                 </table>
                 <p>Please log in to the dashboard after the session to submit star feedback for the candidate.</p>
                 <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.com &mdash; Built for System Architects.</p>
+                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.in &mdash; Built for System Architects.</p>
             </div>
             """.formatted(interviewerName, candidateName, topic, formatDateTime(scheduledAt), meetingLink);
 
@@ -145,7 +145,7 @@ public class InterviewEmailService {
                 <p>We are writing to confirm that the mock interview scheduled for <strong>%s</strong> on topic <strong>%s</strong> with <strong>%s</strong> (as %s) has been cancelled.</p>
                 <p>If you'd like to reschedule, please visit the mock interview directory on our dashboard.</p>
                 <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.com &mdash; Built for System Architects.</p>
+                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.in &mdash; Built for System Architects.</p>
             </div>
             """.formatted(formatDateTime(scheduledAt), topic, partnerName, role);
 
@@ -171,7 +171,7 @@ public class InterviewEmailService {
                 </table>
                 <p>Visit your beingsde dashboard to schedule another session and review more design challenges!</p>
                 <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.com &mdash; Built for System Architects.</p>
+                <p style="font-size: 12px; color: #71717a; margin-bottom: 0;">&copy; beingsde.in &mdash; Built for System Architects.</p>
             </div>
             """.formatted(candidateName, interviewerName, score, notes);
 

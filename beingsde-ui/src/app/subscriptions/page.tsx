@@ -135,7 +135,7 @@ export default function SubscriptionsPage() {
         const options = {
           key: orderData.keyId,
           subscription_id: orderData.subscriptionId,
-          name: "beingsde.com",
+          name: "beingsde.in",
           description: "Premium Pass subscription",
           handler: async function (response: any) {
             setLoading(true);

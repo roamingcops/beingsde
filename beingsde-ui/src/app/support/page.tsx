@@ -3,8 +3,11 @@ import Link from "next/link";
 import { MessageSquare, BookOpen, CreditCard, ShieldCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Support | beingsde",
-  description: "Get help with your beingsde account, subscription, or learning questions.",
+  title: "Support Help Center | beingsde.in",
+  description: "Need help with your beingsde.in account, subscriptions, or learn how to study our system design curriculum? Get support from the beingsde team.",
+  alternates: {
+    canonical: "https://beingsde.in/support",
+  },
 };
 
 const topics = [
@@ -77,6 +80,66 @@ const faqs = [
 export default function SupportPage() {
   return (
     <div className="max-w-3xl mx-auto py-8 flex flex-col gap-12">
+      {/* Schema.org FAQPage Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "How do I reset my password?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Go to the Forgot Password page, enter your registered email address, and we'll send you a reset link valid for 1 hour."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I try the platform before subscribing?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes — the Free tier gives you access to a curated set of foundational topics with no time limit. Premium content (advanced HLD, LLD deep-dives, and mock interviews) requires a paid subscription."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How do I get a refund?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "We offer a full refund within 7 days of your initial subscription purchase. Please reach out via our contact channels with your registered email and order ID. Renewal charges are non-refundable per our Terms of Service."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How long does it take to get a response?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "We aim to respond to all support queries within 24 hours on business days (Mon–Fri, IST). Billing queries are typically resolved within 48 hours."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "I found an error in the content. How do I report it?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "We really appreciate that! Please reach out via our contact channels with the topic name and a description of the issue. Verified corrections receive a shoutout in our changelog."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is beingsde available as a mobile app?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Not yet — but the web platform is fully responsive and works great on mobile browsers. A native app is on our roadmap."
+                }
+              }
+            ]
+          })
+        }}
+      />
 
       {/* Header */}
       <div className="flex flex-col gap-3 border-b border-zinc-200 dark:border-zinc-800 pb-8">
