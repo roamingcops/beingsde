@@ -2,6 +2,7 @@
   {
     "id": 1,
     "title": "Tic Tac Toe",
+    "slug": "tic-tac-toe",
     "difficulty": "Easy",
     "tag": "Game Design",
     "patterns": ["Singleton"],
@@ -28,6 +29,7 @@
   {
     "id": 2,
     "title": "Traffic Signal",
+    "slug": "traffic-signal",
     "difficulty": "Easy",
     "tag": "State / Control",
     "patterns": ["State", "Singleton"],
@@ -54,6 +56,7 @@
   {
     "id": 3,
     "title": "Chess Clock",
+    "slug": "chess-clock",
     "difficulty": "Easy",
     "tag": "State / Behavioral",
     "patterns": ["Observer", "State"],
@@ -80,6 +83,7 @@
   {
     "id": 4,
     "title": "Logger",
+    "slug": "logger",
     "difficulty": "Easy",
     "tag": "Behavioral",
     "patterns": ["Chain of Responsibility", "Singleton"],
@@ -105,6 +109,7 @@
   {
     "id": 5,
     "title": "Coffee Machine",
+    "slug": "coffee-machine",
     "difficulty": "Easy",
     "tag": "State / Behavioral",
     "patterns": ["State", "Singleton"],
@@ -130,6 +135,7 @@
   {
     "id": 6,
     "title": "Vending Machine",
+    "slug": "vending-machine",
     "difficulty": "Easy",
     "tag": "State Pattern / Behavioral",
     "patterns": ["State"],
@@ -156,6 +162,7 @@
   {
     "id": 7,
     "title": "Parking Lot System",
+    "slug": "parking-lot-system",
     "difficulty": "Medium",
     "tag": "Object-Oriented Design",
     "patterns": ["Singleton", "Factory Method"],
@@ -184,6 +191,7 @@
   {
     "id": 8,
     "title": "Snake & Ladder",
+    "slug": "snake-ladder",
     "difficulty": "Medium",
     "tag": "OOD / Game",
     "patterns": ["Singleton"],
@@ -211,6 +219,7 @@
   {
     "id": 9,
     "title": "Library Management System",
+    "slug": "library-management-system",
     "difficulty": "Medium",
     "tag": "CRUD / OOD",
     "patterns": ["Factory", "SearchStrategy"],
@@ -236,6 +245,7 @@
   {
     "id": 10,
     "title": "Cricbuzz",
+    "slug": "cricbuzz",
     "difficulty": "Medium",
     "tag": "Publisher / Subscriber",
     "patterns": ["Observer", "Strategy"],
@@ -261,6 +271,7 @@
   {
     "id": 11,
     "title": "Restaurant",
+    "slug": "restaurant",
     "difficulty": "Medium",
     "tag": "Object-Oriented Design",
     "patterns": ["Factory", "Observer"],
@@ -287,6 +298,7 @@
   {
     "id": 12,
     "title": "Cache (LRU / LFU)",
+    "slug": "cache",
     "difficulty": "Medium",
     "tag": "Structural",
     "patterns": ["Proxy"],
@@ -312,6 +324,7 @@
   {
     "id": 13,
     "title": "File System",
+    "slug": "file-system",
     "difficulty": "Medium",
     "tag": "Structural Design",
     "patterns": ["Composite"],
@@ -337,6 +350,7 @@
   {
     "id": 14,
     "title": "Amazon Locker",
+    "slug": "amazon-locker",
     "difficulty": "Medium",
     "tag": "OOD / Allocation",
     "patterns": ["Strategy", "Factory"],
@@ -362,6 +376,7 @@
   {
     "id": 15,
     "title": "Online Auction System",
+    "slug": "online-auction-system",
     "difficulty": "Medium",
     "tag": "Publisher / Subscriber",
     "patterns": ["Observer", "State"],
@@ -387,6 +402,7 @@
   {
     "id": 16,
     "title": "BookMyShow (Movie Ticket Booking)",
+    "slug": "bookmyshow",
     "difficulty": "Hard",
     "tag": "Concurrency / Transactional",
     "patterns": ["Observer", "Strategy"],
@@ -414,6 +430,7 @@
   {
     "id": 17,
     "title": "Splitwise (Expense Sharing App)",
+    "slug": "splitwise",
     "difficulty": "Hard",
     "tag": "Object-Oriented Design",
     "patterns": ["Strategy", "Factory"],
@@ -440,6 +457,7 @@
   {
     "id": 18,
     "title": "Elevator System",
+    "slug": "elevator-system",
     "difficulty": "Hard",
     "tag": "System Design / State",
     "patterns": ["State", "Strategy (Dispatching)"],
@@ -467,6 +485,7 @@
   {
     "id": 19,
     "title": "Chess",
+    "slug": "chess",
     "difficulty": "Hard",
     "tag": "OOD / Game",
     "patterns": ["Factory Method", "Command"],
@@ -495,6 +514,7 @@
   {
     "id": 20,
     "title": "ATM Machine",
+    "slug": "atm-machine",
     "difficulty": "Hard",
     "tag": "State / Concurrency",
     "patterns": ["State", "Chain of Responsibility"],
@@ -520,6 +540,7 @@
   {
     "id": 21,
     "title": "Hotel Management",
+    "slug": "hotel-management",
     "difficulty": "Hard",
     "tag": "Transactional / OOD",
     "patterns": ["Factory", "Observer"],
@@ -545,6 +566,7 @@
   {
     "id": 22,
     "title": "Uber",
+    "slug": "uber",
     "difficulty": "Hard",
     "tag": "Proximity / Dispatch",
     "patterns": ["Observer", "Strategy"],
@@ -570,6 +592,7 @@
   {
     "id": 23,
     "title": "Google Docs",
+    "slug": "google-docs",
     "difficulty": "Hard",
     "tag": "Concurrency / Realtime",
     "patterns": ["Command", "Observer"],
@@ -596,6 +619,7 @@
   {
     "id": 24,
     "title": "Airline Reservation",
+    "slug": "airline-reservation",
     "difficulty": "Hard",
     "tag": "Transactional / Concurrency",
     "patterns": ["Factory", "Observer"],
@@ -621,6 +645,7 @@
   {
     "id": 25,
     "title": "WhatsApp / Chat System",
+    "slug": "whatsapp",
     "difficulty": "Hard",
     "tag": "Distributed OOD",
     "patterns": ["Observer", "Strategy"],
@@ -646,6 +671,7 @@
   {
     "id": 26,
     "title": "Inventory System",
+    "slug": "inventory-system",
     "difficulty": "Hard",
     "tag": "Transactional / OOD",
     "patterns": ["Strategy", "Observer"],
@@ -672,6 +698,7 @@
   {
     "id": 27,
     "title": "Ride Sharing",
+    "slug": "ride-sharing",
     "difficulty": "Hard",
     "tag": "OOD / Concurrency",
     "patterns": ["Strategy", "Observer"],

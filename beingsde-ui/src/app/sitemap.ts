@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import MOCK_TOPICS from "../data/topics.json";
+import lldQuestions from "../data/lld.json";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://beingsde.in";
@@ -34,5 +35,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: topic.isPremium ? 0.80 : 0.85,
   }));
 
-  return [...staticRoutes, ...topicRoutes];
+  // Dynamic LLD routes — high priority (0.85) for article pages
+  const lldRoutes = lldQuestions.map((q) => ({
+    url: `${baseUrl}/lld/${q.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  }));
+
+  return [...staticRoutes, ...topicRoutes, ...lldRoutes];
 }
