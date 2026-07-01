@@ -5,8 +5,6 @@ import {
   Search,
   ChevronDown,
   ChevronUp,
-  Cpu,
-  BookOpen,
   CheckCircle2,
   Zap,
   AlertTriangle,
@@ -24,8 +22,13 @@ interface LLDQuestion {
   patterns: string[];
   summary: string;
   requirements: string[];
+  erDiagram: string;
   classes: string[];
-  codeSkeleton: string;
+  languages: {
+    java: string;
+    cpp: string;
+    python: string;
+  };
   approach: string;
 }
 
@@ -33,6 +36,7 @@ export default function LldPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("ALL");
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [selectedLang, setSelectedLang] = useState<"java" | "cpp" | "python">("java");
 
   const filtered = (lldQuestions as LLDQuestion[]).filter((q) => {
     const matchesSearch =
@@ -71,7 +75,7 @@ export default function LldPage() {
             <span className="text-xs text-zinc-500 dark:text-zinc-400">Standard Problems</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400">Java</span>
+            <span className="text-xl font-black font-mono text-emerald-600 dark:text-emerald-400">Java / C++ / Py</span>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">Code Blueprints</span>
           </div>
         </div>
@@ -124,7 +128,7 @@ export default function LldPage() {
       <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-sm p-3 mb-6">
         <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
         <p className="text-xs text-amber-700 dark:text-amber-400">
-          Click on any system design exercise to explore its structural class requirements, design patterns, and code skeletons.
+          Click on any system design exercise to explore its structural class requirements, design patterns, ER diagrams, and code templates.
         </p>
       </div>
 
@@ -172,7 +176,9 @@ export default function LldPage() {
                       </span>
                       <span
                         className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm ${
-                          q.difficulty === "Medium"
+                          q.difficulty === "Easy"
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                            : q.difficulty === "Medium"
                             ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
                             : "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300"
                         }`}
@@ -219,6 +225,16 @@ export default function LldPage() {
                       </ul>
                     </div>
 
+                    {/* ER Diagram */}
+                    <div>
+                      <p className="text-[10px] font-black font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2">
+                        Entity-Relationship (ER) Schema
+                      </p>
+                      <pre className="bg-zinc-50 dark:bg-[#1f1f23] border border-zinc-200 dark:border-zinc-800 rounded-sm p-4 text-xs font-mono text-zinc-800 dark:text-zinc-200 whitespace-pre-line leading-relaxed">
+                        {q.erDiagram}
+                      </pre>
+                    </div>
+
                     {/* Core Classes */}
                     <div>
                       <p className="text-[10px] font-black font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2">
@@ -236,13 +252,30 @@ export default function LldPage() {
                       </div>
                     </div>
 
-                    {/* Java Code Blueprint */}
+                    {/* Code Blueprints with language toggle tabs */}
                     <div>
-                      <div className="flex items-center gap-1.5 text-[10px] font-black font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-2">
-                        <Code2 className="w-3.5 h-3.5" /> Java Implementation Skeleton
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1.5 text-[10px] font-black font-mono uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                          <Code2 className="w-3.5 h-3.5" /> Implementation Blueprints
+                        </div>
+                        <div className="flex gap-1">
+                          {(["java", "cpp", "python"] as const).map((lang) => (
+                            <button
+                              key={lang}
+                              onClick={() => setSelectedLang(lang)}
+                              className={`text-[9px] font-mono font-bold px-2 py-0.5 border uppercase tracking-wider rounded-sm transition-all duration-200 ${
+                                selectedLang === lang
+                                  ? "bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100"
+                                  : "bg-transparent text-zinc-450 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
+                              }`}
+                            >
+                              {lang === "cpp" ? "C++" : lang}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                       <pre className="bg-zinc-950 text-zinc-100 text-xs p-4 rounded-sm font-mono overflow-x-auto border border-zinc-800 leading-relaxed max-h-96">
-                        <code>{q.codeSkeleton}</code>
+                        <code>{q.languages[selectedLang]}</code>
                       </pre>
                     </div>
 

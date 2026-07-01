@@ -12,12 +12,17 @@
       "Check win condition in O(1) time after each move.",
       "Detect draw states when all cells are filled without a winner."
     ],
+    "erDiagram": "GameEngine [1] <---> [1] Board\nGameEngine [1] <---> [2] Player\nBoard [1] <---> [N*N] Cell\nCell [1] <---> [1] Symbol",
     "classes": [
       "Board (Holds grid cells)",
       "Player (Symbol: X or O, Name)",
       "GameEngine (Runs turn iterations and checks states)"
     ],
-    "codeSkeleton": "public enum Symbol { X, O, EMPTY }\n\npublic class Board {\n    private Symbol[][] grid;\n    private int size;\n\n    public Board(int size) {\n        this.size = size;\n        grid = new Symbol[size][size];\n        for (int i = 0; i < size; i++)\n            for (int j = 0; j < size; j++)\n                grid[i][j] = Symbol.EMPTY;\n    }\n\n    public boolean makeMove(int row, int col, Symbol sym) {\n        if (row < 0 || row >= size || col < 0 || col >= size || grid[row][col] != Symbol.EMPTY) {\n            return false;\n        }\n        grid[row][col] = sym;\n        return true;\n    }\n}\n\npublic class GameEngine {\n    private Board board;\n    private Player p1, p2;\n    private Player activePlayer;\n\n    public boolean playTurn(int row, int col) {\n        if (board.makeMove(row, col, activePlayer.getSymbol())) {\n            if (checkWinner(row, col)) {\n                System.out.println(activePlayer.getName() + \" wins!\");\n            }\n            activePlayer = (activePlayer == p1) ? p2 : p1;\n            return true;\n        }\n        return false;\n    }\n\n    private boolean checkWinner(int r, int c) { return false; /* O(1) algorithm checks rows/cols/diags */ }\n}",
+    "languages": {
+      "java": "public enum Symbol { X, O, EMPTY }\n\npublic class Board {\n    private Symbol[][] grid;\n    private int size;\n    public Board(int size) {\n        this.size = size;\n        grid = new Symbol[size][size];\n    }\n    public boolean makeMove(int r, int c, Symbol s) {\n        if (grid[r][c] != Symbol.EMPTY) return false;\n        grid[r][c] = s;\n        return true;\n    }\n}",
+      "cpp": "enum class Symbol { X, O, EMPTY };\n\nclass Board {\nprivate:\n    std::vector<std::vector<Symbol>> grid;\n    int size;\npublic:\n    Board(int s) : size(s), grid(s, std::vector<Symbol>(s, Symbol::EMPTY)) {}\n    bool makeMove(int r, int c, Symbol s) {\n        if (grid[r][c] != Symbol::EMPTY) return false;\n        grid[r][c] = s;\n        return true;\n    }\n};",
+      "python": "from enum import Enum\n\nclass Symbol(Enum):\n    X = 1\n    O = 2\n    EMPTY = 3\n\nclass Board:\n    def __init__(self, size: int):\n        self.size = size\n        self.grid = [[Symbol.EMPTY] * size for _ in range(size)]\n    \n    def make_move(self, r: int, c: int, s: Symbol) -> bool:\n        if self.grid[r][c] != Symbol.EMPTY:\n            return False\n        self.grid[r][c] = s\n        return True"
+    },
     "approach": "To check wins in O(1) time, keep rows and cols count arrays for each player symbol, along with main and anti-diagonal counters."
   },
   {
@@ -32,13 +37,18 @@
       "Process state transitions sequentially: Red -> Green -> Yellow -> Red.",
       "Allow dynamic duration override configurations for active states."
     ],
+    "erDiagram": "TrafficSignalController [1] <---> [*] TrafficLight\nTrafficLight [1] <---> [1] SignalState",
     "classes": [
       "TrafficLight (Context class)",
       "SignalState (State interface)",
       "RedState, GreenState, YellowState (Concrete states)",
       "TrafficSignalController (Singleton orchestrating intersections)"
     ],
-    "codeSkeleton": "public interface SignalState {\n    void changeState(TrafficLight light);\n    int getDuration();\n}\n\npublic class RedState implements SignalState {\n    public void changeState(TrafficLight light) {\n        light.setState(new GreenState());\n    }\n    public int getDuration() { return 30; } // default 30s\n}\n\npublic class TrafficLight {\n    private SignalState state = new RedState();\n\n    public void setState(SignalState state) { this.state = state; }\n    public void run() {\n        System.out.println(\"Current state: \" + state.getClass().getSimpleName());\n        state.changeState(this);\n    }\n}",
+    "languages": {
+      "java": "public interface SignalState {\n    void changeState(TrafficLight light);\n    int getDuration();\n}\npublic class RedState implements SignalState {\n    public void changeState(TrafficLight l) { l.setState(new GreenState()); }\n    public int getDuration() { return 30; }\n}",
+      "cpp": "class TrafficLight;\nclass SignalState {\npublic:\n    virtual void changeState(TrafficLight* light) = 0;\n    virtual int getDuration() = 0;\n};",
+      "python": "from abc import ABC, abstractmethod\n\nclass SignalState(ABC):\n    @abstractmethod\n    def change_state(self, light):\n        pass\n    @abstractmethod\n    def get_duration(self) -> int:\n        pass"
+    },
     "approach": "Use the State pattern to prevent massive switch-case statements. Each state holds its display rules and references the next state in sequence."
   },
   {
@@ -54,12 +64,17 @@
       "Support time increment increments (adds N seconds after move).",
       "Trigger notifications if a player's timer runs out (Flagged)."
     ],
+    "erDiagram": "ChessClock [1] <---> [2] PlayerTimer\nChessClock [1] <---> [1] ClockState",
     "classes": [
       "ChessClock (Main wrapper)",
       "Timer (Active thread / counter)",
       "ClockState (ActivePlayer1, ActivePlayer2, Paused, Flagged)"
     ],
-    "codeSkeleton": "public class PlayerTimer {\n    private long remainingMs;\n    private long incrementMs;\n\n    public void start() { /* Timer thread decrement cycle */ }\n    public void pause() { /* Stop decrement */ }\n    public void commitMove() { remainingMs += incrementMs; }\n}\n\npublic class ChessClock {\n    private PlayerTimer p1Timer;\n    private PlayerTimer p2Timer;\n    private boolean isP1Turn = true;\n\n    public void pressClock() {\n        if (isP1Turn) {\n            p1Timer.commitMove();\n            p1Timer.pause();\n            p2Timer.start();\n        } else {\n            p2Timer.commitMove();\n            p2Timer.pause();\n            p1Timer.start();\n        }\n        isP1Turn = !isP1Turn;\n    }\n}",
+    "languages": {
+      "java": "public class PlayerTimer {\n    private long remainingMs;\n    private long incrementMs;\n    public void commitMove() { remainingMs += incrementMs; }\n}",
+      "cpp": "class PlayerTimer {\nprivate:\n    long remainingMs;\n    long incrementMs;\npublic:\n    void commitMove() { remainingMs += incrementMs; }\n};",
+      "python": "class PlayerTimer:\n    def __init__(self, start_ms: int, increment_ms: int):\n        self.remaining_ms = start_ms\n        self.increment_ms = increment_ms\n    def commit_move(self):\n        self.remaining_ms += self.increment_ms"
+    },
     "approach": "Implement thread-safe pause/resume triggers. Protect state mutations from multiple button presses during intense time scrambles."
   },
   {
@@ -74,12 +89,17 @@
       "Each logger in chain handles messages based on threshold levels.",
       "Support multiple sinks: File, Console, and Database."
     ],
+    "erDiagram": "Logger [1] <---> [0..1] Logger (Next Link)\nLogger [1] <---> [1..*] LogSink",
     "classes": [
       "Logger (Abstract base handler)",
       "InfoLogger, DebugLogger, ErrorLogger (Concrete handlers)",
       "LogSubject / LogSink (ConsoleSink, FileSink)"
     ],
-    "codeSkeleton": "public abstract class Logger {\n    public static int INFO = 1;\n    public static int DEBUG = 2;\n    public static int ERROR = 3;\n\n    protected int level;\n    protected Logger nextLogger;\n\n    public void setNextLogger(Logger next) { this.nextLogger = next; }\n\n    public void logMessage(int level, String message) {\n        if (this.level <= level) {\n            write(message);\n        }\n        if (nextLogger != null) {\n            nextLogger.logMessage(level, message);\n        }\n    }\n    protected abstract void write(String msg);\n}",
+    "languages": {
+      "java": "public abstract class Logger {\n    protected Logger nextLogger;\n    public void setNextLogger(Logger next) { this.nextLogger = next; }\n    public abstract void write(String message);\n}",
+      "cpp": "class Logger {\nprotected:\n    Logger* nextLogger = nullptr;\npublic:\n    void setNextLogger(Logger* next) { nextLogger = next; }\n    virtual void write(const std::string& msg) = 0;\n};",
+      "python": "class Logger:\n    def __init__(self):\n        self.next_logger = None\n    def set_next(self, next_logger):\n        self.next_logger = next_logger\n    def write(self, message: str):\n        pass"
+    },
     "approach": "Implement the Chain of Responsibility pattern. Link standard log handlers (Info -> Debug -> Error) so request propagation is automatic."
   },
   {
@@ -94,12 +114,17 @@
       "Check ingredients levels (water, milk, beans) before starting brew.",
       "Lock machine during dispensing and update inventory levels."
     ],
+    "erDiagram": "CoffeeMachine [1] <---> [1] Inventory\nCoffeeMachine [1] <---> [*] Recipe\nInventory [1] <---> [*] Ingredient",
     "classes": [
       "CoffeeMachine (Context)",
       "CoffeeState (Idle, CheckingInventory, Dispensing, RefillNeeded)",
       "Recipe (Coffee beans weight, milk vol, water vol, cost)"
     ],
-    "codeSkeleton": "public class Recipe {\n    private String name;\n    private double cost;\n    private int requiredBeans;\n    private int requiredMilk;\n}\n\npublic class CoffeeMachine {\n    private Map<String, Integer> ingredientInventory = new HashMap<>();\n    private CoffeeState state;\n\n    public synchronized boolean makeCoffee(Recipe recipe, double cash) {\n        if (cash < recipe.getCost()) return false;\n        for (String item : ingredientInventory.keySet()) {\n            // validate and subtract inventory\n        }\n        return true;\n    }\n}",
+    "languages": {
+      "java": "public class CoffeeMachine {\n    private Map<String, Integer> inventory = new ConcurrentHashMap<>();\n    public synchronized boolean checkIngredients(Recipe r) { return true; }\n}",
+      "cpp": "class CoffeeMachine {\nprivate:\n    std::unordered_map<std::string, int> inventory;\n    std::mutex mtx;\npublic:\n    bool checkIngredients(const Recipe& r);\n};",
+      "python": "import threading\n\nclass CoffeeMachine:\n    def __init__(self):\n        self.inventory = {}\n        self.lock = threading.Lock()\n    def check_ingredients(self, recipe) -> bool:\n        with self.lock:\n            return True"
+    },
     "approach": "Represent structural recipes as immutable objects. Protect updates to the shared ingredients map using synchronized blocks or concurrent maps."
   },
   {
@@ -114,13 +139,18 @@
       "Accept coins/cash inputs, calculate balance, and return change.",
       "Ensure transaction safety: don't release items unless funds are confirmed."
     ],
+    "erDiagram": "VendingMachine [1] <---> [1] State\nVendingMachine [1] <---> [1] Inventory\nInventory [1] <---> [*] Product",
     "classes": [
       "VendingMachine (Context class)",
       "State (Interface with selectProduct, insertCoin, pressButton, dispense)",
       "IdleState, HasMoneyState, DispensingState, SoldOutState (Concrete states)",
       "Inventory & Product"
     ],
-    "codeSkeleton": "public interface State {\n    void insertCoin(VendingMachine machine, double amount);\n    void selectProduct(VendingMachine machine, String code);\n    void dispense(VendingMachine machine);\n}\n\npublic class IdleState implements State {\n    public void insertCoin(VendingMachine machine, double amount) {\n        machine.addBalance(amount);\n        machine.setState(new HasMoneyState());\n    }\n    public void selectProduct(VendingMachine machine, String code) {\n        System.out.println(\"Insert coin first.\");\n    }\n    public void dispense(VendingMachine machine) {\n        System.out.println(\"Nothing selected.\");\n    }\n}\n\npublic class VendingMachine {\n    private State currentState = new IdleState();\n    private double balance = 0.0;\n    private Inventory inventory;\n\n    public void setState(State state) { this.currentState = state; }\n    public void addBalance(double amount) { this.balance += amount; }\n    public void selectProduct(String code) { currentState.selectProduct(this, code); }\n    public void dispense() { currentState.dispense(this); }\n}",
+    "languages": {
+      "java": "public interface State {\n    void insertCoin(VendingMachine m, double amt);\n    void selectProduct(VendingMachine m, String code);\n}",
+      "cpp": "class VendingMachine;\nclass State {\npublic:\n    virtual void insertCoin(VendingMachine* m, double amt) = 0;\n    virtual void selectProduct(VendingMachine* m, const std::string& code) = 0;\n};",
+      "python": "from abc import ABC, abstractmethod\n\nclass State(ABC):\n    @abstractmethod\n    def insert_coin(self, machine, amount: float):\n        pass\n    @abstractmethod\n    def select_product(self, machine, code: str):\n        pass"
+    },
     "approach": "Use the State pattern to represent machine phases. The context object (VendingMachine) delegates all action calls to the current state object, which controls state changes based on logic rules."
   },
   {
@@ -136,6 +166,7 @@
       "Thread-safe singleton control for the main ParkingLot instance.",
       "Support dynamic fare calculation based on hour counts and vehicle types."
     ],
+    "erDiagram": "ParkingLot [1] <---> [*] ParkingFloor\nParkingFloor [1] <---> [*] ParkingSpot\nParkingTicket [1] <---> [1] ParkingSpot\nParkingTicket [1] <---> [1] Vehicle",
     "classes": [
       "ParkingLot (Singleton)",
       "ParkingFloor (List of Spots)",
@@ -143,7 +174,11 @@
       "Vehicle (Base class for Car, Motorcycle, Truck)",
       "ParkingTicket (Tracks entry/exit times and spot references)"
     ],
-    "codeSkeleton": "public enum VehicleType { CAR, MOTORCYCLE, TRUCK }\n\npublic abstract class Vehicle {\n    private String licensePlate;\n    private VehicleType type;\n    public Vehicle(String licensePlate, VehicleType type) { \n        this.licensePlate = licensePlate; \n        this.type = type; \n    }\n    public VehicleType getType() { return type; }\n}\n\npublic class Car extends Vehicle {\n    public Car(String licensePlate) { super(licensePlate, VehicleType.CAR); }\n}\n\npublic class ParkingSpot {\n    private int id;\n    private boolean isFree = true;\n    private VehicleType supportedType;\n\n    public boolean canFit(Vehicle v) { return v.getType() == supportedType; }\n    public synchronized void park(Vehicle v) { isFree = false; }\n    public synchronized void release() { isFree = true; }\n}\n\npublic class ParkingLot {\n    private static ParkingLot instance;\n    private List<ParkingFloor> floors;\n\n    private ParkingLot() { floors = new ArrayList<>(); }\n    \n    public static synchronized ParkingLot getInstance() {\n        if (instance == null) {\n            instance = new ParkingLot();\n        }\n        return instance;\n    }\n\n    public synchronized boolean parkVehicle(Vehicle v) {\n        for (ParkingFloor floor : floors) {\n            if (floor.park(v)) return true;\n        }\n        return false;\n    }\n}",
+    "languages": {
+      "java": "public class ParkingLot {\n    private static ParkingLot instance;\n    private ParkingLot() {}\n    public static synchronized ParkingLot getInstance() {\n        if (instance == null) instance = new ParkingLot();\n        return instance;\n    }\n}",
+      "cpp": "class ParkingLot {\nprivate:\n    ParkingLot() = default;\npublic:\n    static ParkingLot& getInstance() {\n        static ParkingLot instance;\n        return instance;\n    }\n};",
+      "python": "import threading\n\nclass ParkingLot:\n    _instance = None\n    _lock = threading.Lock()\n    \n    @classmethod\n    def get_instance(cls):\n        with cls._lock:\n            if not cls._instance:\n                cls._instance = cls()\n        return cls._instance"
+    },
     "approach": "Define a clean class hierarchy for Vehicles and ParkingSpots. Ensure concurrency control on spot allocation (synchronized methods) so multiple gates don't double-book the same physical spot."
   },
   {
@@ -158,6 +193,7 @@
       "Process turns iteratively using a dice (1-6 rolls).",
       "Winning condition: Player lands exactly on slot 100."
     ],
+    "erDiagram": "Game [1] <---> [1] Board\nGame [1] <---> [*] Player\nBoard [1] <---> [100] BoardCell\nBoardCell [1] <---> [0..1] Jump (Snake/Ladder)",
     "classes": [
       "Board (Grid of BoardCells)",
       "BoardCell (Contains optional Snake or Ladder pointer)",
@@ -165,7 +201,11 @@
       "Dice (Generates random values in [1, 6])",
       "Game (Engine loop routing turns)"
     ],
-    "codeSkeleton": "public class BoardCell {\n    private int position;\n    private int nextDestination; // Set different from position for snakes/ladders\n\n    public BoardCell(int position) {\n        this.position = position;\n        this.nextDestination = position;\n    }\n    public int getDestination() { return nextDestination; }\n    public void setJumpDestination(int dest) { this.nextDestination = dest; }\n}\n\npublic class Game {\n    private Board board;\n    private Queue<Player> players;\n    private Dice dice;\n\n    public void playTurn() {\n        Player currentPlayer = players.poll();\n        int roll = dice.roll();\n        int target = currentPlayer.getPosition() + roll;\n\n        if (target <= 100) {\n            BoardCell cell = board.getCell(target);\n            currentPlayer.setPosition(cell.getDestination());\n        }\n\n        if (currentPlayer.getPosition() == 100) {\n            System.out.println(currentPlayer.getName() + \" wins!\");\n            return;\n        }\n        players.offer(currentPlayer); // Put back to the end of the queue\n    }\n}",
+    "languages": {
+      "java": "public class BoardCell {\n    private int destination;\n    public int getDestination() { return destination; }\n}",
+      "cpp": "class BoardCell {\nprivate:\n    int destination;\npublic:\n    int getDestination() const { return destination; }\n};",
+      "python": "class BoardCell:\n    def __init__(self, position: int):\n        self.position = position\n        self.destination = position"
+    },
     "approach": "Use a Queue to manage player turn sequences. Model snakes and ladders as jumping destinations on BoardCell nodes to keep board rendering and trajectory computation decoupled."
   },
   {
@@ -180,12 +220,17 @@
       "Search catalog by title, author, subject, or publication date.",
       "Enforce maximum loan limits (e.g., 5 books for 14 days) and compute daily late fees."
     ],
+    "erDiagram": "Library [1] <---> [*] BookCopy\nBookCopy [1] <---> [0..1] BookLending\nMember [1] <---> [*] BookLending\nBookCopy [1] <---> [1] Book",
     "classes": [
       "Book & BookLending (Book copies tracker)",
       "Member & Librarian (User actors)",
       "SearchIndex (Faceted search maps)"
     ],
-    "codeSkeleton": "public class BookCopy {\n    private String barcode;\n    private String bookId;\n    private boolean isLent;\n    private Date dueDate;\n}\n\npublic class LibraryCard {\n    private String id;\n    private int activeLendingsCount;\n\n    public boolean canBorrow() {\n        return activeLendingsCount < 5;\n    }\n}\n\npublic class Library {\n    private Map<String, List<BookCopy>> catalog = new HashMap<>();\n    \n    public synchronized BookCopy lendBook(LibraryCard card, String title) {\n        if (!card.canBorrow()) return null;\n        List<BookCopy> copies = catalog.get(title);\n        for (BookCopy copy : copies) {\n            if (!copy.isLent()) {\n                copy.setLent(true);\n                return copy;\n            }\n        }\n        return null;\n    }\n}",
+    "languages": {
+      "java": "public class BookCopy {\n    private String barcode;\n    private boolean isLent;\n    public synchronized void setLent(boolean status) { this.isLent = status; }\n}",
+      "cpp": "class BookCopy {\nprivate:\n    std::string barcode;\n    bool isLent = false;\npublic:\n    void setLent(bool s) { isLent = s; }\n};",
+      "python": "class BookCopy:\n    def __init__(self, barcode: str):\n        self.barcode = barcode\n        self.is_lent = False"
+    },
     "approach": "Implement search strategies using indexes on HashMaps to enable fast retrieval. Synchronize the lending action to handle concurrent checkout attempts of the last book copy."
   },
   {
@@ -200,12 +245,17 @@
       "Push scoreboard modifications immediately to observers (web dashboard, SMS notifier).",
       "Compute statistics (Strike rate, economy, target runs) dynamically."
     ],
+    "erDiagram": "Match [1] <---> [2] Innings\nMatch [1] <---> [*] Observer\nInnings [1] <---> [*] PlayerStats",
     "classes": [
       "Match (Matches state and statistics)",
       "Innings (Overs, wickets tracking)",
       "Observer (Interface for scorecard, notification listener)"
     ],
-    "codeSkeleton": "public interface Observer {\n    void update(Scorecard score);\n}\n\npublic class Match {\n    private List<Observer> observers = new ArrayList<>();\n    private Scorecard currentScore;\n\n    public void addObserver(Observer ob) { observers.add(ob); }\n    \n    public void updateScore(int runs, int wickets) {\n        currentScore.addRuns(runs);\n        currentScore.addWicket(wickets);\n        notifyObservers();\n    }\n\n    private void notifyObservers() {\n        for (Observer ob : observers) {\n            ob.update(currentScore);\n        }\n    }\n}",
+    "languages": {
+      "java": "public interface Observer {\n    void update(Scorecard score);\n}",
+      "cpp": "class Scorecard;\nclass Observer {\npublic:\n    virtual void update(const Scorecard& score) = 0;\n};",
+      "python": "class Observer:\n    def update(self, scorecard):\n        pass"
+    },
     "approach": "Use the Observer pattern to decouple Match engine updates from dashboard rendering layouts. Compute statistics on the fly inside the Scorecard model."
   },
   {
@@ -220,13 +270,18 @@
       "Process orders containing multiple menu items and customize chef alerts.",
       "Calculate checks with optional tax, service fee, and discount vouchers."
     ],
+    "erDiagram": "Restaurant [1] <---> [*] Table\nTable [1] <---> [0..1] Order\nOrder [1] <---> [*] MenuItem\nOrder [1] <---> [1] Bill",
     "classes": [
       "Table (Capacity, State)",
       "Order (List of items, table reference, status)",
       "MenuItem (Name, Price, Category)",
       "Bill (Calculations, payments status)"
     ],
-    "codeSkeleton": "public enum TableStatus { FREE, RESERVED, OCCUPIED }\n\npublic class Table {\n    private int tableId;\n    private int seatCapacity;\n    private TableStatus status = TableStatus.FREE;\n\n    public synchronized boolean reserve() {\n        if (status == TableStatus.FREE) {\n            status = TableStatus.RESERVED;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class Order {\n    private int orderId;\n    private Table table;\n    private List<MenuItem> items = new ArrayList<>();\n    private double total;\n\n    public void addItem(MenuItem item) {\n        items.add(item);\n        total += item.getPrice();\n    }\n}",
+    "languages": {
+      "java": "public enum TableStatus { FREE, RESERVED, OCCUPIED }\npublic class Table {\n    private TableStatus status = TableStatus.FREE;\n    public synchronized boolean book() { return true; }\n}",
+      "cpp": "enum class TableStatus { FREE, RESERVED, OCCUPIED };\nclass Table {\nprivate:\n    TableStatus status = TableStatus::FREE;\npublic:\n    bool book();\n};",
+      "python": "from enum import Enum\nclass TableStatus(Enum):\n    FREE = 1\n    RESERVED = 2\n    OCCUPIED = 3\n\nclass Table:\n    def __init__(self):\n        self.status = TableStatus.FREE"
+    },
     "approach": "Table booking must be thread-safe to prevent double reservation. Use Observer to push active kitchen order updates directly to the chefs' display."
   },
   {
@@ -241,12 +296,17 @@
       "Clean eviction trigger once the cache reaches max capacity limit.",
       "Full thread-safety under concurrent reads and writes."
     ],
+    "erDiagram": "LRUCache [1] <---> [*] Node\nLRUCache [1] <---> [1] DoublyLinkedList",
     "classes": [
       "Cache (Interface)",
       "LRUCache (LinkedListNode, DoublyLinkedList, Map)",
       "Node (Key, Value, Prev, Next)"
     ],
-    "codeSkeleton": "public class Node {\n    int key, value;\n    Node prev, next;\n}\n\npublic class LRUCache {\n    private int capacity;\n    private Map<Integer, Node> map = new ConcurrentHashMap<>();\n    private Node head, tail;\n\n    public synchronized int get(int key) {\n        if (!map.containsKey(key)) return -1;\n        Node node = map.get(key);\n        moveToHead(node);\n        return node.value;\n    }\n\n    public synchronized void put(int key, int value) {\n        if (map.containsKey(key)) {\n            Node node = map.get(key);\n            node.value = value;\n            moveToHead(node);\n        } else {\n            if (map.size() >= capacity) {\n                map.remove(tail.key);\n                removeNode(tail);\n            }\n            Node newNode = new Node();\n            newNode.key = key;\n            newNode.value = value;\n            addNode(newNode);\n            map.put(key, newNode);\n        }\n    }\n    private void moveToHead(Node n) {} \n    private void removeNode(Node n) {} \n    private void addNode(Node n) {}\n}",
+    "languages": {
+      "java": "public class LRUCache {\n    private Map<Integer, Node> map = new ConcurrentHashMap<>();\n    public synchronized int get(int key) { return -1; }\n}",
+      "cpp": "class LRUCache {\nprivate:\n    std::unordered_map<int, Node*> map;\n    std::mutex mtx;\npublic:\n    int get(int key);\n};",
+      "python": "import threading\n\nclass LRUCache:\n    def __init__(self, capacity: int):\n        self.capacity = capacity\n        self.map = {}\n        self.lock = threading.Lock()\n    def get(self, key: int) -> int:\n        with self.lock:\n            return -1"
+    },
     "approach": "Combine a HashMap (for O(1) lookups) with a custom Doubly Linked List (for O(1) updates/removals). Protect operations using locks or synchronization blocks."
   },
   {
@@ -261,12 +321,17 @@
       "Calculate directory sizes dynamically (sum of all nested contents).",
       "Support standard actions like list, delete, and search."
     ],
+    "erDiagram": "Directory [1] <---> [*] FileSystemEntry\nFileSystemEntry <|-- File\nFileSystemEntry <|-- Directory",
     "classes": [
       "FileSystemEntry (Base abstract component)",
       "File (Leaf component)",
       "Directory (Composite component containing children)"
     ],
-    "codeSkeleton": "public abstract class FileSystemEntry {\n    protected String name;\n    public abstract int getSize();\n    public abstract void print(String indent);\n}\n\npublic class File extends FileSystemEntry {\n    private int size;\n    public File(String name, int size) { this.name = name; this.size = size; }\n    public int getSize() { return size; }\n    public void print(String indent) { System.out.println(indent + \"- \" + name); }\n}\n\npublic class Directory extends FileSystemEntry {\n    private List<FileSystemEntry> children = new ArrayList<>();\n\n    public void add(FileSystemEntry entry) { children.add(entry); }\n    \n    public int getSize() {\n        int total = 0;\n        for (FileSystemEntry child : children) {\n            total += child.getSize();\n        }\n        return total;\n    }\n    \n    public void print(String indent) {\n        System.out.println(indent + \"[\" + name + \"]\");\n        for (FileSystemEntry child : children) {\n            child.print(indent + \"  \");\n        }\n    }\n}",
+    "languages": {
+      "java": "public abstract class FileSystemEntry {\n    protected String name;\n    public abstract int getSize();\n}",
+      "cpp": "class FileSystemEntry {\nprotected:\n    std::string name;\npublic:\n    virtual int getSize() = 0;\n};",
+      "python": "from abc import ABC, abstractmethod\n\nclass FileSystemEntry(ABC):\n    def __init__(self, name: str):\n        self.name = name\n    @abstractmethod\n    def get_size(self) -> int:\n        pass"
+    },
     "approach": "Implement the Composite design pattern. Ensure directories and files inherit from the same base class to process sizes and listing routines uniformly."
   },
   {
@@ -281,12 +346,17 @@
       "Generate a secure 6-digit PIN on package delivery for customer pickup.",
       "Enforce pickup timeout limits (release locker if not claimed in 3 days)."
     ],
+    "erDiagram": "LockerService [1] <---> [*] Locker\nLocker [1] <---> [0..1] Package",
     "classes": [
       "LockerService (Coordinator)",
       "Locker (ID, size, availability, PIN, expiry)",
       "Package (Size, Tracking ID)"
     ],
-    "codeSkeleton": "public enum LockerSize { SMALL, MEDIUM, LARGE }\n\npublic class Locker {\n    private String id;\n    private LockerSize size;\n    private String securePin;\n    private boolean isAvailable = true;\n    private Long expiryTime;\n\n    public boolean assignPackage(Package pkg, String pin) {\n        if (!isAvailable) return false;\n        this.securePin = pin;\n        this.isAvailable = false;\n        this.expiryTime = System.currentTimeMillis() + (72 * 3600 * 1000); // 3 days\n        return true;\n    }\n    \n    public boolean verifyPinAndRelease(String pin) {\n        if (!isAvailable && securePin.equals(pin)) {\n            isAvailable = true;\n            securePin = null;\n            return true;\n        }\n        return false;\n    }\n}",
+    "languages": {
+      "java": "public class Locker {\n    private String id;\n    private boolean isAvailable = true;\n    public synchronized boolean lock() { return true; }\n}",
+      "cpp": "class Locker {\nprivate:\n    std::string id;\n    bool isAvailable = true;\npublic:\n    bool lock();\n};",
+      "python": "class Locker:\n    def __init__(self, id_str: str):\n        self.id = id_str\n        self.is_available = True"
+    },
     "approach": "Optimize matching using dynamic strategies (first fit, best fit). Use background cron processes to clean expired locks and flag unclaimed lockers."
   },
   {
@@ -301,12 +371,17 @@
       "Bid validation: incoming bid must exceed current highest bid by minimum increment.",
       "Broadcast updates to all active bidders when a higher bid is accepted."
     ],
+    "erDiagram": "AuctionItem [1] <---> [*] Bid\nAuctionItem [1] <---> [*] Observer (Bidders)",
     "classes": [
       "AuctionItem (ID, startingPrice, currentBid, status)",
       "Bidder (User implementation subscribing to items)",
       "AuctionController (Handles bidding state rules)"
     ],
-    "codeSkeleton": "public class Bid {\n    private double amount;\n    private String bidderId;\n    private long timestamp;\n}\n\npublic class AuctionItem {\n    private String itemId;\n    private double currentHighestBid;\n    private List<Observer> bidders = new ArrayList<>();\n\n    public synchronized boolean placeBid(String bidderId, double amount) {\n        if (amount > currentHighestBid) {\n            currentHighestBid = amount;\n            notifyBidders(bidderId, amount);\n            return true;\n        }\n        return false;\n    }\n\n    private void notifyBidders(String currentBidder, double amount) {\n        // push bid updates to registered bidders\n    }\n}",
+    "languages": {
+      "java": "public class AuctionItem {\n    private double currentHighestBid;\n    public synchronized boolean placeBid(double amount) { return true; }\n}",
+      "cpp": "class AuctionItem {\nprivate:\n    double currentHighestBid;\npublic:\n    bool placeBid(double amount);\n};",
+      "python": "class AuctionItem:\n    def __init__(self, item_id: str, starting_price: float):\n        self.item_id = item_id\n        self.current_highest_bid = starting_price\n    def place_bid(self, amount: float) -> bool:\n        return True"
+    },
     "approach": "Use synchronizations on bid actions to solve race conditions when bids arrive simultaneously in the final seconds of an auction."
   },
   {
@@ -322,13 +397,18 @@
       "Release seat locks if checkout session expires or payment fails.",
       "Support multiple payment gateways."
     ],
+    "erDiagram": "Theater [1] <---> [*] Screen\nScreen [1] <---> [*] Show\nShow [1] <---> [*] Seat\nBooking [1] <---> [*] Seat\nBooking [1] <---> [1] User",
     "classes": [
       "Theater & Screen",
       "Show (Movie, Screen, timings)",
       "Seat (Gold, Silver, status: FREE, LOCKED, BOOKED)",
       "Booking (Seat references, User, Show, Status)"
     ],
-    "codeSkeleton": "public enum SeatStatus { FREE, LOCKED, BOOKED }\n\npublic class Seat {\n    private String seatId;\n    private SeatStatus status = SeatStatus.FREE;\n    private Long lockTimestamp;\n\n    public synchronized boolean lockSeat() { \n        if (status == SeatStatus.FREE) {\n            status = SeatStatus.LOCKED;\n            lockTimestamp = System.currentTimeMillis();\n            return true;\n        }\n        return false;\n    }\n\n    public synchronized void releaseSeat() {\n        if (status == SeatStatus.LOCKED) {\n            status = SeatStatus.FREE;\n            lockTimestamp = null;\n        }\n    }\n\n    public synchronized void bookSeat() {\n        if (status == SeatStatus.LOCKED) {\n            status = SeatStatus.BOOKED;\n        }\n    }\n}\n\npublic class Show {\n    private String id;\n    private Movie movie;\n    private List<Seat> seats;\n\n    public List<Seat> getAvailableSeats() {\n        List<Seat> freeSeats = new ArrayList<>();\n        for (Seat seat : seats) {\n            // Drop expired locks during lookup\n            if (seat.isLockExpired()) seat.releaseSeat();\n            if (seat.getStatus() == SeatStatus.FREE) freeSeats.add(seat); \n        }\n        return freeSeats;\n    }\n}",
+    "languages": {
+      "java": "public enum SeatStatus { FREE, LOCKED, BOOKED }\npublic class Seat {\n    private SeatStatus status = SeatStatus.FREE;\n    public synchronized boolean lock() { return true; }\n}",
+      "cpp": "enum class SeatStatus { FREE, LOCKED, BOOKED };\nclass Seat {\nprivate:\n    SeatStatus status = SeatStatus::FREE;\npublic:\n    bool lock();\n};",
+      "python": "from enum import Enum\nclass SeatStatus(Enum):\n    FREE = 1\n    LOCKED = 2\n    BOOKED = 3\n\nclass Seat:\n    def __init__(self):\n        self.status = SeatStatus.FREE"
+    },
     "approach": "Implement optimistic or pessimistic locking on seats to prevent double booking. Use a Redis-based cache to store temporary seat locks with TTLs (Time-To-Live) corresponding to payment checkout timers."
   },
   {
@@ -343,13 +423,18 @@
       "Automatically compute balances between users.",
       "Provide a debt-simplification algorithm (minimize transactions between members)."
     ],
+    "erDiagram": "Group [1] <---> [*] User\nGroup [1] <---> [*] Expense\nExpense [1] <---> [*] Split\nUser [1] <---> [1] BalanceSheet",
     "classes": [
       "User (Name, Email, Balance Sheet)",
       "Expense (Base class for EqualExpense, UnequalExpense)",
       "Split (Maps User to split amount)",
       "Group (Tracks users and expenses list)"
     ],
-    "codeSkeleton": "public abstract class Expense {\n    private String id;\n    private User paidBy;\n    private double totalAmount;\n    private List<Split> splits;\n\n    public abstract boolean validate();\n}\n\npublic class EqualExpense extends Expense {\n    public boolean validate() {\n        double splitAmount = getTotalAmount() / getSplits().size();\n        for (Split split : getSplits()) {\n            if (Math.abs(split.getAmount() - splitAmount) > 0.01) return false;\n        }\n        return true;\n    }\n}\n\npublic class BalanceSheet {\n    // Map of User -> Net Balance (Positive means they are owed money, negative means they owe)\n    private Map<User, Double> balances = new HashMap<>();\n\n    public void updateBalance(User debtor, User creditor, double amount) {\n        balances.put(debtor, balances.getOrDefault(debtor, 0.0) - amount);\n        balances.put(creditor, balances.getOrDefault(creditor, 0.0) + amount);\n    }\n}",
+    "languages": {
+      "java": "public abstract class Expense {\n    private double totalAmount;\n    public abstract boolean validate();\n}",
+      "cpp": "class Expense {\nprotected:\n    double totalAmount;\npublic:\n    virtual bool validate() = 0;\n};",
+      "python": "from abc import ABC, abstractmethod\n\nclass Expense(ABC):\n    def __init__(self, amount: float):\n        self.total_amount = amount\n    @abstractmethod\n    def validate(self) -> bool:\n        pass"
+    },
     "approach": "Compute net balance sheets for all users. Run a greedy optimization algorithm (using a Min Heap for debtors and a Max Heap for creditors) to iteratively settle the largest debts, minimizing the total number of transactions."
   },
   {
@@ -365,13 +450,18 @@
       "Handle state transitions cleanly (doors opening, closing, moving, emergency stops).",
       "Support request queues with direction optimization (e.g. SCAN algorithm)."
     ],
+    "erDiagram": "ElevatorController [1] <---> [*] ElevatorCar\nElevatorCar [1] <---> [1] ElevatorState\nElevatorCar [1] <---> [*] Request",
     "classes": [
       "ElevatorController (Manages multiple cars)",
       "ElevatorCar (Current state, floor, direction)",
       "Request (Source floor, target floor, direction)",
       "ElevatorState (Interface for IdleState, MovingState, StoppedState)"
     ],
-    "codeSkeleton": "public enum Direction { UP, DOWN, IDLE }\n\npublic interface ElevatorState {\n    void handleRequest(ElevatorCar car, int floor);\n}\n\npublic class IdleState implements ElevatorState {\n    public void handleRequest(ElevatorCar car, int floor) {\n        car.setTargetFloor(floor);\n        car.setDirection(floor > car.getCurrentFloor() ? Direction.UP : Direction.DOWN);\n        car.setState(new MovingState());\n    }\n}\n\npublic class ElevatorCar {\n    private int id;\n    private int currentFloor = 0;\n    private Direction direction = Direction.IDLE;\n    private ElevatorState state = new IdleState();\n    private TreeSet<Integer> upQueue = new TreeSet<>();\n    private TreeSet<Integer> downQueue = new TreeSet<>(Collections.reverseOrder());\n\n    public void processRequest(int floor) {\n        state.handleRequest(this, floor);\n    }\n    public void setState(ElevatorState state) { this.state = state; }\n    // Getters and Setters...\n}\n\npublic class ElevatorController {\n    private List<ElevatorCar> elevators;\n    \n    public void dispatch(Request req) {\n        // Find best elevator using distance, direction, and current load\n        ElevatorCar optimalCar = findBestCar(req);\n        optimalCar.processRequest(req.getTargetFloor());\n    }\n}",
+    "languages": {
+      "java": "public enum Direction { UP, DOWN, IDLE }\npublic interface ElevatorState {\n    void handleRequest(ElevatorCar car, int floor);\n}",
+      "cpp": "enum class Direction { UP, DOWN, IDLE };\nclass ElevatorCar;\nclass ElevatorState {\npublic:\n    virtual void handleRequest(ElevatorCar* car, int floor) = 0;\n};",
+      "python": "from enum import Enum\nclass Direction(Enum):\n    UP = 1\n    DOWN = 2\n    IDLE = 3\n\nclass ElevatorState:\n    def handle_request(self, car, floor: int):\n        pass"
+    },
     "approach": "Use the State pattern to decouple direction & floor transition logics from the main Elevator class. Maintain separate sorted sets (upQueue and downQueue) for SCAN-based request handling."
   },
   {
@@ -387,6 +477,7 @@
       "Checkmate/stalemate validation algorithms.",
       "Support transaction history/undo moves."
     ],
+    "erDiagram": "Game [1] <---> [1] Board\nGame [1] <---> [2] Player\nBoard [1] <---> [64] Cell\nCell [1] <---> [0..1] Piece\nGame [1] <---> [*] Move",
     "classes": [
       "Board (8x8 grid of Cells)",
       "Cell (Tracks Row, Column, and current Piece)",
@@ -394,7 +485,11 @@
       "Move (Tracks start and end Cells, capturing history)",
       "Game (Manages turn history, game status)"
     ],
-    "codeSkeleton": "public abstract class Piece {\n    private boolean isWhite;\n    public Piece(boolean isWhite) { this.isWhite = isWhite; }\n    public boolean isWhite() { return isWhite; }\n    \n    public abstract boolean canMove(Board board, Cell start, Cell end);\n}\n\npublic class Knight extends Piece {\n    public Knight(boolean isWhite) { super(isWhite); }\n    public boolean canMove(Board board, Cell start, Cell end) {\n        int x = Math.abs(start.getX() - end.getX());\n        int y = Math.abs(start.getY() - end.getY());\n        return x * y == 2; // Knight movement multiplier (2x1 L-shape)\n    }\n}\n\npublic class Move {\n    private Player player;\n    private Cell start;\n    private Cell end;\n    private Piece pieceMoved;\n    private Piece pieceKilled;\n\n    public Move(Player p, Cell start, Cell end) {\n        this.player = p;\n        this.start = start; \n        this.end = end;\n        this.pieceMoved = start.getPiece();\n    }\n}",
+    "languages": {
+      "java": "public abstract class Piece {\n    public abstract boolean canMove(Board b, Cell start, Cell end);\n}",
+      "cpp": "class Board;\nclass Cell;\nclass Piece {\npublic:\n    virtual bool canMove(Board* b, Cell* start, Cell* end) = 0;\n};",
+      "python": "class Piece:\n    def can_move(self, board, start_cell, end_cell) -> bool:\n        pass"
+    },
     "approach": "Model Chess pieces by subclassing a base Piece class with custom canMove rules. Use the Command pattern for Move objects to support action validation, turn logs, and undo actions."
   },
   {
@@ -409,12 +504,17 @@
       "Support multiple currency denominations ($10, $20, $50, $100).",
       "Implement ATM cash limits and roll back transactions if dispenser fails."
     ],
+    "erDiagram": "ATM [1] <---> [1] ATMState\nATM [1] <---> [1] CashDispenser\nCashDispenser [1] <---> [0..1] CashDispenser (Next Chain)",
     "classes": [
       "ATM (Main context class)",
       "ATMState (State interfaces)",
       "CashDispenser (Base link handler in Chain of Responsibility)"
     ],
-    "codeSkeleton": "public abstract class CashDispenser {\n    protected CashDispenser nextDispenser;\n    public void setNext(CashDispenser next) { this.nextDispenser = next; }\n    public abstract void dispense(double amount);\n}\n\npublic class HundredDispenser extends CashDispenser {\n    public void dispense(double amount) {\n        int numNotes = (int)(amount / 100);\n        if (numNotes > 0) {\n            System.out.println(\"Dispensing \" + numNotes + \" $100 notes\");\n            amount %= 100;\n        }\n        if (amount > 0 && nextDispenser != null) {\n            nextDispenser.dispense(amount);\n        }\n    }\n}",
+    "languages": {
+      "java": "public abstract class CashDispenser {\n    protected CashDispenser nextDispenser;\n    public abstract void dispense(double amount);\n}",
+      "cpp": "class CashDispenser {\nprotected:\n    CashDispenser* nextDispenser = nullptr;\npublic:\n    virtual void dispense(double amount) = 0;\n};",
+      "python": "class CashDispenser:\n    def __init__(self):\n        self.next_dispenser = None\n    def dispense(self, amount: float):\n        pass"
+    },
     "approach": "Combine the State pattern (for card handling steps) with Chain of Responsibility (for resolving cash dispensing counts of bills)."
   },
   {
@@ -429,12 +529,17 @@
       "Dynamic price adjustment based on occupancy, season, and room class.",
       "Support reservation lifecycle: Booked, CheckedIn, CheckedOut, Cancelled."
     ],
+    "erDiagram": "Hotel [1] <---> [*] Room\nRoom [1] <---> [*] Reservation\nReservation [1] <---> [1] Customer\nReservation [1] <---> [1] Bill",
     "classes": [
       "Hotel (Rooms map, reservations)",
       "Room (Room number, Category, Status: Free, Occupied, OutOfOrder)",
       "Reservation (Customer, Room, Duration, Bill)"
     ],
-    "codeSkeleton": "public enum RoomCategory { SINGLE, DOUBLE, SUITE }\npublic enum RoomStatus { FREE, OCCUPIED, MAINTENANCE }\n\npublic class Room {\n    private String roomNo;\n    private RoomCategory category;\n    private RoomStatus status = RoomStatus.FREE;\n\n    public synchronized boolean checkIn() {\n        if (status == RoomStatus.FREE) {\n            status = RoomStatus.OCCUPIED;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class HotelService {\n    private List<Room> rooms = new ArrayList<>();\n    \n    public synchronized Reservation bookRoom(Customer c, RoomCategory cat, Date start, Date end) {\n        // find free room of category, set room status to occupied\n        return null;\n    }\n}",
+    "languages": {
+      "java": "public class Room {\n    private String roomNo;\n    public synchronized boolean checkIn() { return true; }\n}",
+      "cpp": "class Room {\nprivate:\n    std::string roomNo;\npublic:\n    bool checkIn();\n};",
+      "python": "class Room:\n    def __init__(self, room_no: str):\n        self.room_no = room_no\n        self.is_occupied = False"
+    },
     "approach": "Separate Reservation entities from Room entities. Use state patterns for Room cleaning flows, and lock rooms during booking transactions."
   },
   {
@@ -449,12 +554,17 @@
       "Find closest active driver within N miles (e.g. using spatial matching).",
       "Dynamic trip pricing strategies (surge based on active trip demand/drivers count)."
     ],
+    "erDiagram": "Rider [1] <---> [*] Trip\nDriver [1] <---> [*] Trip\nTrip [1] <---> [1] Location (Start)\nTrip [1] <---> [1] Location (End)",
     "classes": [
       "Rider & Driver (Actor models)",
       "Trip (Source, Destination, Driver, Rider, Fare, Status)",
       "Dispatcher (Coordinates vehicle assignments)"
     ],
-    "codeSkeleton": "public enum TripStatus { REQUESTED, DRIVER_ASSIGNED, IN_PROGRESS, COMPLETED, CANCELLED }\n\npublic class Trip {\n    private String tripId;\n    private Rider rider;\n    private Driver driver;\n    private Location startLocation;\n    private Location endLocation;\n    private TripStatus status = TripStatus.REQUESTED;\n    private double fare;\n\n    public void assignDriver(Driver d) {\n        this.driver = d;\n        this.status = TripStatus.DRIVER_ASSIGNED;\n    }\n}\n\npublic class Dispatcher {\n    public synchronized void matchRider(Rider r, Location start, Location end, PricingStrategy pricing) {\n        double fare = pricing.calculateFare(start, end);\n        Trip trip = new Trip();\n        // Query spatial indices for local drivers, pick nearest, send notification\n    }\n}",
+    "languages": {
+      "java": "public class Trip {\n    private String tripId;\n    private double fare;\n    public void setFare(double f) { this.fare = f; }\n}",
+      "cpp": "class Trip {\nprivate:\n    std::string tripId;\n    double fare;\npublic:\n    void setFare(double f) { fare = f; }\n};",
+      "python": "class Trip:\n    def __init__(self, start, end):\n        self.start = start\n        self.end = end\n        self.fare = 0.0"
+    },
     "approach": "Match drivers using spatial grid grids (like geohash/S2 cells). Decouple surge calculations into Strategy patterns for easy live testing overrides."
   },
   {
@@ -469,13 +579,18 @@
       "Resolve edit conflicts using Operational Transformation (OT) or Conflict-free Replicated Data Types (CRDT).",
       "Broadcast updates to active participants dynamically."
     ],
+    "erDiagram": "Document [1] <---> [*] TextOperation\nDocument [1] <---> [*] UserSession",
     "classes": [
       "Document (Character list, version history)",
       "Operation (Insert/Delete character, Position, Version)",
       "OTEngine (Transforms operations so they execute consistently)",
       "UserSession (Tracks connection socket and cursor position)"
     ],
-    "codeSkeleton": "public class TextOperation {\n    public enum Type { INSERT, DELETE }\n    private Type type;\n    private char character;\n    private int position;\n    private int clientVersion;\n}\n\npublic class Document {\n    private String docId;\n    private StringBuilder content = new StringBuilder();\n    private List<TextOperation> history = new ArrayList<>();\n\n    public synchronized void applyOperation(TextOperation op) {\n        // Transform operation if version matches historic operations\n        if (op.getType() == TextOperation.Type.INSERT) {\n            content.insert(op.getPosition(), op.getCharacter());\n        } else {\n            content.deleteCharAt(op.getPosition());\n        }\n        history.add(op);\n    }\n}",
+    "languages": {
+      "java": "public class TextOperation {\n    private int position;\n    public synchronized void transform(TextOperation concurrentOp) {}\n}",
+      "cpp": "class TextOperation {\nprivate:\n    int position;\npublic:\n    void transform(const TextOperation& concurrentOp);\n};",
+      "python": "class TextOperation:\n    def __init__(self, op_type: str, position: int, char: str):\n        self.op_type = op_type\n        self.position = position\n        self.char = char"
+    },
     "approach": "Maintain absolute index offsets on operations. Transform indices on concurrent inserts using standard client-server sequence IDs to maintain convergence."
   },
   {
@@ -490,13 +605,18 @@
       "Process seat reserves using pessimistic concurrency control.",
       "Generate passenger flight schedules, boarding passes, and ticket updates."
     ],
+    "erDiagram": "Flight [1] <---> [*] FlightInstance\nFlightInstance [1] <---> [*] FlightSeat\nReservation [1] <---> [*] FlightSeat\nReservation [1] <---> [1] User",
     "classes": [
       "FlightInstance (Specific departure date, seat status map)",
       "Seat (Seat number, class, status)",
       "Reservation (Flight details, Passengers list, Status)"
     ],
-    "codeSkeleton": "public class FlightSeat {\n    private String seatNo;\n    private String classType;\n    private boolean isReserved;\n\n    public synchronized boolean reserve() {\n        if (!isReserved) {\n            isReserved = true;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class FlightInstance {\n    private String flightNumber;\n    private Date departureTime;\n    private List<FlightSeat> seats;\n\n    public synchronized boolean bookSeat(String seatNo) {\n        for (FlightSeat seat : seats) {\n            if (seat.getSeatNo().equals(seatNo)) {\n                return seat.reserve();\n            }\n        }\n        return false;\n    }\n}",
-    "approach": "Use database row-level locking (`SELECT ... FOR UPDATE`) during seat selection to avoid overbooking the same physical aircraft seats."
+    "languages": {
+      "java": "public class FlightSeat {\n    private boolean isReserved;\n    public synchronized boolean reserve() {\n        if (isReserved) return false;\n        isReserved = true;\n        return true;\n    }\n}",
+      "cpp": "class FlightSeat {\nprivate:\n    bool isReserved = false;\npublic:\n    bool reserve() {\n        if (isReserved) return false;\n        isReserved = true;\n        return true;\n    }\n};",
+      "python": "class FlightSeat:\n    def __init__(self):\n        self.is_reserved = False\n    def reserve(self) -> bool:\n        if self.is_reserved:\n            return False\n        self.is_reserved = True\n        return True"
+    },
+    "approach": "Use database row-level locking (SELECT ... FOR UPDATE) during seat selection to avoid overbooking the same physical aircraft seats."
   },
   {
     "id": 25,
@@ -510,12 +630,17 @@
       "Queue messages for offline users and deliver them once they connect.",
       "Support read receipts (Sent -> Delivered -> Read status)."
     ],
+    "erDiagram": "User [1] <---> [*] UserConnection\nUser [1] <---> [*] ChatMessage\nChatMessage [1] <---> [1] MessageStatus",
     "classes": [
       "User (ID, active status, contacts)",
       "Message (Sender, Recipient, timestamp, contents, status)",
       "MessageService (Queues, routes messages)"
     ],
-    "codeSkeleton": "public enum MessageStatus { SENT, DELIVERED, READ }\n\npublic class Message {\n    private String id;\n    private String senderId;\n    private String recipientId;\n    private String content;\n    private MessageStatus status = MessageStatus.SENT;\n}\n\npublic class ChatGateway {\n    private Map<String, UserConnection> activeConnections = new ConcurrentHashMap<>();\n    private Map<String, Queue<Message>> offlineQueues = new ConcurrentHashMap<>();\n\n    public void sendMessage(Message msg) {\n        if (activeConnections.containsKey(msg.getRecipientId())) {\n            activeConnections.get(msg.getRecipientId()).send(msg);\n            msg.setStatus(MessageStatus.DELIVERED);\n        } else {\n            offlineQueues.computeIfAbsent(msg.getRecipientId(), k -> new ConcurrentLinkedQueue<>()).add(msg);\n        }\n    }\n}",
+    "languages": {
+      "java": "public class Message {\n    private String id;\n    private String sender;\n    private String recipient;\n}",
+      "cpp": "class Message {\nprivate:\n    std::string id;\n    std::string sender;\n    std::string recipient;\n};",
+      "python": "class Message:\n    def __init__(self, msg_id: str, sender: str, recipient: str):\n        self.msg_id = msg_id\n        self.sender = sender\n        self.recipient = recipient"
+    },
     "approach": "Protect the active connections directory using concurrent collections. Use message queues to isolate offline delivery logic from active socket threads."
   },
   {
@@ -527,16 +652,21 @@
     "summary": "Design a warehouse inventory system tracking stock levels, processing order picks, and alerting low stock events.",
     "requirements": [
       "Track quantities of products across different warehouse layouts.",
-      "Reserve stock immediately during checkout checkout checkout.",
+      "Reserve stock immediately during checkout.",
       "Trigger notifications to suppliers once inventory falls below a threshold."
     ],
+    "erDiagram": "Warehouse [1] <---> [*] InventoryItem\nInventoryItem [1] <---> [1] StockLevel\nOrder [1] <---> [*] OrderItem",
     "classes": [
       "ProductItem (Item details, sku)",
       "StockLevel (Quantity available, reserved counts)",
       "Order (List of items, packing status)",
       "Warehouse (Locations, replenishment policy)"
     ],
-    "codeSkeleton": "public class InventoryItem {\n    private String sku;\n    private int quantityAvailable;\n    private int quantityReserved;\n\n    public synchronized boolean reserveStock(int count) {\n        if (quantityAvailable >= count) {\n            quantityAvailable -= count;\n            quantityReserved += count;\n            return true;\n        }\n        return false;\n    }\n\n    public synchronized void commitStock(int count) {\n        quantityReserved -= count;\n    }\n}\n\npublic class InventoryService {\n    private Map<String, InventoryItem> stockTable = new ConcurrentHashMap<>();\n    \n    public boolean processOrder(String sku, int count) {\n        InventoryItem item = stockTable.get(sku);\n        return item != null && item.reserveStock(count);\n    }\n}",
+    "languages": {
+      "java": "public class InventoryItem {\n    private int quantity;\n    public synchronized boolean reserve(int count) { return true; }\n}",
+      "cpp": "class InventoryItem {\nprivate:\n    int quantity;\npublic:\n    bool reserve(int count);\n};",
+      "python": "class InventoryItem:\n    def __init__(self, sku: str, quantity: int):\n        self.sku = sku\n        self.quantity = quantity\n    def reserve(self, count: int) -> bool:\n        return True"
+    },
     "approach": "Apply pessimistic locks to individual inventory SKU rows to prevent transaction race conditions during popular flash sales."
   },
   {
@@ -551,12 +681,17 @@
       "Calculate fare dynamically based on distance, time, and active splits.",
       "Real-time coordination of driver pick-up sequences."
     ],
+    "erDiagram": "PoolTrip [1] <---> [1..4] Rider\nPoolTrip [1] <---> [1] Driver\nPoolTrip [1] <---> [1] Route\nRoute [1] <---> [2..8] Location",
     "classes": [
       "PoolTrip (Multiple Rider list, Driver, Route mapping)",
       "Route (Sequence of pick-up and drop-off coordinates)",
       "FareSplitter (Strategy for split rates)"
     ],
-    "codeSkeleton": "public class PoolTrip {\n    private List<Rider> riders = new ArrayList<>();\n    private Driver driver;\n    private List<Location> sequenceOfStops = new ArrayList<>();\n    private double totalDistance;\n\n    public synchronized boolean joinPool(Rider r, Location start, Location end) {\n        if (riders.size() < 4) {\n            riders.add(r);\n            // Recalculate routing sequences\n            sequenceOfStops.add(start);\n            sequenceOfStops.add(end);\n            return true;\n        }\n        return false;\n    }\n}",
+    "languages": {
+      "java": "public class PoolTrip {\n    private List<Rider> riders = new ArrayList<>();\n    public synchronized boolean join(Rider r) { return true; }\n}",
+      "cpp": "class PoolTrip {\nprivate:\n    std::vector<Rider> riders;\npublic:\n    bool join(const Rider& r);\n};",
+      "python": "class PoolTrip:\n    def __init__(self):\n        self.riders = []\n    def join(self, rider) -> bool:\n        return True"
+    },
     "approach": "Model routing as a directed graph traversal problem. Decouple pickup sequences from driver location tracking using a modular route manager."
   }
 ]
