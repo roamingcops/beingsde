@@ -1663,22 +1663,92 @@ function QuestionCard({
   );
 }
 
+// Helper to check if a question matches a Data Structure filter
+function matchesDsFilter(q: DSAQuestion, filter: string): boolean {
+  if (filter === "all") return true;
+  const tagLower = q.tag.toLowerCase();
+  const patternLower = q.pattern.toLowerCase();
+  const titleLower = q.title.toLowerCase();
+  const searchSpace = `${tagLower} ${patternLower} ${titleLower}`;
+
+  switch (filter) {
+    case "array":
+      return searchSpace.includes("array") || searchSpace.includes("matrix");
+    case "list":
+      return searchSpace.includes("linked list") || searchSpace.includes("list");
+    case "stack-queue":
+      return searchSpace.includes("stack") || searchSpace.includes("queue") || searchSpace.includes("deque");
+    case "tree":
+      return searchSpace.includes("tree") || searchSpace.includes("trie");
+    case "heap":
+      return searchSpace.includes("heap");
+    case "graph":
+      return searchSpace.includes("graph") || searchSpace.includes("union-find") || searchSpace.includes("island") || searchSpace.includes("topological");
+    case "hash":
+      return searchSpace.includes("hashmap") || searchSpace.includes("hashset") || searchSpace.includes("hash");
+    case "string":
+      return searchSpace.includes("string") || searchSpace.includes("substring") || searchSpace.includes("anagram");
+    case "bit":
+      return searchSpace.includes("bit") || searchSpace.includes("binary") || searchSpace.includes("hamming");
+    default:
+      return false;
+  }
+}
+
+// Helper to check if a question matches an Algorithm filter
+function matchesAlgoFilter(q: DSAQuestion, filter: string): boolean {
+  if (filter === "all") return true;
+  const tagLower = q.tag.toLowerCase();
+  const patternLower = q.pattern.toLowerCase();
+  const titleLower = q.title.toLowerCase();
+  const approachLower = q.approach.toLowerCase();
+  const searchSpace = `${tagLower} ${patternLower} ${titleLower} ${approachLower}`;
+
+  switch (filter) {
+    case "binary-search":
+      return searchSpace.includes("binary search");
+    case "sorting":
+      return searchSpace.includes("sorting") || searchSpace.includes("sort");
+    case "dp":
+      return searchSpace.includes("dynamic programming") || searchSpace.includes("dp") || searchSpace.includes("kadane");
+    case "greedy":
+      return searchSpace.includes("greedy");
+    case "two-pointers":
+      return searchSpace.includes("two pointer") || searchSpace.includes("two-pointer") || searchSpace.includes("sliding window") || searchSpace.includes("deque");
+    case "backtracking":
+      return searchSpace.includes("backtracking") || searchSpace.includes("recursion") || searchSpace.includes("dfs") || searchSpace.includes("bfs") || searchSpace.includes("topological");
+    case "divide-conquer":
+      return searchSpace.includes("divide") || searchSpace.includes("conquer") || searchSpace.includes("merge sort") || searchSpace.includes("quickselect");
+    default:
+      return false;
+  }
+}
+
 // ─────────────────────────────────────────────
 // Main Page
 // ─────────────────────────────────────────────
 export default function DsaPage() {
   const [activeTab, setActiveTab] = useState<Tab>("ds");
   const [searchQuery, setSearchQuery] = useState("");
+  const [dsFilter, setDsFilter] = useState("all");
+  const [algoFilter, setAlgoFilter] = useState("all");
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const questions = activeTab === "ds" ? dsQuestions : algoQuestions;
 
-  const filtered = questions.filter(
-    (q) =>
+  const filtered = questions.filter((q) => {
+    const matchesSearch =
       q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       q.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      q.pattern.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      q.pattern.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (!matchesSearch) return false;
+
+    const matchesDs = matchesDsFilter(q, dsFilter);
+    const matchesAlgo = matchesAlgoFilter(q, algoFilter);
+
+    return matchesDs && matchesAlgo;
+  });
 
   const toggleExpand = (idx: number) => {
     setExpandedIndex(expandedIndex === idx ? null : idx);
@@ -1688,6 +1758,8 @@ export default function DsaPage() {
     setActiveTab(tab);
     setExpandedIndex(null);
     setSearchQuery("");
+    setDsFilter("all");
+    setAlgoFilter("all");
   };
 
   return (
@@ -1767,6 +1839,65 @@ export default function DsaPage() {
         />
       </div>
 
+      {/* Filter Selects */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        {/* DS Filter */}
+        <div className="relative">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5 font-mono">
+            Filter by Data Structure
+          </label>
+          <div className="relative">
+            <select
+              value={dsFilter}
+              onChange={(e) => {
+                setDsFilter(e.target.value);
+                setExpandedIndex(null);
+              }}
+              className="w-full pl-3 pr-10 py-2.5 text-xs border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 rounded-sm appearance-none cursor-pointer"
+            >
+              <option value="all">All Data Structures</option>
+              <option value="array">Arrays & Matrices</option>
+              <option value="list">Linked Lists</option>
+              <option value="stack-queue">Stacks & Queues</option>
+              <option value="tree">Trees & Tries</option>
+              <option value="heap">Heaps (Priority Queues)</option>
+              <option value="graph">Graphs & Union-Find</option>
+              <option value="hash">HashMaps & HashSets</option>
+              <option value="string">Strings & Substrings</option>
+              <option value="bit">Bit Manipulation</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Algo Filter */}
+        <div className="relative">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5 font-mono">
+            Filter by Algorithm
+          </label>
+          <div className="relative">
+            <select
+              value={algoFilter}
+              onChange={(e) => {
+                setAlgoFilter(e.target.value);
+                setExpandedIndex(null);
+              }}
+              className="w-full pl-3 pr-10 py-2.5 text-xs border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 rounded-sm appearance-none cursor-pointer"
+            >
+              <option value="all">All Algorithms</option>
+              <option value="binary-search">Binary Search</option>
+              <option value="sorting">Sorting Algorithms</option>
+              <option value="dp">Dynamic Programming & Kadane's</option>
+              <option value="greedy">Greedy Algorithms</option>
+              <option value="two-pointers">Two Pointers & Sliding Window</option>
+              <option value="backtracking">Backtracking, DFS & BFS</option>
+              <option value="divide-conquer">Divide & Conquer</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+          </div>
+        </div>
+      </div>
+
       {/* Section subtitle */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
@@ -1796,12 +1927,16 @@ export default function DsaPage() {
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-zinc-400 dark:text-zinc-500">
           <Search className="w-8 h-8 mx-auto mb-3 opacity-50" />
-          <p className="text-sm">No questions match &quot;{searchQuery}&quot;</p>
+          <p className="text-sm">No questions match your search or active filters.</p>
           <button
-            onClick={() => setSearchQuery("")}
+            onClick={() => {
+              setSearchQuery("");
+              setDsFilter("all");
+              setAlgoFilter("all");
+            }}
             className="mt-2 text-xs underline text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
           >
-            Clear search
+            Reset all filters
           </button>
         </div>
       ) : (
