@@ -1,5 +1,7 @@
 "use client";
 
+// Rebuild trigger: 2026-07-02
+
 import { useState } from "react";
 import Link from "next/link";
 import { Search, AlertTriangle, Boxes } from "lucide-react";
