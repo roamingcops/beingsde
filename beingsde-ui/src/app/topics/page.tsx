@@ -11,7 +11,7 @@ export default function TopicsExplorer() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("ALL");
   const [selectedCategory, setSelectedCategory] = useState("ALL");
-  const [topics, setTopics] = useState(MOCK_TOPICS);
+  const [topics, setTopics] = useState(MOCK_TOPICS.map(t => ({ ...t, isPremium: false })));
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -35,7 +35,7 @@ export default function TopicsExplorer() {
                 ...t,
                 category: mockMatch ? mockMatch.category : t.category,
                 tags: mockMatch ? mockMatch.tags : t.tags,
-                isPremium: mockMatch ? mockMatch.isPremium : true
+                isPremium: false
               };
             });
             setTopics(merged);

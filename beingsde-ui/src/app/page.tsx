@@ -84,12 +84,6 @@ export default function LandingPage() {
             Explore HLD Topics
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link 
-            href="/subscriptions"
-            className="text-sm font-semibold uppercase tracking-wider bg-transparent text-zinc-900 dark:text-zinc-100 px-6 py-3.5 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-900 dark:hover:border-zinc-100 transition-colors"
-          >
-            View Pricing Plans
-          </Link>
         </div>
 
         {/* Scribble Pointing Arrow */}

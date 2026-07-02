@@ -21,7 +21,7 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
 
   // Retrieve topic info matching slug
   const topic = MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1];
-  const isLocked = topic.isPremium && !isPremiumUser;
+  const isLocked = false;
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto py-4">

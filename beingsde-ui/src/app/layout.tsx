@@ -211,9 +211,6 @@ export default function RootLayout({
               <Link href="/dsa" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 DSA
               </Link>
-              <Link href="/subscriptions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                Subscriptions
-              </Link>
               <Link href="/interviews" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Mock Interviews
               </Link>
