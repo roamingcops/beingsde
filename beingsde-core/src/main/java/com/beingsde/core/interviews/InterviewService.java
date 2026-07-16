@@ -5,11 +5,16 @@ import com.beingsde.core.auth.UserRepository;
 import com.beingsde.core.interviews.dto.ProfileRequest;
 import com.beingsde.core.interviews.dto.ProfileResponse;
 import com.beingsde.core.interviews.dto.InterviewResponse;
+import com.beingsde.core.interviews.events.InterviewBookedEvent;
+import com.beingsde.core.interviews.events.InterviewCancelledEvent;
+import com.beingsde.core.interviews.events.InterviewFeedbackEvent;
 import com.beingsde.core.billing.SubscriptionRepository;
 import com.beingsde.core.billing.PaymentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,22 +28,22 @@ public class InterviewService {
     private final InterviewerProfileRepository profileRepo;
     private final InterviewRepository interviewRepo;
     private final UserRepository userRepo;
-    private final InterviewEmailService emailService;
     private final SubscriptionRepository subscriptionRepo;
     private final PaymentRepository paymentRepo;
+    private final ApplicationEventPublisher eventPublisher;
  
     public InterviewService(InterviewerProfileRepository profileRepo,
                             InterviewRepository interviewRepo,
                             UserRepository userRepo,
-                            InterviewEmailService emailService,
                             SubscriptionRepository subscriptionRepo,
-                            PaymentRepository paymentRepo) {
+                            PaymentRepository paymentRepo,
+                            ApplicationEventPublisher eventPublisher) {
         this.profileRepo = profileRepo;
         this.interviewRepo = interviewRepo;
         this.userRepo = userRepo;
-        this.emailService = emailService;
         this.subscriptionRepo = subscriptionRepo;
         this.paymentRepo = paymentRepo;
+        this.eventPublisher = eventPublisher;
     }
 
     private User resolveUser(String email) {
@@ -61,7 +66,6 @@ public class InterviewService {
             }
             avg = ratedCount > 0 ? sum / ratedCount : 0.0;
         }
-        // Round to 1 decimal place
         avg = Math.round(avg * 10.0) / 10.0;
         return ProfileResponse.fromProfile(profile, avg, count);
     }
@@ -106,6 +110,7 @@ public class InterviewService {
         );
     }
 
+    @Transactional
     public ProfileResponse upsertProfile(String email, ProfileRequest request) {
         User user = resolveUser(email);
         String userId = user.getId();
@@ -136,6 +141,7 @@ public class InterviewService {
         return mapProfileToResponse(profile);
     }
 
+    @Transactional
     public void disableProfile(String email) {
         User user = resolveUser(email);
         InterviewerProfile profile = profileRepo.findByUserId(user.getId())
@@ -181,6 +187,7 @@ public class InterviewService {
                 .toList();
     }
 
+    @Transactional
     public Interview handleCalendlyWebhook(String interviewerEmail, String candidateId,
                                            String topic, Instant scheduledTime, String meetingLink) {
         User interviewer = resolveUser(interviewerEmail);
@@ -202,16 +209,16 @@ public class InterviewService {
 
         Interview saved = interviewRepo.save(interview);
 
-        try {
-            emailService.sendBookingEmailToCandidate(candidate.getEmail(), candidate.getName(), interviewer.getName(), topic, scheduledTime, meetLink);
-            emailService.sendBookingEmailToInterviewer(interviewer.getEmail(), interviewer.getName(), candidate.getName(), topic, scheduledTime, meetLink);
-        } catch (Exception e) {
-            log.error("Failed to send webhook email notifications: {}", e.getMessage());
-        }
+        eventPublisher.publishEvent(new InterviewBookedEvent(
+                this, candidate.getEmail(), candidate.getName(),
+                interviewer.getEmail(), interviewer.getName(),
+                topic, scheduledTime, meetLink
+        ));
 
         return saved;
     }
 
+    @Transactional
     public Interview bookInterview(String email, String profileId, String topic, Instant scheduledAt, String meetingLink) {
         User candidate = resolveUser(email);
         InterviewerProfile profile = profileRepo.findById(profileId)
@@ -239,16 +246,16 @@ public class InterviewService {
         User interviewer = userRepo.findById(profile.getUserId())
                 .orElseThrow(() -> new RuntimeException("Interviewer user not found"));
 
-        try {
-            emailService.sendBookingEmailToCandidate(candidate.getEmail(), candidate.getName(), interviewer.getName(), topic, scheduledAt, meetLink);
-            emailService.sendBookingEmailToInterviewer(interviewer.getEmail(), interviewer.getName(), candidate.getName(), topic, scheduledAt, meetLink);
-        } catch (Exception e) {
-            log.error("Failed to send booking email notifications: {}", e.getMessage());
-        }
+        eventPublisher.publishEvent(new InterviewBookedEvent(
+                this, candidate.getEmail(), candidate.getName(),
+                interviewer.getEmail(), interviewer.getName(),
+                topic, scheduledAt, meetLink
+        ));
 
         return saved;
     }
 
+    @Transactional
     public Interview cancelInterview(String interviewId, String email) {
         User user = resolveUser(email);
         Interview interview = interviewRepo.findById(interviewId)
@@ -258,26 +265,34 @@ public class InterviewService {
             throw new RuntimeException("You are not authorized to cancel this interview");
         }
 
+        if (interview.getStatus() != InterviewStatus.SCHEDULED) {
+            throw new IllegalStateException("Only scheduled interviews can be cancelled");
+        }
+
         interview.setStatus(InterviewStatus.CANCELLED);
         Interview saved = interviewRepo.save(interview);
 
-        try {
-            User interviewer = userRepo.findById(interview.getInterviewerId()).orElse(null);
-            User candidate = userRepo.findById(interview.getCandidateId()).orElse(null);
-            if (interviewer != null && candidate != null) {
-                if (user.getId().equals(candidate.getId())) {
-                    emailService.sendCancellationEmail(interviewer.getEmail(), candidate.getName(), interview.getTopic(), interview.getScheduledAt(), "Candidate");
-                } else {
-                    emailService.sendCancellationEmail(candidate.getEmail(), interviewer.getName(), interview.getTopic(), interview.getScheduledAt(), "Interviewer");
-                }
+        User interviewer = userRepo.findById(interview.getInterviewerId()).orElse(null);
+        User candidate = userRepo.findById(interview.getCandidateId()).orElse(null);
+
+        if (interviewer != null && candidate != null) {
+            if (user.getId().equals(candidate.getId())) {
+                eventPublisher.publishEvent(new InterviewCancelledEvent(
+                        this, interviewer.getEmail(), candidate.getName(),
+                        interview.getTopic(), interview.getScheduledAt(), "Candidate"
+                ));
+            } else {
+                eventPublisher.publishEvent(new InterviewCancelledEvent(
+                        this, candidate.getEmail(), interviewer.getName(),
+                        interview.getTopic(), interview.getScheduledAt(), "Interviewer"
+                ));
             }
-        } catch (Exception e) {
-            log.error("Failed to send cancellation email notifications: {}", e.getMessage());
         }
 
         return saved;
     }
 
+    @Transactional
     public Interview submitFeedback(String interviewId, String email, Integer score, String notes) {
         User user = resolveUser(email);
         Interview interview = interviewRepo.findById(interviewId)
@@ -287,23 +302,27 @@ public class InterviewService {
             throw new RuntimeException("Only the interviewer can submit feedback");
         }
 
+        if (interview.getStatus() == InterviewStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot submit feedback for a cancelled interview");
+        }
+
         interview.setFeedbackScore(score);
         interview.setFeedbackNotes(notes);
         interview.setStatus(InterviewStatus.COMPLETED);
         Interview saved = interviewRepo.save(interview);
 
-        try {
-            User candidate = userRepo.findById(interview.getCandidateId()).orElse(null);
-            if (candidate != null) {
-                emailService.sendFeedbackEmail(candidate.getEmail(), candidate.getName(), user.getName(), interview.getTopic(), score, notes);
-            }
-        } catch (Exception e) {
-            log.error("Failed to send feedback email notification: {}", e.getMessage());
+        User candidate = userRepo.findById(interview.getCandidateId()).orElse(null);
+        if (candidate != null) {
+            eventPublisher.publishEvent(new InterviewFeedbackEvent(
+                    this, candidate.getEmail(), candidate.getName(),
+                    user.getName(), interview.getTopic(), score, notes
+            ));
         }
 
         return saved;
     }
 
+    @Transactional
     public void testCleanup() {
         profileRepo.deleteAll();
         interviewRepo.deleteAll();

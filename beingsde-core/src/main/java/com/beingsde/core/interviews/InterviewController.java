@@ -1,8 +1,9 @@
 package com.beingsde.core.interviews;
 
-import com.beingsde.core.featureflags.FeatureFlagService;
+import com.beingsde.core.interviews.annotations.RequiresPremium;
 import com.beingsde.core.interviews.dto.ProfileRequest;
 import com.beingsde.core.interviews.dto.ProfileResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,15 +18,13 @@ import java.util.Map;
 @RequestMapping("/api/v1/interviews")
 public class InterviewController {
 
-    private static final String FEATURE_FLAG = "feature_premium_mock_interviews";
-
     private final InterviewService interviewService;
-    private final FeatureFlagService featureFlagService;
+    
+    @Value("${calendly.webhook.secret:secret_token_123}")
+    private String webhookSecret;
 
-    public InterviewController(InterviewService interviewService,
-                                FeatureFlagService featureFlagService) {
+    public InterviewController(InterviewService interviewService) {
         this.interviewService = interviewService;
-        this.featureFlagService = featureFlagService;
     }
 
     private String getCurrentUserEmail() {
@@ -36,36 +35,18 @@ public class InterviewController {
         return "anonymous";
     }
 
-    private ResponseEntity<?> checkPremiumAccess(String email) {
-        if (!featureFlagService.evaluate(email, FEATURE_FLAG)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of(
-                            "type", "https://api.beingsde.com/errors/insufficient-permissions",
-                            "title", "Premium Feature",
-                            "status", 403,
-                            "detail", "Mock interviews are a premium feature. Please upgrade your subscription.",
-                            "instance", "/api/v1/interviews"
-                    ));
-        }
-        return null;
-    }
-
     @PostMapping("/profile")
-    public ResponseEntity<?> upsertProfile(@RequestBody ProfileRequest request) {
+    @RequiresPremium
+    public ResponseEntity<ProfileResponse> upsertProfile(@RequestBody ProfileRequest request) {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         ProfileResponse profile = interviewService.upsertProfile(email, request);
         return ResponseEntity.ok(profile);
     }
 
     @GetMapping("/profile/me")
+    @RequiresPremium
     public ResponseEntity<?> getMyProfile() {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         try {
             ProfileResponse profile = interviewService.getMyProfile(email);
             return ResponseEntity.ok(profile);
@@ -76,43 +57,36 @@ public class InterviewController {
     }
 
     @DeleteMapping("/profile")
+    @RequiresPremium
     public ResponseEntity<?> disableProfile() {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         interviewService.disableProfile(email);
         return ResponseEntity.ok(Map.of("message", "Profile disabled"));
     }
 
     @GetMapping("/directory")
-    public ResponseEntity<?> getDirectory(
+    @RequiresPremium
+    public ResponseEntity<List<ProfileResponse>> getDirectory(
             @RequestParam(required = false) String topic,
             @RequestParam(required = false) String experienceLevel,
             @RequestParam(required = false) String slot) {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         List<ProfileResponse> directory = interviewService.getDirectory(topic, experienceLevel, slot);
         return ResponseEntity.ok(directory);
     }
 
     @GetMapping
-    public ResponseEntity<?> getMyInterviews() {
+    @RequiresPremium
+    public ResponseEntity<List<com.beingsde.core.interviews.dto.InterviewResponse>> getMyInterviews() {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         List<com.beingsde.core.interviews.dto.InterviewResponse> interviews = interviewService.getUserInterviews(email);
         return ResponseEntity.ok(interviews);
     }
 
     @PostMapping("/book")
+    @RequiresPremium
     public ResponseEntity<?> bookInterview(@RequestBody Map<String, Object> body) {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
 
         String profileId = (String) body.get("profileId");
         String topic = (String) body.get("topic");
@@ -135,11 +109,9 @@ public class InterviewController {
     }
 
     @PostMapping("/{id}/cancel")
+    @RequiresPremium
     public ResponseEntity<?> cancelInterview(@PathVariable String id) {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         try {
             Interview interview = interviewService.cancelInterview(id, email);
             return ResponseEntity.ok(interview);
@@ -150,13 +122,11 @@ public class InterviewController {
     }
 
     @PostMapping("/{id}/feedback")
+    @RequiresPremium
     public ResponseEntity<?> submitFeedback(
             @PathVariable String id,
             @RequestBody Map<String, Object> body) {
         String email = getCurrentUserEmail();
-        ResponseEntity<?> accessError = checkPremiumAccess(email);
-        if (accessError != null) return accessError;
-
         Integer score = body.get("score") != null ? ((Number) body.get("score")).intValue() : null;
         String notes = (String) body.get("notes");
 
@@ -170,7 +140,15 @@ public class InterviewController {
     }
 
     @PostMapping("/calendly-webhook")
-    public ResponseEntity<?> calendlyWebhook(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> calendlyWebhook(@RequestHeader(value = "Calendly-Webhook-Signature", required = false) String signature,
+                                             @RequestBody Map<String, Object> body) {
+        
+        // Basic signature check to prevent spoofing
+        if (signature == null || !signature.equals(webhookSecret)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid or missing webhook signature"));
+        }
+
         String interviewerEmail = (String) body.get("interviewerEmail");
         String candidateId = (String) body.get("candidateId");
         String topic = (String) body.get("topic");
