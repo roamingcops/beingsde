@@ -48,7 +48,7 @@ export default function MobileMenu() {
 
       {/* Mobile Menu Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 top-[64px] z-40 bg-[#fafafa] dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 flex flex-col p-6 animate-in slide-in-from-top-2 duration-200">
+        <div className="absolute top-full left-0 w-full h-[calc(100vh-64px)] z-40 bg-[#fafafa] dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 flex flex-col p-6 animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-6 text-lg font-medium text-zinc-800 dark:text-zinc-200">
             {links.map((link) => (
               <Link
