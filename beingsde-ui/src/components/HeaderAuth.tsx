@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
 
 export default function HeaderAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,7 +14,7 @@ export default function HeaderAuth() {
   const fetchUser = async (token: string) => {
     try {
       const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
-      const res = await fetch(`${API_BASE}/users/me`, {
+      const res = await sessionAwareFetch(`${API_BASE}/users/me`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }

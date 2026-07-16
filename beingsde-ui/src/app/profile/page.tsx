@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { User, Mail, Shield, Calendar, Camera, Check, Loader2, AlertCircle } from "lucide-react";
+import { sessionAwareFetch } from "@/lib/sessionAwareFetch";
 
 interface UserProfile {
   id: string;
@@ -45,7 +46,7 @@ export default function ProfilePage() {
         return;
       }
 
-      const res = await fetch(`${API_BASE}/users/me`, {
+      const res = await sessionAwareFetch(`${API_BASE}/users/me`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -76,7 +77,7 @@ export default function ProfilePage() {
     setUpdatingAvatar(true);
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch(`${API_BASE}/users/me/avatar`, {
+      const res = await sessionAwareFetch(`${API_BASE}/users/me/avatar`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
