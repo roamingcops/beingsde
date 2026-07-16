@@ -215,7 +215,7 @@ function InterviewRow({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 mt-1 sm:mt-0 w-full sm:w-auto">
           {interview.scheduledAt && (
             <span className="text-3xs text-zinc-500 font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-sm flex items-center gap-1">
               <Calendar className="w-3 h-3" />
