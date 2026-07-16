@@ -2,32 +2,28 @@ package com.beingsde.core.auth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 /**
- * Manages the single-session fingerprint for each user in Redis.
+ * Manages the single-session fingerprint for each user in MongoDB.
  *
- * Key format : session:{email}
- * Value      : sessionId (UUID string)
- * TTL        : 7 days (matches refresh token lifetime)
- *
- * When a user logs in a new device the key is overwritten, making every
+ * When a user logs in a new device the record is overwritten, making every
  * previously issued JWT immediately invalid on the next request.
  */
 @Service
 public class SessionStore {
 
     private static final Logger log = LoggerFactory.getLogger(SessionStore.class);
-    private static final String PREFIX = "session:";
     private static final long SESSION_TTL_DAYS = 7;
 
-    private final StringRedisTemplate redis;
+    private final UserSessionRepository sessionRepository;
 
-    public SessionStore(StringRedisTemplate redis) {
-        this.redis = redis;
+    public SessionStore(UserSessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
     }
 
     /**
@@ -37,19 +33,20 @@ public class SessionStore {
     public void save(String email, String sessionId) {
         java.util.concurrent.CompletableFuture.runAsync(() -> {
             try {
-                redis.opsForValue().set(key(email), sessionId, SESSION_TTL_DAYS, TimeUnit.DAYS);
-                log.debug("Session saved for {}: {}", email, sessionId);
+                Instant expiresAt = Instant.now().plus(SESSION_TTL_DAYS, ChronoUnit.DAYS);
+                UserSession session = new UserSession(email, sessionId, expiresAt);
+                sessionRepository.save(session);
+                log.debug("Session saved in MongoDB for {}: {}", email, sessionId);
             } catch (Exception e) {
-                // If Redis is down we fail open (log but don't block login)
-                log.error("Redis unavailable — could not save session for {}: {}", email, e.getMessage());
+                log.error("MongoDB unavailable — could not save session for {}: {}", email, e.getMessage());
             }
         });
     }
 
     /**
      * Returns true if the given sessionId matches the currently active session
-     * stored in Redis for this email. Returns true on Redis errors (fail open)
-     * to avoid locking users out due to infrastructure issues.
+     * stored in MongoDB for this email. Returns false on errors (fail closed)
+     * to strictly enforce single session.
      */
     public boolean isValid(String email, String sessionId) {
         if (sessionId == null) {
@@ -57,11 +54,19 @@ public class SessionStore {
             return true;
         }
         try {
-            String stored = redis.opsForValue().get(key(email));
-            return sessionId.equals(stored);
+            Optional<UserSession> stored = sessionRepository.findById(email);
+            if (stored.isPresent()) {
+                // Optionally check expiration
+                if (stored.get().getExpiresAt().isBefore(Instant.now())) {
+                    sessionRepository.deleteById(email);
+                    return false;
+                }
+                return sessionId.equals(stored.get().getSessionId());
+            }
+            return false;
         } catch (Exception e) {
-            log.error("Redis unavailable — failing closed for session check on {}: {}", email, e.getMessage());
-            return false; // fail closed: strictly enforce single session by denying access if Redis is down
+            log.error("MongoDB unavailable — failing closed for session check on {}: {}", email, e.getMessage());
+            return false; // fail closed: strictly enforce single session
         }
     }
 
@@ -70,14 +75,10 @@ public class SessionStore {
      */
     public void invalidate(String email) {
         try {
-            redis.delete(key(email));
+            sessionRepository.deleteById(email);
             log.debug("Session invalidated for {}", email);
         } catch (Exception e) {
-            log.error("Redis unavailable — could not invalidate session for {}: {}", email, e.getMessage());
+            log.error("MongoDB unavailable — could not invalidate session for {}: {}", email, e.getMessage());
         }
-    }
-
-    private String key(String email) {
-        return PREFIX + email;
     }
 }
