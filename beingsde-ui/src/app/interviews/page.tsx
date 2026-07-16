@@ -102,9 +102,9 @@ export default function InterviewsPage() {
               <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6 border border-zinc-200 dark:border-zinc-700 shadow-inner">
                 <Lock className="w-7 h-7 text-zinc-500 dark:text-zinc-400" />
               </div>
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">Authentication Required</h2>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">Sign in to unlock Mock Interviews</h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed">
-                You need to sign in or create an account to view the interviewer directory, book mock sessions, or offer your own time to other candidates.
+                Join our community to browse the directory, book live 1-on-1 mock sessions, or offer your expertise to help others grow.
               </p>
               <Link
                 href="/login"
