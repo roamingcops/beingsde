@@ -68,85 +68,74 @@ export default function InterviewsPage() {
         </div>
       </section>
 
-      {authStatus === "unauthenticated" && (
-        <div className="flex flex-col items-center justify-center py-20 bg-zinc-50/50 dark:bg-zinc-900/20 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-center px-4">
-          <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-5 border border-zinc-200 dark:border-zinc-700">
-            <Lock className="w-6 h-6 text-zinc-400" />
+      <div className="relative">
+        {/* Workspace Grid */}
+        <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-start transition-all duration-500 ${authStatus !== "premium" ? "opacity-40 select-none pointer-events-none blur-[2px]" : ""}`}>
+          {/* Left Column: Interviewer Panel */}
+          <div className="lg:col-span-5 flex flex-col gap-6">
+            <InterviewerConsole
+              profile={profile}
+              onSave={saveProfile}
+              onStopOffering={stopOffering}
+            />
           </div>
-          <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 mb-2">Authentication Required</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-md text-sm">
-            You need to sign in or create an account to view the interviewer directory, book mock sessions, or offer your own time to other candidates.
-          </p>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md shadow-sm hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
-          >
-            Sign In to Continue <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      )}
 
-      {authStatus === "free" && (
-        <div className="flex flex-col items-center justify-center py-20 bg-amber-50/30 dark:bg-amber-950/10 border border-dashed border-amber-200 dark:border-amber-900/50 rounded-lg shadow-sm text-center px-4">
-          <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center mb-5 border border-amber-200 dark:border-amber-800">
-            <Crown className="w-6 h-6 text-amber-500 dark:text-amber-400" />
+          {/* Right Column: Search & Schedule Directory */}
+          <div className="lg:col-span-7 flex flex-col gap-8">
+            <InterviewerDirectory
+              directory={directory}
+              onSimulate={openBookingModal}
+            />
+
+            <MyInterviews
+              interviews={interviews}
+              onCancel={cancelInterview}
+              onSubmitFeedback={submitFeedback}
+            />
           </div>
-          <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 mb-2">Premium Feature</h2>
-          <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-md text-sm">
-            Mock Interviews are an exclusive feature for Premium members. Upgrade your account to unlock the ability to schedule live 1-on-1 system design sessions with experienced architects.
-          </p>
-          <Link
-            href="/pricing"
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-md shadow-sm hover:bg-amber-600 transition-colors"
-          >
-            Upgrade to Premium <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      )}
-
-      {authStatus === "premium" && (
-        <>
-          {/* Notifications */}
-      {error && (
-        <div className="flex gap-2.5 items-start p-4 text-sm border border-red-200 dark:border-red-950 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 rounded-md">
-          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-          <span>{error}</span>
-        </div>
-      )}
-      {successMsg && (
-        <div className="flex gap-2.5 items-start p-4 text-sm border border-emerald-200 dark:border-emerald-950 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 rounded-md">
-          <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" />
-          <span>{successMsg}</span>
-        </div>
-      )}
-
-      {/* Workspace Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Interviewer Panel */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          <InterviewerConsole
-            profile={profile}
-            onSave={saveProfile}
-            onStopOffering={stopOffering}
-          />
         </div>
 
-        {/* Right Column: Search & Schedule Directory */}
-        <div className="lg:col-span-7 flex flex-col gap-8">
-          <InterviewerDirectory
-            directory={directory}
-            onSimulate={openBookingModal}
-          />
+        {/* Overlay Paywalls */}
+        {authStatus === "unauthenticated" && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-6">
+            <div className="flex flex-col items-center justify-center p-8 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl text-center max-w-lg mx-auto transform transition-all">
+              <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6 border border-zinc-200 dark:border-zinc-700 shadow-inner">
+                <Lock className="w-7 h-7 text-zinc-500 dark:text-zinc-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">Authentication Required</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed">
+                You need to sign in or create an account to view the interviewer directory, book mock sessions, or offer your own time to other candidates.
+              </p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-8 py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Sign In to Continue <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        )}
 
-          <MyInterviews
-            interviews={interviews}
-            onCancel={cancelInterview}
-            onSubmitFeedback={submitFeedback}
-          />
-        </div>
+        {authStatus === "free" && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-6">
+            <div className="flex flex-col items-center justify-center p-8 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-amber-200/50 dark:border-amber-900/50 rounded-2xl shadow-2xl shadow-amber-900/5 text-center max-w-lg mx-auto transform transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-900/10 rounded-full flex items-center justify-center mb-6 border border-amber-200 dark:border-amber-800 shadow-inner">
+                <Crown className="w-7 h-7 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">Premium Feature</h2>
+              <p className="text-zinc-600 dark:text-zinc-400 mb-8 leading-relaxed">
+                Mock Interviews are an exclusive feature for Premium members. Upgrade your account to unlock the ability to schedule live 1-on-1 system design sessions with experienced architects.
+              </p>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl hover:from-amber-400 hover:to-amber-500 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                Upgrade to Premium <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
-      </>
-      )}
 
       {showBookingModal && selectedProfile && authStatus === "premium" && (
         <BookingModal
