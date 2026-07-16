@@ -60,8 +60,8 @@ public class SessionStore {
             String stored = redis.opsForValue().get(key(email));
             return sessionId.equals(stored);
         } catch (Exception e) {
-            log.error("Redis unavailable — failing open for session check on {}: {}", email, e.getMessage());
-            return true; // fail open: don't lock out users if Redis is down
+            log.error("Redis unavailable — failing closed for session check on {}: {}", email, e.getMessage());
+            return false; // fail closed: strictly enforce single session by denying access if Redis is down
         }
     }
 

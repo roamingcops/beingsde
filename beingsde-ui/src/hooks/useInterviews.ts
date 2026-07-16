@@ -175,7 +175,7 @@ export function useInterviews() {
     communication: number | null,
     notes: string
   ) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (!token) return;
     try {
       const res = await sessionAwareFetch(`${API_BASE}/${interviewId}/candidate-review`, {
