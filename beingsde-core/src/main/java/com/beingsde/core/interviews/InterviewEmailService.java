@@ -63,7 +63,7 @@ public class InterviewEmailService {
 
     private String formatDateTime(Instant instant) {
         if (instant == null) return "N/A";
-        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm UTC")
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'UTC'")
                 .withZone(ZoneId.of("UTC"))
                 .format(instant);
     }
