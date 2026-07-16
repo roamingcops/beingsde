@@ -900,7 +900,7 @@ export default function QuestionsPage() {
         </div>
 
         {/* SEARCH AND FILTERS */}
-        <div className="flex flex-col md:flex-row gap-4 mt-2">
+        <div className="flex flex-col gap-4 mt-2">
           {/* Search Box */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
