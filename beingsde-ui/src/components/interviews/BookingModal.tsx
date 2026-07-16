@@ -79,17 +79,6 @@ export function BookingModal({ profile, onClose, onBook }: BookingModalProps) {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-3xs font-mono font-bold uppercase text-zinc-400">Scheduled Date & Time</label>
-            <input
-              type="datetime-local"
-              value={bookingDateTime}
-              onChange={(e) => setBookingDateTime(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 rounded-md dark:bg-zinc-800"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
             <label className="text-3xs font-mono font-bold uppercase text-zinc-400">Simulated Meet Link (Optional)</label>
             <input
               type="url"
@@ -99,27 +88,38 @@ export function BookingModal({ profile, onClose, onBook }: BookingModalProps) {
               className="w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 rounded-md dark:bg-zinc-800"
             />
           </div>
+
+          <div className="flex flex-col gap-1">
+            <label className="text-3xs font-mono font-bold uppercase text-zinc-400">Scheduled Date & Time</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="datetime-local"
+                value={bookingDateTime}
+                onChange={(e) => setBookingDateTime(e.target.value)}
+                required
+                className="flex-1 px-3 py-2 border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm focus:outline-none focus:border-zinc-800 dark:focus:border-zinc-200 rounded-md dark:bg-zinc-800"
+              />
+              <button
+                onClick={handleBook}
+                disabled={isBooking || !bookingDateTime || !bookingTopic}
+                className="inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 transition-all rounded-md shadow-sm disabled:opacity-50 h-[38px]"
+              >
+                {isBooking ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  "Submit"
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 mt-4">
+        <div className="flex items-center justify-start mt-2">
           <button
             onClick={onClose}
-            className="text-xs font-semibold px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-500 rounded-md transition-colors"
+            className="text-xs font-semibold px-4 py-1.5 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-zinc-500 rounded-md transition-colors"
           >
             Cancel
-          </button>
-          <button
-            onClick={handleBook}
-            disabled={isBooking || !bookingDateTime || !bookingTopic}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-4 py-2 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all rounded-md shadow-sm disabled:opacity-50"
-          >
-            {isBooking ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Scheduling...
-              </>
-            ) : (
-              "Confirm Booking"
-            )}
           </button>
         </div>
       </div>
