@@ -169,7 +169,7 @@ export function InterviewerDirectory({ directory, onSimulate }: InterviewerDirec
                     href={p.calendlyLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 px-4 py-2 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                    className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   >
                     {p.calendlyLink.includes("calendly.com")
                       ? "Calendly"
@@ -183,7 +183,7 @@ export function InterviewerDirectory({ directory, onSimulate }: InterviewerDirec
                 )}
                 <button
                   onClick={() => onSimulate(p)}
-                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
+                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md transition-colors shadow-sm"
                 >
                   Simulate
                 </button>
