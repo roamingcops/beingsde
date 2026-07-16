@@ -185,7 +185,7 @@ export function InterviewerDirectory({ directory, onSimulate }: InterviewerDirec
                   onClick={() => onSimulate(p)}
                   className="w-full sm:flex-1 inline-flex items-center justify-center gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md transition-colors shadow-sm"
                 >
-                  Simulate
+                  Schedule
                 </button>
               </div>
             </div>
