@@ -42,7 +42,7 @@ public class Interview {
     public Interview() {
     }
 
-    public Interview(String id, String interviewerId, String candidateId, String topic,
+    public Interview(String id, String interviewerId, String candidateId, String topic, InterviewStatus status, Instant scheduledAt, String meetingLink,
                      Integer feedbackScore, String feedbackNotes,
                      Boolean candidateReviewDidHappen, Integer candidateReviewDsa,
                      Integer candidateReviewSystemDesign, Integer candidateReviewCommunication,
