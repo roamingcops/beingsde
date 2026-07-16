@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2, Lock, Crown, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useInterviews } from "@/hooks/useInterviews";
 import { Profile } from "@/components/interviews/types";
 import { InterviewerConsole } from "@/components/interviews/InterviewerConsole";
@@ -12,6 +13,7 @@ import { BookingModal } from "@/components/interviews/BookingModal";
 export default function InterviewsPage() {
   const {
     loading,
+    authStatus,
     profile,
     directory,
     interviews,
@@ -38,7 +40,7 @@ export default function InterviewsPage() {
     }
   };
 
-  if (loading) {
+  if (loading || authStatus === "loading") {
     return (
       <div className="flex items-center justify-center py-40">
         <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
@@ -66,7 +68,45 @@ export default function InterviewsPage() {
         </div>
       </section>
 
-      {/* Notifications */}
+      {authStatus === "unauthenticated" && (
+        <div className="flex flex-col items-center justify-center py-20 bg-zinc-50/50 dark:bg-zinc-900/20 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg shadow-sm text-center px-4">
+          <div className="w-14 h-14 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-5 border border-zinc-200 dark:border-zinc-700">
+            <Lock className="w-6 h-6 text-zinc-400" />
+          </div>
+          <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 mb-2">Authentication Required</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-md text-sm">
+            You need to sign in or create an account to view the interviewer directory, book mock sessions, or offer your own time to other candidates.
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md shadow-sm hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+          >
+            Sign In to Continue <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
+
+      {authStatus === "free" && (
+        <div className="flex flex-col items-center justify-center py-20 bg-amber-50/30 dark:bg-amber-950/10 border border-dashed border-amber-200 dark:border-amber-900/50 rounded-lg shadow-sm text-center px-4">
+          <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/40 rounded-full flex items-center justify-center mb-5 border border-amber-200 dark:border-amber-800">
+            <Crown className="w-6 h-6 text-amber-500 dark:text-amber-400" />
+          </div>
+          <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100 mb-2">Premium Feature</h2>
+          <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-md text-sm">
+            Mock Interviews are an exclusive feature for Premium members. Upgrade your account to unlock the ability to schedule live 1-on-1 system design sessions with experienced architects.
+          </p>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-md shadow-sm hover:bg-amber-600 transition-colors"
+          >
+            Upgrade to Premium <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
+
+      {authStatus === "premium" && (
+        <>
+          {/* Notifications */}
       {error && (
         <div className="flex gap-2.5 items-start p-4 text-sm border border-red-200 dark:border-red-950 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 rounded-md">
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
@@ -105,8 +145,10 @@ export default function InterviewsPage() {
           />
         </div>
       </div>
+      </>
+      )}
 
-      {showBookingModal && selectedProfile && (
+      {showBookingModal && selectedProfile && authStatus === "premium" && (
         <BookingModal
           profile={selectedProfile}
           onClose={() => setShowBookingModal(false)}

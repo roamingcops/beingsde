@@ -11,10 +11,12 @@ export function useInterviews() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [authStatus, setAuthStatus] = useState<"loading" | "unauthenticated" | "free" | "premium">("loading");
 
   const loadData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
+      setAuthStatus("unauthenticated");
       setLoading(false);
       return;
     }
@@ -26,6 +28,14 @@ export function useInterviews() {
         sessionAwareFetch(`${API_BASE}/directory`, { headers }),
         sessionAwareFetch(`${API_BASE}`, { headers }),
       ]);
+
+      if (dirRes.status === 403 || profileRes.status === 403 || interviewsRes.status === 403) {
+        setAuthStatus("free");
+        setLoading(false);
+        return;
+      }
+
+      setAuthStatus("premium");
 
       if (profileRes.ok) {
         const p: Profile = await profileRes.json();
@@ -159,6 +169,7 @@ export function useInterviews() {
 
   return {
     loading,
+    authStatus,
     profile,
     directory,
     interviews,
