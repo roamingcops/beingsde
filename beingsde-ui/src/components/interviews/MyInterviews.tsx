@@ -197,38 +197,25 @@ function InterviewRow({
         ? "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40" 
         : "border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/20 dark:bg-zinc-950/10"
     }`}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        
-        <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <span className={`text-3xs font-bold font-mono uppercase px-2 py-0.5 border rounded-full shrink-0 ${
-            isInterviewer 
-              ? "border-indigo-200 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400"
-              : "border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400"
-          }`}>
-            {roleLabel}
-          </span>
-          <div className="flex flex-col min-w-0">
-            <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">{interview.topic}</span>
-            <span className="text-3xs text-zinc-400 truncate">
-              {isInterviewer ? "Candidate: " : "Interviewer: "} <strong>{partnerName}</strong> ({partnerEmail})
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className={`text-[9px] font-bold font-mono uppercase px-2 py-0.5 border rounded-full shrink-0 ${
+                isInterviewer 
+                  ? "border-indigo-200 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400"
+                  : "border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400"
+              }`}>
+                {roleLabel}
+              </span>
+              <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100 truncate">{interview.topic}</span>
+            </div>
+            <span className="text-3xs text-zinc-500 truncate mt-0.5">
+              {isInterviewer ? "Candidate: " : "Interviewer: "} <strong className="text-zinc-700 dark:text-zinc-300">{partnerName}</strong> ({partnerEmail})
             </span>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 mt-1 sm:mt-0 w-full sm:w-auto">
-          {interview.scheduledAt && (
-            <span className="text-3xs text-zinc-500 font-mono bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-sm flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              {new Date(interview.scheduledAt).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          )}
-
-          <span className={`text-3xs font-mono font-bold uppercase px-2 py-0.5 rounded-full border ${
+          <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-full border shrink-0 ${
             interview.status === "SCHEDULED"
               ? "border-amber-200 dark:border-amber-900/60 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20"
               : interview.status === "COMPLETED"
@@ -237,52 +224,70 @@ function InterviewRow({
           }`}>
             {interview.status}
           </span>
+        </div>
 
-          {interview.status === "SCHEDULED" && interview.meetingLink && (
-            <a
-              href={interview.meetingLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-3xs font-bold uppercase tracking-wider bg-transparent text-zinc-800 dark:text-zinc-200 px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-950 dark:hover:border-zinc-300 rounded-md transition-colors flex items-center gap-1 shadow-sm"
-            >
-              <Video className="w-3 h-3" /> Join
-            </a>
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-1 pt-3 border-t border-zinc-100 dark:border-zinc-800/60">
+          {interview.scheduledAt ? (
+            <span className="text-3xs text-zinc-500 font-mono bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1.5 rounded flex items-center gap-1.5 border border-zinc-200 dark:border-zinc-700">
+              <Calendar className="w-3.5 h-3.5" />
+              {new Date(interview.scheduledAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          ) : (
+            <div />
           )}
 
-          {interview.status === "SCHEDULED" && (
-            <button
-              onClick={() => onCancel(interview.id)}
-              disabled={cancellingId === interview.id}
-              className="text-3xs font-bold uppercase tracking-wider text-red-500 border border-transparent hover:border-red-300 dark:hover:border-red-900/60 px-3 py-1.5 rounded-md hover:bg-red-50/50 dark:hover:bg-red-950/10 transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {interview.status === "SCHEDULED" && interview.meetingLink && (
+              <a
+                href={interview.meetingLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-3xs font-bold uppercase tracking-wider bg-transparent text-zinc-800 dark:text-zinc-200 px-3 py-1.5 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-950 dark:hover:border-zinc-300 rounded-md transition-colors flex items-center gap-1 shadow-sm"
+              >
+                <Video className="w-3 h-3" /> Join
+              </a>
+            )}
 
-          {interview.status === "SCHEDULED" && isInterviewer && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-3xs font-bold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-3 py-1.5 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 rounded-md transition-all flex items-center gap-1 shadow-sm"
-            >
-              Feedback {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            </button>
-          )}
+            {interview.status === "SCHEDULED" && (
+              <button
+                onClick={() => onCancel(interview.id)}
+                disabled={cancellingId === interview.id}
+                className="text-3xs font-bold uppercase tracking-wider text-red-500 border border-transparent hover:border-red-300 dark:hover:border-red-900/60 px-3 py-1.5 rounded-md hover:bg-red-50/50 dark:hover:bg-red-950/10 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            )}
 
-          {!isInterviewer && interview.status !== "CANCELLED" && interview.candidateReviewDidHappen == null && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-3xs font-bold uppercase tracking-wider bg-indigo-600 text-white px-3 py-1.5 border border-indigo-600 hover:bg-transparent hover:text-indigo-600 rounded-md transition-all flex items-center gap-1 shadow-sm"
-            >
-              Review Interviewer {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            </button>
-          )}
+            {interview.status === "SCHEDULED" && isInterviewer && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-3xs font-bold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-3 py-1.5 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 rounded-md transition-all flex items-center gap-1 shadow-sm"
+              >
+                Feedback {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            )}
 
-          {interview.feedbackScore != null && (
-            <div className="flex items-center gap-0.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/40 px-2 py-0.5 rounded-md">
-              <span>{interview.feedbackScore}</span>
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            </div>
-          )}
+            {!isInterviewer && interview.status !== "CANCELLED" && interview.candidateReviewDidHappen == null && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-3xs font-bold uppercase tracking-wider bg-indigo-600 text-white px-3 py-1.5 border border-indigo-600 hover:bg-transparent hover:text-indigo-600 rounded-md transition-all flex items-center gap-1 shadow-sm"
+              >
+                Review Interviewer {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            )}
+
+            {interview.feedbackScore != null && (
+              <div className="flex items-center gap-0.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/40 px-2 py-0.5 rounded-md">
+                <span>{interview.feedbackScore}</span>
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
