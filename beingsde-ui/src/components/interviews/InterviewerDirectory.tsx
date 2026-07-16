@@ -33,14 +33,14 @@ export function InterviewerDirectory({ directory, onSimulate }: InterviewerDirec
   const getExperienceColor = (level: string) => {
     switch (level) {
       case "STAFF":
-        return "border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400";
+        return "bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300";
       case "SENIOR":
-        return "border-indigo-200 dark:border-indigo-900 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400";
+        return "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-800 dark:text-indigo-300";
       case "MID_LEVEL":
-        return "border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400";
+        return "bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300";
       case "ENTRY_LEVEL":
       default:
-        return "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 text-zinc-600 dark:text-zinc-400";
+        return "bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-300";
     }
   };
 
@@ -98,32 +98,41 @@ export function InterviewerDirectory({ directory, onSimulate }: InterviewerDirec
           {filteredDirectory.map((p) => (
             <div
               key={p.id}
-              className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/60 p-5 rounded-lg flex flex-col justify-between gap-4 hover:shadow-md transition-shadow duration-200"
+              className="group border border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-950 p-5 rounded-xl flex flex-col justify-between gap-5 hover:shadow-lg hover:border-zinc-300 dark:hover:border-zinc-700 transition-all duration-300"
             >
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-start justify-between">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-sm font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-1.5">
-                      {p.name}
-                      <BadgeCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                    </h3>
-                    <span className={`text-3xs font-mono font-bold px-2 py-0.5 border rounded-full w-max ${getExperienceColor(p.experienceLevel)}`}>
-                      {p.experienceLevel.replace("_", " ")}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
+                      <img 
+                        src={`https://api.dicebear.com/7.x/notionists/svg?seed=${p.name}`} 
+                        alt={p.name} 
+                        className="w-11 h-11 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
+                      />
+                      <BadgeCheck className="absolute -bottom-1 -right-1 w-4 h-4 text-blue-500 bg-white dark:bg-zinc-950 rounded-full" />
+                    </div>
+                    <div className="flex flex-col">
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                        {p.name}
+                      </h3>
+                      <span className={`mt-0.5 text-xs font-semibold px-2 py-0.5 rounded w-max ${getExperienceColor(p.experienceLevel)}`}>
+                        {p.experienceLevel.replace("_", " ")}
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1 text-2xs font-semibold text-zinc-500">
+                  <div className="flex items-center gap-1 text-xs font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded-md">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     <span>{p.averageRating ? `${p.averageRating} (${p.interviewsConducted})` : "New"}</span>
                   </div>
                 </div>
 
                 {p.topics && p.topics.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {p.topics.map((topic) => (
                       <span
                         key={topic}
-                        className="text-3xs font-mono px-2 py-0.5 border border-zinc-200 dark:border-zinc-800 text-zinc-500 bg-zinc-100 dark:bg-zinc-800/40 rounded-sm"
+                        className="text-xs font-medium px-2.5 py-1 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900/50 rounded-md"
                       >
                         {topic}
                       </span>
@@ -132,53 +141,51 @@ export function InterviewerDirectory({ directory, onSimulate }: InterviewerDirec
                 )}
 
                 {p.bio && (
-                  <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">{p.bio}</p>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">{p.bio}</p>
                 )}
 
                 {((p.availabilitySlots && p.availabilitySlots.length > 0) || p.availabilityText) && (
-                  <div className="flex flex-col gap-1 mt-1 p-2 bg-zinc-100/50 dark:bg-zinc-950/20 border border-zinc-200/40 dark:border-zinc-800/40 rounded-md">
-                    <span className="text-3xs font-mono font-bold uppercase text-zinc-400 flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5" /> Availability
-                    </span>
-                    <span className="text-3xs text-zinc-500 font-medium">
+                  <div className="flex items-start gap-2 text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900/30 p-2.5 rounded-lg border border-zinc-100 dark:border-zinc-800/50">
+                    <Clock className="w-4 h-4 mt-0.5 shrink-0 text-zinc-400" />
+                    <div className="flex flex-col">
                       {p.availabilitySlots && p.availabilitySlots.length > 0 && (
-                        <span className="capitalize block mb-0.5 font-mono">
+                        <span className="capitalize font-medium">
                           {p.availabilitySlots.map(s => s.toLowerCase().replace("_", " ")).join(", ")}
                         </span>
                       )}
                       {p.availabilityText && (
-                        <span className="italic block text-zinc-400">
+                        <span className="italic text-zinc-500">
                           {p.availabilityText}
                         </span>
                       )}
-                    </span>
+                    </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-zinc-200/50 dark:border-zinc-850">
+              <div className="flex flex-col sm:flex-row items-center gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800/50 mt-auto">
                 {p.calendlyLink && (
                   <a
                     href={p.calendlyLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 text-3xs font-bold uppercase tracking-wider bg-transparent text-zinc-800 dark:text-zinc-200 px-3 py-2 border border-zinc-300 dark:border-zinc-700 hover:border-zinc-950 dark:hover:border-zinc-300 rounded-md transition-colors"
+                    className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 px-4 py-2 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                   >
                     {p.calendlyLink.includes("calendly.com")
-                      ? "Book via Calendly"
+                      ? "Calendly"
                       : p.calendlyLink.includes("cal.com")
-                      ? "Book via Cal.com"
+                      ? "Cal.com"
                       : p.calendlyLink.includes("jit.si")
-                      ? "Join Jitsi Room"
+                      ? "Jitsi Room"
                       : "Book Session"}
-                    <ExternalLink className="w-3 h-3" />
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
                 <button
                   onClick={() => onSimulate(p)}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 text-3xs font-bold uppercase tracking-wider bg-zinc-950 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-950 px-3 py-2 border border-zinc-950 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-950 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all rounded-md shadow-sm"
+                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
                 >
-                  Simulate Session
+                  Simulate
                 </button>
               </div>
             </div>
