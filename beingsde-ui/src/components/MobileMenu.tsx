@@ -31,6 +31,7 @@ export default function MobileMenu() {
   const links = [
     { href: "/topics", label: "HLD" },
     { href: "/lld", label: "LLD" },
+    { href: "/fde", label: "FDE" },
     { href: "/questions", label: "TOP HLD Questions" },
     { href: "/dsa", label: "DSA" },
     { href: "/interviews", label: "Mock Interviews" },
