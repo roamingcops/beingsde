@@ -45,6 +45,11 @@ public class AuthController {
                     .body(Map.of("message", "Email address already in use"));
         }
 
+        // Assign a random default avatar
+        int randomAvatarNum = new java.util.Random().nextInt(10) + 1;
+        User.Profile defaultProfile = new User.Profile();
+        defaultProfile.setAvatarUrl("/avatars/avatar-" + randomAvatarNum + ".png");
+
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -52,6 +57,7 @@ public class AuthController {
                 .role(UserRole.FREE_USER)
                 .emailVerified(false)
                 .verificationToken(UUID.randomUUID().toString())
+                .profile(defaultProfile)
                 .isDeleted(false)
                 .build();
 

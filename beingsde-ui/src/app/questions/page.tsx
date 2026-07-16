@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Search, 
-  ChevronDown, 
-  ChevronUp, 
-  Database, 
-  Cpu, 
-  Shield, 
-  Network, 
-  HelpCircle, 
-  Sliders, 
+import {
+  Search,
+  ChevronDown,
+  ChevronUp,
+  Database,
+  Cpu,
+  Shield,
+  Network,
+  HelpCircle,
+  Sliders,
   ArrowUpRight,
   Info,
   AlertTriangle,
@@ -585,11 +585,11 @@ export default function QuestionsPage() {
             Snowflake IDs are time-sortable, 64-bit integers structured as follows:
           </p>
           <div className="bg-zinc-100 dark:bg-zinc-900 p-3 rounded-sm font-mono text-2xs flex flex-wrap gap-2 justify-between border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400">
-            <div>Sign Bit (1b)<br/><span className="text-zinc-400">0</span></div>
-            <div>Timestamp (41b)<br/><span className="text-zinc-400">Milliseconds Epoch (~69 yrs)</span></div>
-            <div>Datacenter ID (5b)<br/><span className="text-zinc-400">Up to 32 centers</span></div>
-            <div>Worker Node ID (5b)<br/><span className="text-zinc-400">Up to 32 servers</span></div>
-            <div>Sequence Number (12b)<br/><span className="text-zinc-400">Up to 4096 ids/ms</span></div>
+            <div>Sign Bit (1b)<br /><span className="text-zinc-400">0</span></div>
+            <div>Timestamp (41b)<br /><span className="text-zinc-400">Milliseconds Epoch (~69 yrs)</span></div>
+            <div>Datacenter ID (5b)<br /><span className="text-zinc-400">Up to 32 centers</span></div>
+            <div>Worker Node ID (5b)<br /><span className="text-zinc-400">Up to 32 servers</span></div>
+            <div>Sequence Number (12b)<br /><span className="text-zinc-400">Up to 4096 ids/ms</span></div>
           </div>
 
           <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-200 mt-3">Why this design is premium:</h4>
@@ -734,7 +734,7 @@ export default function QuestionsPage() {
             PACELC goes further by evaluating normal operating conditions when there is no network partition:
           </p>
           <div className="bg-zinc-100 dark:bg-zinc-950 p-4 border border-zinc-200 dark:border-zinc-800 rounded-sm font-mono text-xs text-zinc-600 dark:text-zinc-400">
-            <strong>If there is a Partition (P):</strong> Choose Availability (A) vs. Consistency (C).<br/>
+            <strong>If there is a Partition (P):</strong> Choose Availability (A) vs. Consistency (C).<br />
             <strong>Else (E):</strong> Choose Latency (L) vs. Consistency (C).
           </div>
 
@@ -877,17 +877,17 @@ export default function QuestionsPage() {
   ];
 
   const filteredQuestions = questions.filter((q) => {
-    const matchesSearch = 
+    const matchesSearch =
       q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       q.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = 
+    const matchesCategory =
       selectedCategory === "ALL" || q.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   return (
     <div className="flex flex-col gap-10 py-6 max-w-5xl mx-auto">
-      
+
       {/* HEADER SECTION */}
       <section className="flex flex-col gap-4">
         <div>
@@ -900,12 +900,12 @@ export default function QuestionsPage() {
         </div>
 
         {/* SEARCH AND FILTERS */}
-        <div className="flex flex-col gap-4 mt-2">
+        <div className="flex flex-col md:flex-row gap-4 mt-2">
           {/* Search Box */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Search questions (e.g. WebSockets, Sharding, DynamoDB)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -924,11 +924,10 @@ export default function QuestionsPage() {
                     setSelectedCategory(cat.id);
                     setExpandedIndex(null); // Reset open accordion to prevent layout confusion
                   }}
-                  className={`text-2xs font-semibold px-3 py-1.5 border uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 rounded-sm cursor-pointer ${
-                    selectedCategory === cat.id 
-                      ? "bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100" 
+                  className={`text-2xs font-semibold px-3 py-1.5 border uppercase tracking-wider flex items-center gap-1.5 transition-all duration-300 rounded-sm cursor-pointer ${selectedCategory === cat.id
+                      ? "bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100"
                       : "bg-white dark:bg-[#18181b] text-zinc-500 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-3 h-3" />
                   {cat.label}
@@ -945,13 +944,12 @@ export default function QuestionsPage() {
           filteredQuestions.map((q, index) => {
             const isExpanded = expandedIndex === index;
             return (
-              <div 
+              <div
                 key={q.id}
-                className={`border rounded-sm bg-white dark:bg-[#18181b] transition-all duration-300 overflow-hidden ${
-                  isExpanded 
-                    ? "border-zinc-900 dark:border-zinc-100 shadow-md" 
+                className={`border rounded-sm bg-white dark:bg-[#18181b] transition-all duration-300 overflow-hidden ${isExpanded
+                    ? "border-zinc-900 dark:border-zinc-100 shadow-md"
                     : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
-                }`}
+                  }`}
               >
                 {/* Header/Summary Card Trigger */}
                 <button
@@ -964,11 +962,10 @@ export default function QuestionsPage() {
                       <span className="text-zinc-300 dark:text-zinc-700">&bull;</span>
                       <span className="text-zinc-500">{q.category}</span>
                       <span className="text-zinc-300 dark:text-zinc-700">&bull;</span>
-                      <span className={`px-1.5 py-0.5 border rounded-sm ${
-                        q.difficulty === "Easy" ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/5" :
-                        q.difficulty === "Medium" ? "text-amber-500 border-amber-500/20 bg-amber-500/5" :
-                        "text-rose-500 border-rose-500/20 bg-rose-500/5"
-                      }`}>
+                      <span className={`px-1.5 py-0.5 border rounded-sm ${q.difficulty === "Easy" ? "text-emerald-500 border-emerald-500/20 bg-emerald-500/5" :
+                          q.difficulty === "Medium" ? "text-amber-500 border-amber-500/20 bg-amber-500/5" :
+                            "text-rose-500 border-rose-500/20 bg-rose-500/5"
+                        }`}>
                         {q.difficulty}
                       </span>
                     </div>
@@ -985,10 +982,9 @@ export default function QuestionsPage() {
                 </button>
 
                 {/* Collapsible Answer Body */}
-                <div 
-                  className={`transition-all duration-500 ease-in-out border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 ${
-                    isExpanded ? "max-h-[2500px] p-6 opacity-100 animate-fadeIn" : "max-h-0 opacity-0 pointer-events-none"
-                  }`}
+                <div
+                  className={`transition-all duration-500 ease-in-out border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/30 dark:bg-zinc-900/10 ${isExpanded ? "max-h-[2500px] p-6 opacity-100 animate-fadeIn" : "max-h-0 opacity-0 pointer-events-none"
+                    }`}
                 >
                   {isExpanded && q.content}
                 </div>
@@ -1028,7 +1024,7 @@ export default function QuestionsPage() {
           </div>
         </div>
       </section>
-      
+
     </div>
   );
 }
