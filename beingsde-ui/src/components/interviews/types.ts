@@ -27,5 +27,10 @@ export interface Interview {
   meetingLink: string;
   feedbackScore: number | null;
   feedbackNotes: string | null;
+  candidateReviewDidHappen: boolean | null;
+  candidateReviewDsa: number | null;
+  candidateReviewSystemDesign: number | null;
+  candidateReviewCommunication: number | null;
+  candidateReviewNotes: string | null;
   createdAt: string;
 }

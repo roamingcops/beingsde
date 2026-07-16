@@ -17,6 +17,13 @@ public class InterviewResponse {
     private String meetingLink;
     private Integer feedbackScore;
     private String feedbackNotes;
+    
+    private Boolean candidateReviewDidHappen;
+    private Integer candidateReviewDsa;
+    private Integer candidateReviewSystemDesign;
+    private Integer candidateReviewCommunication;
+    private String candidateReviewNotes;
+    
     private Instant createdAt;
 
     public InterviewResponse() {}
@@ -24,7 +31,10 @@ public class InterviewResponse {
     public InterviewResponse(String id, String interviewerId, String interviewerName, String interviewerEmail,
                              String candidateId, String candidateName, String candidateEmail, String topic,
                              InterviewStatus status, Instant scheduledAt, String meetingLink,
-                             Integer feedbackScore, String feedbackNotes, Instant createdAt) {
+                             Integer feedbackScore, String feedbackNotes,
+                             Boolean candidateReviewDidHappen, Integer candidateReviewDsa,
+                             Integer candidateReviewSystemDesign, Integer candidateReviewCommunication,
+                             String candidateReviewNotes, Instant createdAt) {
         this.id = id;
         this.interviewerId = interviewerId;
         this.interviewerName = interviewerName;
@@ -38,6 +48,11 @@ public class InterviewResponse {
         this.meetingLink = meetingLink;
         this.feedbackScore = feedbackScore;
         this.feedbackNotes = feedbackNotes;
+        this.candidateReviewDidHappen = candidateReviewDidHappen;
+        this.candidateReviewDsa = candidateReviewDsa;
+        this.candidateReviewSystemDesign = candidateReviewSystemDesign;
+        this.candidateReviewCommunication = candidateReviewCommunication;
+        this.candidateReviewNotes = candidateReviewNotes;
         this.createdAt = createdAt;
     }
 
@@ -79,6 +94,21 @@ public class InterviewResponse {
 
     public String getFeedbackNotes() { return feedbackNotes; }
     public void setFeedbackNotes(String feedbackNotes) { this.feedbackNotes = feedbackNotes; }
+    
+    public Boolean getCandidateReviewDidHappen() { return candidateReviewDidHappen; }
+    public void setCandidateReviewDidHappen(Boolean candidateReviewDidHappen) { this.candidateReviewDidHappen = candidateReviewDidHappen; }
+    
+    public Integer getCandidateReviewDsa() { return candidateReviewDsa; }
+    public void setCandidateReviewDsa(Integer candidateReviewDsa) { this.candidateReviewDsa = candidateReviewDsa; }
+    
+    public Integer getCandidateReviewSystemDesign() { return candidateReviewSystemDesign; }
+    public void setCandidateReviewSystemDesign(Integer candidateReviewSystemDesign) { this.candidateReviewSystemDesign = candidateReviewSystemDesign; }
+    
+    public Integer getCandidateReviewCommunication() { return candidateReviewCommunication; }
+    public void setCandidateReviewCommunication(Integer candidateReviewCommunication) { this.candidateReviewCommunication = candidateReviewCommunication; }
+    
+    public String getCandidateReviewNotes() { return candidateReviewNotes; }
+    public void setCandidateReviewNotes(String candidateReviewNotes) { this.candidateReviewNotes = candidateReviewNotes; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

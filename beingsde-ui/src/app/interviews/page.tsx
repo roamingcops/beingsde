@@ -24,6 +24,7 @@ export default function InterviewsPage() {
     bookInterview,
     cancelInterview,
     submitFeedback,
+    submitCandidateReview,
   } = useInterviews();
 
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -91,6 +92,7 @@ export default function InterviewsPage() {
               interviews={interviews}
               onCancel={cancelInterview}
               onSubmitFeedback={submitFeedback}
+              onSubmitCandidateReview={submitCandidateReview}
             />
           </div>
         </div>

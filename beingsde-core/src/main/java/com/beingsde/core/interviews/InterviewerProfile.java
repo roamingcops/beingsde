@@ -33,6 +33,9 @@ public class InterviewerProfile {
 
     private String availabilityText;
 
+    private Integer totalReviews = 0;
+    private Double averageRatingOverall = 0.0;
+
     @CreatedDate
     private Instant createdAt;
 
@@ -41,7 +44,8 @@ public class InterviewerProfile {
 
     public InterviewerProfile(String id, String userId, String name, List<String> topics,
                               ExperienceLevel experienceLevel, String bio, String calendlyLink,
-                              boolean isAvailable, List<String> availabilitySlots, String availabilityText, Instant createdAt) {
+                              boolean isAvailable, List<String> availabilitySlots, String availabilityText,
+                              Integer totalReviews, Double averageRatingOverall, Instant createdAt) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -52,6 +56,8 @@ public class InterviewerProfile {
         this.isAvailable = isAvailable;
         this.availabilitySlots = availabilitySlots;
         this.availabilityText = availabilityText;
+        this.totalReviews = totalReviews != null ? totalReviews : 0;
+        this.averageRatingOverall = averageRatingOverall != null ? averageRatingOverall : 0.0;
         this.createdAt = createdAt;
     }
 
@@ -75,6 +81,13 @@ public class InterviewerProfile {
     public void setAvailabilitySlots(List<String> availabilitySlots) { this.availabilitySlots = availabilitySlots; }
     public String getAvailabilityText() { return availabilityText; }
     public void setAvailabilityText(String availabilityText) { this.availabilityText = availabilityText; }
+    
+    public Integer getTotalReviews() { return totalReviews; }
+    public void setTotalReviews(Integer totalReviews) { this.totalReviews = totalReviews; }
+    
+    public Double getAverageRatingOverall() { return averageRatingOverall; }
+    public void setAverageRatingOverall(Double averageRatingOverall) { this.averageRatingOverall = averageRatingOverall; }
+    
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
@@ -93,6 +106,8 @@ public class InterviewerProfile {
         private boolean isAvailable;
         private List<String> availabilitySlots;
         private String availabilityText;
+        private Integer totalReviews;
+        private Double averageRatingOverall;
         private Instant createdAt;
 
         InterviewerProfileBuilder() {}
@@ -107,10 +122,12 @@ public class InterviewerProfile {
         public InterviewerProfileBuilder isAvailable(boolean isAvailable) { this.isAvailable = isAvailable; return this; }
         public InterviewerProfileBuilder availabilitySlots(List<String> availabilitySlots) { this.availabilitySlots = availabilitySlots; return this; }
         public InterviewerProfileBuilder availabilityText(String availabilityText) { this.availabilityText = availabilityText; return this; }
+        public InterviewerProfileBuilder totalReviews(Integer totalReviews) { this.totalReviews = totalReviews; return this; }
+        public InterviewerProfileBuilder averageRatingOverall(Double averageRatingOverall) { this.averageRatingOverall = averageRatingOverall; return this; }
         public InterviewerProfileBuilder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
 
         public InterviewerProfile build() {
-            return new InterviewerProfile(id, userId, name, topics, experienceLevel, bio, calendlyLink, isAvailable, availabilitySlots, availabilityText, createdAt);
+            return new InterviewerProfile(id, userId, name, topics, experienceLevel, bio, calendlyLink, isAvailable, availabilitySlots, availabilityText, totalReviews, averageRatingOverall, createdAt);
         }
     }
 }

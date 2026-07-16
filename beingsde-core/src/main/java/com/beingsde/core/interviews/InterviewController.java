@@ -139,6 +139,27 @@ public class InterviewController {
         }
     }
 
+    @PostMapping("/{id}/candidate-review")
+    @RequiresPremium
+    public ResponseEntity<?> submitCandidateReview(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> body) {
+        String email = getCurrentUserEmail();
+        Boolean didHappen = (Boolean) body.get("didHappen");
+        Integer dsa = body.get("dsa") != null ? ((Number) body.get("dsa")).intValue() : null;
+        Integer systemDesign = body.get("systemDesign") != null ? ((Number) body.get("systemDesign")).intValue() : null;
+        Integer communication = body.get("communication") != null ? ((Number) body.get("communication")).intValue() : null;
+        String notes = (String) body.get("notes");
+
+        try {
+            Interview interview = interviewService.submitCandidateReview(id, email, didHappen, dsa, systemDesign, communication, notes);
+            return ResponseEntity.ok(interview);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/calendly-webhook")
     public ResponseEntity<?> calendlyWebhook(@RequestHeader(value = "Calendly-Webhook-Signature", required = false) String signature,
                                              @RequestBody Map<String, Object> body) {

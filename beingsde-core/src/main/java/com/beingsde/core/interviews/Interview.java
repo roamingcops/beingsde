@@ -30,6 +30,12 @@ public class Interview {
 
     private String feedbackNotes;
 
+    private Boolean candidateReviewDidHappen;
+    private Integer candidateReviewDsa;
+    private Integer candidateReviewSystemDesign;
+    private Integer candidateReviewCommunication;
+    private String candidateReviewNotes;
+
     @CreatedDate
     private Instant createdAt;
 
@@ -37,8 +43,10 @@ public class Interview {
     }
 
     public Interview(String id, String interviewerId, String candidateId, String topic,
-                     InterviewStatus status, Instant scheduledAt, String meetingLink,
-                     Integer feedbackScore, String feedbackNotes, Instant createdAt) {
+                     Integer feedbackScore, String feedbackNotes,
+                     Boolean candidateReviewDidHappen, Integer candidateReviewDsa,
+                     Integer candidateReviewSystemDesign, Integer candidateReviewCommunication,
+                     String candidateReviewNotes, Instant createdAt) {
         this.id = id;
         this.interviewerId = interviewerId;
         this.candidateId = candidateId;
@@ -48,6 +56,11 @@ public class Interview {
         this.meetingLink = meetingLink;
         this.feedbackScore = feedbackScore;
         this.feedbackNotes = feedbackNotes;
+        this.candidateReviewDidHappen = candidateReviewDidHappen;
+        this.candidateReviewDsa = candidateReviewDsa;
+        this.candidateReviewSystemDesign = candidateReviewSystemDesign;
+        this.candidateReviewCommunication = candidateReviewCommunication;
+        this.candidateReviewNotes = candidateReviewNotes;
         this.createdAt = createdAt;
     }
 
@@ -69,6 +82,22 @@ public class Interview {
     public void setFeedbackScore(Integer feedbackScore) { this.feedbackScore = feedbackScore; }
     public String getFeedbackNotes() { return feedbackNotes; }
     public void setFeedbackNotes(String feedbackNotes) { this.feedbackNotes = feedbackNotes; }
+    
+    public Boolean getCandidateReviewDidHappen() { return candidateReviewDidHappen; }
+    public void setCandidateReviewDidHappen(Boolean candidateReviewDidHappen) { this.candidateReviewDidHappen = candidateReviewDidHappen; }
+    
+    public Integer getCandidateReviewDsa() { return candidateReviewDsa; }
+    public void setCandidateReviewDsa(Integer candidateReviewDsa) { this.candidateReviewDsa = candidateReviewDsa; }
+    
+    public Integer getCandidateReviewSystemDesign() { return candidateReviewSystemDesign; }
+    public void setCandidateReviewSystemDesign(Integer candidateReviewSystemDesign) { this.candidateReviewSystemDesign = candidateReviewSystemDesign; }
+    
+    public Integer getCandidateReviewCommunication() { return candidateReviewCommunication; }
+    public void setCandidateReviewCommunication(Integer candidateReviewCommunication) { this.candidateReviewCommunication = candidateReviewCommunication; }
+    
+    public String getCandidateReviewNotes() { return candidateReviewNotes; }
+    public void setCandidateReviewNotes(String candidateReviewNotes) { this.candidateReviewNotes = candidateReviewNotes; }
+    
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
@@ -86,6 +115,13 @@ public class Interview {
         private String meetingLink;
         private Integer feedbackScore;
         private String feedbackNotes;
+        
+        private Boolean candidateReviewDidHappen;
+        private Integer candidateReviewDsa;
+        private Integer candidateReviewSystemDesign;
+        private Integer candidateReviewCommunication;
+        private String candidateReviewNotes;
+        
         private Instant createdAt;
 
         InterviewBuilder() {}
@@ -99,11 +135,19 @@ public class Interview {
         public InterviewBuilder meetingLink(String meetingLink) { this.meetingLink = meetingLink; return this; }
         public InterviewBuilder feedbackScore(Integer feedbackScore) { this.feedbackScore = feedbackScore; return this; }
         public InterviewBuilder feedbackNotes(String feedbackNotes) { this.feedbackNotes = feedbackNotes; return this; }
+        
+        public InterviewBuilder candidateReviewDidHappen(Boolean candidateReviewDidHappen) { this.candidateReviewDidHappen = candidateReviewDidHappen; return this; }
+        public InterviewBuilder candidateReviewDsa(Integer candidateReviewDsa) { this.candidateReviewDsa = candidateReviewDsa; return this; }
+        public InterviewBuilder candidateReviewSystemDesign(Integer candidateReviewSystemDesign) { this.candidateReviewSystemDesign = candidateReviewSystemDesign; return this; }
+        public InterviewBuilder candidateReviewCommunication(Integer candidateReviewCommunication) { this.candidateReviewCommunication = candidateReviewCommunication; return this; }
+        public InterviewBuilder candidateReviewNotes(String candidateReviewNotes) { this.candidateReviewNotes = candidateReviewNotes; return this; }
+        
         public InterviewBuilder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
 
         public Interview build() {
             return new Interview(id, interviewerId, candidateId, topic, status, scheduledAt, meetingLink,
-                    feedbackScore, feedbackNotes, createdAt);
+                    feedbackScore, feedbackNotes, candidateReviewDidHappen, candidateReviewDsa, 
+                    candidateReviewSystemDesign, candidateReviewCommunication, candidateReviewNotes, createdAt);
         }
     }
 }

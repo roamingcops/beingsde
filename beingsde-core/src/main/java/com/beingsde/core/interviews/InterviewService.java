@@ -52,22 +52,7 @@ public class InterviewService {
     }
 
     private ProfileResponse mapProfileToResponse(InterviewerProfile profile) {
-        List<Interview> conducted = interviewRepo.findByInterviewerIdAndStatus(profile.getUserId(), InterviewStatus.COMPLETED);
-        int count = conducted.size();
-        double avg = 0.0;
-        if (count > 0) {
-            double sum = 0;
-            int ratedCount = 0;
-            for (Interview i : conducted) {
-                if (i.getFeedbackScore() != null) {
-                    sum += i.getFeedbackScore();
-                    ratedCount++;
-                }
-            }
-            avg = ratedCount > 0 ? sum / ratedCount : 0.0;
-        }
-        avg = Math.round(avg * 10.0) / 10.0;
-        return ProfileResponse.fromProfile(profile, avg, count);
+        return ProfileResponse.fromProfile(profile, profile.getAverageRatingOverall(), profile.getTotalReviews());
     }
 
     private InterviewResponse mapInterviewToResponse(Interview interview) {
@@ -106,6 +91,11 @@ public class InterviewService {
                 interview.getMeetingLink(),
                 interview.getFeedbackScore(),
                 interview.getFeedbackNotes(),
+                interview.getCandidateReviewDidHappen(),
+                interview.getCandidateReviewDsa(),
+                interview.getCandidateReviewSystemDesign(),
+                interview.getCandidateReviewCommunication(),
+                interview.getCandidateReviewNotes(),
                 interview.getCreatedAt()
         );
     }
@@ -317,6 +307,62 @@ public class InterviewService {
                     this, candidate.getEmail(), candidate.getName(),
                     user.getName(), interview.getTopic(), score, notes
             ));
+        }
+
+        return saved;
+    }
+
+    @Transactional
+    public Interview submitCandidateReview(String interviewId, String email, Boolean didHappen,
+                                           Integer dsa, Integer systemDesign, Integer communication, String notes) {
+        User user = resolveUser(email);
+        Interview interview = interviewRepo.findById(interviewId)
+                .orElseThrow(() -> new RuntimeException("Interview not found: " + interviewId));
+
+        if (!interview.getCandidateId().equals(user.getId())) {
+            throw new RuntimeException("Only the candidate can submit a review for the interviewer");
+        }
+
+        if (interview.getCandidateReviewDidHappen() != null) {
+            throw new RuntimeException("You have already submitted a review for this interview");
+        }
+
+        if (interview.getScheduledAt().isAfter(Instant.now()) && interview.getStatus() != InterviewStatus.COMPLETED) {
+            throw new RuntimeException("You cannot submit a review before the interview has occurred");
+        }
+
+        interview.setCandidateReviewDidHappen(didHappen);
+        interview.setCandidateReviewDsa(dsa);
+        interview.setCandidateReviewSystemDesign(systemDesign);
+        interview.setCandidateReviewCommunication(communication);
+        interview.setCandidateReviewNotes(notes);
+        
+        Interview saved = interviewRepo.save(interview);
+
+        InterviewerProfile profile = profileRepo.findByUserId(interview.getInterviewerId()).orElse(null);
+        if (profile != null) {
+            List<Interview> allInterviews = interviewRepo.findByInterviewerIdOrderByCreatedAtDesc(interview.getInterviewerId());
+            int totalReviews = 0;
+            double sumRatings = 0;
+            
+            for (Interview i : allInterviews) {
+                if (i.getCandidateReviewDidHappen() != null && i.getCandidateReviewDidHappen()) {
+                    double avgScore = 0.0;
+                    int subCount = 0;
+                    if (i.getCandidateReviewDsa() != null) { avgScore += i.getCandidateReviewDsa(); subCount++; }
+                    if (i.getCandidateReviewSystemDesign() != null) { avgScore += i.getCandidateReviewSystemDesign(); subCount++; }
+                    if (i.getCandidateReviewCommunication() != null) { avgScore += i.getCandidateReviewCommunication(); subCount++; }
+                    
+                    if (subCount > 0) {
+                        sumRatings += (avgScore / subCount);
+                        totalReviews++;
+                    }
+                }
+            }
+            
+            profile.setTotalReviews(totalReviews);
+            profile.setAverageRatingOverall(totalReviews > 0 ? Math.round((sumRatings / totalReviews) * 10.0) / 10.0 : 0.0);
+            profileRepo.save(profile);
         }
 
         return saved;

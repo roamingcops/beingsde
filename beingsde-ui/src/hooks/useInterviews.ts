@@ -167,6 +167,36 @@ export function useInterviews() {
     }
   };
 
+  const submitCandidateReview = async (
+    interviewId: string,
+    didHappen: boolean,
+    dsa: number | null,
+    systemDesign: number | null,
+    communication: number | null,
+    notes: string
+  ) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const res = await sessionAwareFetch(`${API_BASE}/${interviewId}/candidate-review`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ didHappen, dsa, systemDesign, communication, notes }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to submit review");
+      }
+      await loadData();
+    } catch (err: any) {
+      setError(err.message || "Network error submitting review");
+      throw err;
+    }
+  };
+
   return {
     loading,
     authStatus,
@@ -181,5 +211,6 @@ export function useInterviews() {
     bookInterview,
     cancelInterview,
     submitFeedback,
+    submitCandidateReview,
   };
 }
