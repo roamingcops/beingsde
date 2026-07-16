@@ -20,6 +20,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      if (localStorage.getItem("accessToken")) {
+        router.push("/topics");
+        return;
+      }
+
       const params = new URLSearchParams(window.location.search);
       if (params.get("registered") === "true") {
         setTimeout(() => setIsRegistered(true), 0);

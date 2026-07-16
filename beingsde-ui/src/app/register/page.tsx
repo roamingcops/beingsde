@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { KeyRound, Mail, AlertTriangle, User, Eye, EyeOff, CheckCircle2, Circle } from "lucide-react";
@@ -66,6 +66,12 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem("accessToken")) {
+      router.push("/topics");
+    }
+  }, [router]);
 
   const passwordsMatch = confirmPassword === "" || password === confirmPassword;
 
