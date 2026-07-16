@@ -72,12 +72,19 @@ export default function InterviewsPage() {
       <div className="relative">
         {/* Workspace Grid */}
         <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 items-start transition-all duration-500 ${authStatus !== "premium" ? "opacity-40 select-none pointer-events-none blur-[2px]" : ""}`}>
-          {/* Left Column: Interviewer Panel */}
+          {/* Left Column: Interviewer Panel & My Interviews */}
           <div className="lg:col-span-5 flex flex-col gap-6">
             <InterviewerConsole
               profile={profile}
               onSave={saveProfile}
               onStopOffering={stopOffering}
+            />
+
+            <MyInterviews
+              interviews={interviews}
+              onCancel={cancelInterview}
+              onSubmitFeedback={submitFeedback}
+              onSubmitCandidateReview={submitCandidateReview}
             />
           </div>
 
@@ -86,13 +93,6 @@ export default function InterviewsPage() {
             <InterviewerDirectory
               directory={directory}
               onSimulate={openBookingModal}
-            />
-
-            <MyInterviews
-              interviews={interviews}
-              onCancel={cancelInterview}
-              onSubmitFeedback={submitFeedback}
-              onSubmitCandidateReview={submitCandidateReview}
             />
           </div>
         </div>
