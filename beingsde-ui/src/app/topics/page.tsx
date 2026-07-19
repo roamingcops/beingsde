@@ -26,10 +26,8 @@ export default function TopicsExplorer() {
         const res = await sessionAwareFetch(`${API_BASE}/topics`, { headers });
         if (res.ok) {
           const data = await res.json();
-          if (data.content && data.content.length > 0) {
-            // Merge with local mock metadata to retain premium flag configuration details
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const merged = data.content.map((t: any) => {
+            const activeTopics = data.content.filter((t: any) => !t.isArchived);
+            const merged = activeTopics.map((t: any) => {
               const mockMatch = MOCK_TOPICS.find(m => m.slug === t.slug);
               return {
                 ...t,
@@ -39,7 +37,6 @@ export default function TopicsExplorer() {
               };
             });
             setTopics(merged);
-          }
         }
       } catch {
         // Fallback silently to mock details if server is down

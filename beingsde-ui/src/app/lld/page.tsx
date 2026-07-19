@@ -2,7 +2,7 @@
 
 // Rebuild trigger: 2026-07-02
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, AlertTriangle, Boxes } from "lucide-react";
 
@@ -30,8 +30,30 @@ interface LLDQuestion {
 export default function LldPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState("ALL");
+  const [questions, setQuestions] = useState<LLDQuestion[]>(lldQuestions as LLDQuestion[]);
 
-  const filtered = (lldQuestions as LLDQuestion[]).filter((q) => {
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
+        const res = await fetch(`${API_BASE}/lld`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            const activeQuestions = data.filter((q: any) => !q.isArchived);
+            if (activeQuestions.length > 0) {
+              setQuestions(activeQuestions);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load live LLD questions, using fallback.", e);
+      }
+    };
+    fetchQuestions();
+  }, []);
+
+  const filtered = questions.filter((q) => {
     const matchesSearch =
       q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       q.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -63,7 +85,7 @@ export default function LldPage() {
         <div className="flex gap-4 mt-4">
           <div className="flex items-center gap-2">
             <span className="text-xl font-black font-mono text-blue-600 dark:text-blue-400">
-              {lldQuestions.length}
+              {questions.length}
             </span>
             <span className="text-xs text-zinc-500 dark:text-zinc-400">Standard Problems</span>
           </div>

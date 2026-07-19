@@ -7,4 +7,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmail(String email);
     Optional<User> findByVerificationToken(String token);
     Optional<User> findByResetPasswordToken(String token);
+    long countByRole(UserRole role);
 }
+

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Clock, CheckCircle2, Code2, AlertTriangle, Boxes } from "lucide-react";
 
@@ -29,8 +29,27 @@ export default function LldDetailPage({ params }: { params: Promise<{ slug: stri
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
   const [selectedLang, setSelectedLang] = useState<"java" | "cpp" | "python">("java");
+  const [question, setQuestion] = useState<LLDQuestion>(
+    (lldQuestions as LLDQuestion[]).find((q) => q.slug === slug) || (lldQuestions[0] as LLDQuestion)
+  );
 
-  const question = (lldQuestions as LLDQuestion[]).find((q) => q.slug === slug) || lldQuestions[0];
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      try {
+        const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
+        const res = await fetch(`${API_BASE}/lld/${slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            setQuestion(data);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to fetch live LLD detail, using static fallback", e);
+      }
+    };
+    fetchQuestion();
+  }, [slug]);
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto py-6 px-4">

@@ -12,16 +12,32 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
   const slug = resolvedParams.slug;
   
   const [activeTab, setActiveTab] = useState<"notes" | "video" | "pdf">("notes");
+  const [topic, setTopic] = useState<any>(() => MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1]);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const isLocked = false;
   
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     setIsPremiumUser(role === "PREMIUM_USER" || role === "ADMIN");
   }, []);
 
-  // Retrieve topic info matching slug
-  const topic = MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1];
-  const isLocked = false;
+  useEffect(() => {
+    const fetchLiveTopic = async () => {
+      try {
+        const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8081").replace(/\/$/, "") + "/api/v1";
+        const res = await fetch(`${API_BASE}/topics/slug/${slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            setTopic(data);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load live topic data, using static fallback", e);
+      }
+    };
+    fetchLiveTopic();
+  }, [slug]);
 
   return (
     <div className="flex flex-col gap-8 max-w-5xl mx-auto py-4">
@@ -208,7 +224,7 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
             <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md">
               <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">Prerequisites</h3>
               <ul className="flex flex-col gap-3">
-                {topic.prerequisites?.map((prereq) => (
+                {topic.prerequisites?.map((prereq: string) => (
                   <li key={prereq} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
                     <CheckCircle className="w-4 h-4 text-zinc-400 shrink-0" />
                     {prereq}

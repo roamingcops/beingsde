@@ -68,8 +68,17 @@ export default function HeaderAuth() {
   };
 
   if (isAuthenticated) {
+    const isAdminUser = typeof window !== "undefined" && localStorage.getItem("userRole") === "ADMIN";
     return (
       <div className="flex items-center gap-4">
+        {isAdminUser && (
+          <Link 
+            href="/admin" 
+            className="text-2xs font-mono font-bold uppercase tracking-wider text-rose-500 hover:text-rose-600 border border-rose-500/20 dark:border-rose-500/40 px-2 py-1 rounded bg-rose-500/5 hover:bg-rose-500/10 transition-all shrink-0"
+          >
+            Admin Panel
+          </Link>
+        )}
         <Link href="/profile" className="w-9 h-9 rounded-full overflow-hidden border-2 border-transparent hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 shadow-sm">
           {avatarUrl ? (
             <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />

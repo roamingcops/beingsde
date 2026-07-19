@@ -59,10 +59,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/error").permitAll()
-                        .requestMatchers("/api/v1/topics/**").permitAll() 
-                        .requestMatchers("/api/v1/payments/razorpay/webhook").permitAll() 
-                        .requestMatchers("/api/v1/interviews/calendly-webhook", "/api/v1/interviews/test/cleanup").permitAll() 
+                        .requestMatchers("/", "/api/v1/auth/**", "/error").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/topics/**", "/api/v1/lld/**", "/api/v1/dsa/**", "/api/v1/bar-raiser/**", "/api/v1/hld-questions/**").permitAll()
+                        .requestMatchers("/api/v1/payments/razorpay/webhook").permitAll()
+                        .requestMatchers("/api/v1/interviews/calendly-webhook", "/api/v1/interviews/test/cleanup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

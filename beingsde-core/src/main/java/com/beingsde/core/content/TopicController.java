@@ -112,4 +112,24 @@ public class TopicController {
         Topic saved = topicRepository.save(topic);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateTopic(@PathVariable String id, @RequestBody Topic topic) {
+        if (!topicRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        topic.setId(id);
+        return ResponseEntity.ok(topicRepository.save(topic));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> archiveTopic(@PathVariable String id) {
+        Topic topic = topicRepository.findById(id).orElse(null);
+        if (topic == null) return ResponseEntity.notFound().build();
+        topic.setArchived(true);
+        topicRepository.save(topic);
+        return ResponseEntity.ok(Map.of("message", "Topic archived"));
+    }
 }
