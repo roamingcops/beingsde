@@ -228,6 +228,10 @@ export default function RootLayout({
               <Link href="/interviews" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 Mock Interviews
               </Link>
+              <Link href="/bar-raiser" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1">
+                Bar Raiser
+                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-full border border-rose-200 dark:border-rose-800">New</span>
+              </Link>
             </nav>
 
             <div className="flex items-center gap-4">
