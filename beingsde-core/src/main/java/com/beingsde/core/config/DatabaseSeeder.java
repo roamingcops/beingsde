@@ -161,8 +161,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // 7. Seed Bar Raiser Questions
-        if (barRaiserRepository.count() == 0) {
+        if (barRaiserRepository.count() < 7) {
             try {
+                barRaiserRepository.deleteAll();
                 File file = new File("/Users/arnavagarwal/beingsde/beingsde-ui/src/data/bar-raiser.json");
                 if (file.exists()) {
                     List<BarRaiserQuestion> questions = objectMapper.readValue(file, new TypeReference<List<BarRaiserQuestion>>() {});

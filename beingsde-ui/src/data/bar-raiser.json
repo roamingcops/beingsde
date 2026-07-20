@@ -226,5 +226,176 @@
         "keyTakeaway": "Test your failure detection under the exact failure conditions it is supposed to detect. A DR plan that has not been game-day tested is just a false sense of security."
       }
     ]
+  },
+  {
+    "id": 5,
+    "title": "Tell me about a time you had to work on a project with vague or constantly changing requirements with no clear technical direction.",
+    "category": "Ambiguity",
+    "principle": "Are Right, A Lot · Deal with Ambiguity · Invent and Simplify",
+    "why": "Bar Raisers want to see that you do not freeze or complain when requirements are unclear. They evaluate whether you can create clarity from chaos by writing RFCs, building fast prototypes, defining boundary constraints, and iteratively aligning stakeholders.",
+    "redFlags": [
+      "Waited passively for the PM or manager to define exact requirements before coding",
+      "Built the wrong thing blindly without validating assumptions with stakeholders",
+      "Blamed changing requirements for project delays without driving alignment",
+      "Could not articulate how you broke down the ambiguous problem"
+    ],
+    "greenFlags": [
+      "Wrote a clear Technical Design Document / RFC with explicit boundary constraints",
+      "Built quick prototypes to test hypotheses early with real users or data",
+      "Created a phased delivery plan to de-risk high-ambiguity areas first",
+      "Maintained regular communication loops with product and business leads"
+    ],
+    "levels": [
+      {
+        "level": "SDE1",
+        "focus": "Asking clarifying questions and creating a written spec before coding",
+        "situation": "I was assigned a ticket titled: 'Add export capability to reporting section'. That was the entire description. There was no UI mockup, no list of supported formats (CSV, PDF, Excel), and no specification on whether the export should include filtered data or full historical records.",
+        "task": "As a junior engineer, I did not want to guess and build the wrong feature, nor did I want to ping the PM with constant micro-questions in Slack.",
+        "action": "I drafted a 1-page Spec Proposal in Notion before writing any code. I listed 3 specific options: Option A (Client-side CSV export of visible table data, 1 day), Option B (Server-side CSV export of all filtered data, 3 days), Option C (Server-side PDF formatted report, 2 weeks). For each option, I listed effort, technical constraints, and user experience. I sent the doc to the PM and scheduled a 15-minute sync.",
+        "result": "The PM reviewed the doc and chose Option B immediately, noting that PDF was unnecessary. I built Option B in 3 days. The PM praised my structured approach in my performance review, noting that my 1-page proposal saved the team from a potential 2-week misdirected effort.",
+        "keyTakeaway": "When requirements are vague, write down 3 concrete options with trade-offs. Decision-makers prefer choosing between options over answering open-ended questions."
+      },
+      {
+        "level": "SDE2",
+        "focus": "Building an extensible abstraction layer when business requirements keep shifting",
+        "situation": "Our business leadership wanted to integrate third-party logistics providers (FedEx, UPS, DHL). However, the business team was negotiating contracts in parallel, meaning the exact list of providers, pricing APIs, and authentication rules were changing every three days.",
+        "task": "I was assigned to build the logistics integration module. If I hardcoded FedEx first, I would have to rewrite the entire integration when DHL or UPS was finalized with different payloads.",
+        "action": "I recognized that while the providers were moving targets, the core operations (CreateShipment, TrackPackage, CancelShipment, GetRateQuote) were universal. I designed a Provider Plugin Architecture using the Strategy Pattern in TypeScript. I defined a strict `LogisticsProvider` interface and a `ProviderFactory`. Writing a new provider integration meant implementing the interface without touching any core checkout or order fulfillment code. I built a `MockProvider` first to unblock the frontend team.",
+        "result": "When business finally signed FedEx and DHL two weeks before launch, implementing their drivers took only 3 days each. Three months later, when the business added UPS and local courier services, junior engineers added them in under 2 days with zero bugs. The architecture handled 100% of shipping volume smoothly.",
+        "keyTakeaway": "When requirements shift constantly, don't build features — build interfaces. Standardize the domain operations so concrete implementations become swappable modules."
+      },
+      {
+        "level": "SDE3",
+        "focus": "Defining system architecture for a completely new, unproven product category",
+        "situation": "Company leadership decided to enter the real-time collaborative whiteboarding space (similar to Miro) to complement our document editor. There were no technical specs, no defined architecture, and no internal team experience with WebSockets, CRDTs (Conflict-free Replicated Data Types), or canvas rendering at scale.",
+        "task": "As the Tech Lead, I had to architect a real-time multiplayer engine capable of supporting 100+ concurrent editors per canvas with <50ms sync latency, with zero prior internal benchmarks.",
+        "action": "I structured a 4-week spikes and de-risking phase: Week 1: Researched operational transformation (OT) vs. CRDTs (Yjs vs. Automerge) and built a micro-benchmark testing memory and latency under 1,000 rapid concurrent edits. Selected Yjs + WebSockets. Week 2: Built a load-testing harness using Artillery to simulate 500 WebSocket connections pushing cursor coordinates to a Node.js server. Discovered Node.js single-thread CPU bottlenecks at 200 connections; shifted architecture to a Rust-based WebSocket gateway. Week 3: Drafted a comprehensive 15-page RFC covering state sync, offline persistence, and fallback to REST snapshots. Hosted two architecture review sessions with senior principal engineers to stress-test the design.",
+        "result": "The architecture proposal was approved unanimously. The real-time engine launched on time and sustained 150 concurrent users per canvas with P99 sync latency of 28ms. It became the foundational real-time engine for three subsequent collaborative product features across the company.",
+        "keyTakeaway": "De-risk high ambiguity through structured technical spikes before writing production architecture RFCs. Measure real performance instead of relying on blog posts."
+      },
+      {
+        "level": "Principal",
+        "focus": "Navigating company-wide strategic ambiguity during a major pivot",
+        "situation": "Following a sudden shift in market dynamics, the executive team directed engineering to transform our multi-tenant SaaS platform into an AI-native platform capable of running fine-tuned LLMs per enterprise client. There was total strategic ambiguity: no clarity on cloud infrastructure budget, model latency requirements, data privacy compliance for LLM prompts, or vendor lock-in strategy (OpenAI vs. Anthropic vs. self-hosted Llama).",
+        "task": "As Principal Engineer, I had to define the company's multi-year AI Infrastructure & Data Privacy Architecture while executive priorities and LLM capabilities were changing weekly.",
+        "action": "I authored the 'AI Gateway & Privacy Control Plane Architecture' vision paper. Instead of betting on a single LLM vendor or self-hosting strategy, I designed an Model-Agnostic AI Gateway layer. Key architectural decisions: 1) Abstract LLM providers behind a unified OpenAI-compatible API spec. 2) Implement an on-premise PII Redaction & Anonymization proxy that strips customer PII before sending prompts to external APIs. 3) Build a Semantic Cache layer using Redis Vector Search to cache prompt responses, reducing API costs by 35%. 4) Establish a Model Evaluation Sandbox framework to benchmark new model releases (GPT-4 vs Claude vs Llama) against standard company evals in automated CI/CD.",
+        "result": "The architecture enabled our product teams to launch 6 AI features in 4 months without worrying about compliance or vendor lock-in. When OpenAI experienced an outage, our Gateway automatically failed over to Anthropic Claude with zero downtime for end users. The semantic cache saved $420,000 in API costs in the first two quarters alone.",
+        "keyTakeaway": "Principal leadership during strategic ambiguity means building optionality into the foundation. Never tie your core platform to a single external vendor or shifting trend."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Tell me about a time you drove an engineering initiative or mentored team members to significantly elevate engineering standards and velocity.",
+    "category": "Technical Leadership",
+    "principle": "Earn Trust · Develop the Best · Insist on the Highest Standards",
+    "why": "Bar Raisers evaluate how you multiply the impact of engineers around you. True senior/principal engineers do not just write great code themselves — they raise the bar for the entire organization through mentorship, tooling, and establishing culture.",
+    "redFlags": [
+      "Focused purely on personal output without lifting teammates",
+      "Imposed rigid standards dictatorially without explaining the 'why' or getting buy-in",
+      "Gave critical feedback without coaching or providing actionable paths forward",
+      "Could not measure the impact of engineering standard improvements"
+    ],
+    "greenFlags": [
+      "Mentored junior/mid engineers into promotion or autonomy",
+      "Created automated tooling/CI checks to enforce standards effortlessly",
+      "Listened to team pain points before introducing process changes",
+      "Measured improvement in deployment velocity, bug rates, or onboarding time"
+    ],
+    "levels": [
+      {
+        "level": "SDE1",
+        "focus": "Improving team documentation and onboarding experience for new engineers",
+        "situation": "When I joined the team, setting up the local development environment took me 4 days because the README was 2 years out of date, referenced deprecated Docker images, and missed environment variable setup steps.",
+        "task": "I wanted to fix this so future new hires wouldn't waste days struggling with broken local setups.",
+        "action": "While fixing my own environment, I documented every single step, error message, and fix in real-time. I created a automated `scripts/dev-setup.sh` script that validated dependencies (Node version, Docker daemon, PostgreSQL) and seeded a local test database with one command. I submitted a PR updating the README and tested it by having another new hire follow it step-by-step without my intervention.",
+        "result": "Local setup time dropped from 4 days to 30 minutes. My onboarding script became the standard template across all 5 teams in our engineering department. My manager highlighted this initiative in my 6-month review as demonstrating exceptional ownership.",
+        "keyTakeaway": "The best time to fix onboarding documentation is when you are experiencing it. If something took you hours to figure out, automate or document it immediately."
+      },
+      {
+        "level": "SDE2",
+        "focus": "Mentoring a junior engineer through their first complex feature and promoting quality",
+        "situation": "A junior engineer on my team was struggling with a complex asynchronous webhook processing feature. They were feeling overwhelmed, missing deadlines, and submitting PRs with insufficient test coverage and edge-case bugs.",
+        "task": "Instead of taking over the ticket to meet the deadline myself, I needed to mentor the engineer to successfully build and own the feature while developing their architectural confidence.",
+        "action": "I initiated structured pair-programming sessions 3 times a week for 45 minutes. I taught them how to write Test-Driven Development (TDD) unit tests for edge cases (idempotency, network retry, payload validation) before writing the implementation. I introduced them to the Outbox Pattern for reliable event publishing. I reviewed their PRs with detailed inline explanations of *why* certain patterns were preferred rather than just demanding changes.",
+        "result": "The junior engineer successfully delivered the webhook feature. Over the next 6 months, their code quality improved dramatically, their PR approval cycles dropped from 4 revisions to 1, and they were promoted to SDE2 the following cycle. They credited our pairing sessions as the turning point in their career.",
+        "keyTakeaway": "Taking over a struggling colleague's work solves today's deadline but starves tomorrow's team. Investing time in coaching builds long-term team velocity."
+      },
+      {
+        "level": "SDE3",
+        "focus": "Standardizing testing culture and CI/CD quality gates across 8 engineering teams",
+        "situation": "Our product release cycle was plagued by regressions. We had a 45% flakiness rate in E2E Cypress tests, zero integration tests for microservices, and deployments frequently required manual rollback. Feature delivery had slowed down because engineers were afraid of breaking production.",
+        "task": "As Senior Engineer, I set out to transform our testing culture and establish automated quality gates across all 8 feature teams without causing developer friction.",
+        "action": "1) Audited the CI pipeline: Identified that flaky tests were caused by shared database state in E2E tests. Replaced global database mocks with isolated Docker Testcontainers per test worker. 2) Introduced Contract Testing using Pact for inter-service APIs, eliminating the need to spin up all 12 microservices locally. 3) Established a 'Quality Engineering Working Group' with representatives from each team. Hosted weekly 30-minute tech talks on writing deterministic integration tests. 4) Implemented a Flaky Test Quarantine Bot that automatically quarantined tests failing intermittently and assigned Jira tickets to the owner team.",
+        "result": "Test flakiness dropped from 45% to <1%. Build pipeline time dropped from 38 minutes to 11 minutes. Production rollback rate dropped by 78%. Deployment frequency increased from bi-weekly releases to 14 deployments per day. Team morale and deployment confidence improved measurably.",
+        "keyTakeaway": "Culture change happens through developer tooling, not mandates. If you make writing good tests easier and faster than writing bad ones, engineers will adopt high standards naturally."
+      },
+      {
+        "level": "Principal",
+        "focus": "Establishing company-wide Engineering RFC Process and Principal Review Guild",
+        "situation": "As our engineering organization scaled from 50 to 300+ engineers across 4 global hubs, teams began operating in silos. Duplicate microservices were built for the same capabilities, incompatible RPC protocols (gRPC vs REST vs GraphQL) were adopted ad-hoc, and major technical decisions were made without cross-org review.",
+        "task": "As Principal Engineer, I needed to institute an engineering governance framework that enforced high architectural standards and cross-pollination without creating bureaucratic slowdowns.",
+        "action": "1) Created the official Company RFC (Request for Comments) Architecture Process. Defined clear RFC templates (Problem Statement, Technical Options, Security & Privacy, Data Model, Cost Impact). 2) Formed the Architecture Review Council comprising Principal and Staff Engineers. Established a SLA: every submitted RFC receives feedback within 5 business days. 3) Instituted lightweight RFC tiers: Tier 1 (minor service changes, internal team approval), Tier 2 (cross-team API contracts, 2 Staff reviewers), Tier 3 (core infrastructure/data model shifts, full Council review). 4) Hosted bi-weekly open 'Architecture Office Hours' where any engineer could bring early ideas for informal feedback before writing an RFC.",
+        "result": "Over 18 months, 140+ RFCs were processed. Saved an estimated $1.8M in redundant infrastructure costs by consolidating duplicate search and notification services. Time to onboard new senior engineers dropped by 40% because all major architectural decisions were documented with context. The RFC process was praised by the VP of Eng as the single most impactful operational improvement during our scale-up phase.",
+        "keyTakeaway": "Engineering standards at scale require transparent asynchronous communication tools. Written RFCs democratize technical decision-making and build a lasting institutional memory."
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Tell me about a time you advocated for the customer when technical or business priorities were pushing in a different direction.",
+    "category": "Customer Obsession",
+    "principle": "Customer Obsession · Insist on the Highest Standards · Earn Trust",
+    "why": "Bar Raisers look for engineers who start with the customer and work backwards. They evaluate whether you prioritize long-term user trust and experience over short-term engineering convenience or aggressive business metrics.",
+    "redFlags": [
+      "Prioritized technical elegance or developer convenience over user experience",
+      "Accepted dark patterns or poor UX without pushing back",
+      "Viewed customer complaints as support issues rather than engineering signals",
+      "Could not articulate the customer impact of a technical decision"
+    ],
+    "greenFlags": [
+      "Fought for performance, accessibility, or data privacy when it wasn't on the roadmap",
+      "Used real user metrics, session recordings, or customer feedback to drive engineering decisions",
+      "Worked backwards from the customer experience to design technical solutions",
+      "Built self-service tools that eliminated customer friction points"
+    ],
+    "levels": [
+      {
+        "level": "SDE1",
+        "focus": "Fixing an accessibility and mobile responsiveness bug that affected real users",
+        "situation": "While reviewing user session replays in FullStory to debug a checkout error, I noticed that users on smaller screen mobile devices (like iPhone SE) were struggling to tap the 'Complete Order' button because it was overlapped by a floating promotional widget.",
+        "task": "The ticket assigned to me was just to fix a backend error log. Fixing the mobile overlap layout issue was technically outside the scope of my sprint ticket.",
+        "action": "Instead of ignoring it, I captured screen recordings of 5 affected user sessions showing abandonment at the final step. I brought it to my standup: 'I found an issue where mobile users on 320px screens can't tap the purchase button due to a CSS overlap. I can fix this responsiveness bug in 2 hours.' The PM agreed. I updated the CSS layout using flexbox media queries and added responsive viewport testing to our Cypress suite.",
+        "result": "Mobile checkout conversion rate for small-screen devices increased by 4.2% over the following month, generating an estimated $35,000 in additional monthly revenue. My team lead awarded me the monthly 'Customer Champion' shoutout.",
+        "keyTakeaway": "Customer obsession means paying attention to user friction when nobody is watching. Don't step past a broken user experience just because it's not in your assigned ticket."
+      },
+      {
+        "level": "SDE2",
+        "focus": "Eliminating a dark pattern and optimizing API performance for low-bandwidth users",
+        "situation": "Our product team wanted to implement an aggressive auto-play video feature in our mobile app to boost ad impressions. However, my performance profiling showed that auto-playing uncompressed HD videos consumed up to 150MB of user cellular data per session and caused severe UI stuttering on 3G connections in emerging markets.",
+        "task": "The business team was focused on meeting quarterly ad impression targets. I needed to champion the user experience and bandwidth cost for our global users without flatly refusing the business objective.",
+        "action": "I gathered network telemetry data from our analytics: 38% of our global user base was on 3G or metered connections in LatAm and India. I calculated that auto-playing HD video would cost these users real money in mobile data overages. I proposed a compromise: 1) Auto-play only when connected to Wi-Fi. 2) On cellular data, serve a lightweight preview GIF (under 400KB) with a manual play button. 3) Implement HLS adaptive bitrate streaming so video quality adjusts dynamically to network speed.",
+        "result": "Leadership approved the adaptive strategy. User retention in target emerging markets increased by 18%, and app store ratings improved from 3.8 to 4.6 stars. Ad impressions still met 92% of the business target while protecting user data plans and device performance.",
+        "keyTakeaway": "Customer obsession means protecting the user from short-sighted business decisions. Offer technical compromises that achieve business goals without sacrificing user trust."
+      },
+      {
+        "level": "SDE3",
+        "focus": "Redesigning data recovery systems to protect users from accidental data loss",
+        "situation": "Our cloud document platform allowed users to delete workspace projects. However, 'Delete' performed an immediate hard SQL `DELETE CASCADE`, permanently erasing all user documents, comments, and history. Every week, customer support received 15+ desperate tickets from users who had accidentally deleted critical project folders.",
+        "task": "Product management resisted prioritizing a 'Soft Delete / Trash Bin' feature for 3 quarters because it didn't drive new acquisition metrics. As Senior Engineer, I recognized that data loss was the single biggest destroyer of customer trust.",
+        "action": "I gathered support ticket data: 42 enterprise accounts had threatened to churn over unrecoverable data loss in the past 6 months. I drafted an RFC for a unified 'Soft Delete & 30-Day Recovery Vault' pattern using PostgreSQL temporal tables and S3 Lifecycle Rules. I presented the data to the VP of Product: 'We are losing $600k ARR in churn from accidental deletions while spending 120 support hours per month manually attempting database restores.' I proposed implementing the Soft Delete framework as an infrastructure-level middleware that automatically intercepted all DELETE operations across all microservices.",
+        "result": "The infrastructure team implemented the middleware in 2 sprints. Accidental data loss support tickets dropped to zero overnight. Users could self-serve restore deleted items from their Trash Bin. Enterprise churn related to data loss dropped by 100%, preserving over $600k in ARR.",
+        "keyTakeaway": "Customer trust takes years to build and seconds to destroy through unrecoverable errors. Build safety nets directly into your data layer."
+      },
+      {
+        "level": "Principal",
+        "focus": "Re-architecting global API latency to deliver sub-100ms experiences worldwide",
+        "situation": "Our global SaaS platform was hosted entirely in AWS us-east-1 (N. Virginia). While North American users enjoyed 45ms P95 latency, users in Asia-Pacific and South America experienced 650ms–1.2s API response times due to transatlantic network roundtrips. Sales and Product treated this as an acceptable geographic constraint.",
+        "task": "As Principal Engineer, I refused to accept that non-US customers should have a second-class experience. I set a bold engineering goal: P95 API latency < 100ms for 99% of global users.",
+        "action": "I designed and executed the 'Global Edge Acceleration Strategy': 1) Deployed Cloudflare Enterprise Workers at 275+ edge locations to terminate TLS and execute authentication checks at the edge, saving 150ms of network handshake latency. 2) Implemented Read-Replicas with AWS Aurora Global Database in Tokyo, Frankfurt, and Sydney, routing read queries to the nearest geographic region. 3) Designed an optimistic UI update spec and GraphQL caching layer that allowed client applications to render instant UI state while async mutations synced in the background. 4) Established a strict Latency Budget CI check that fails builds if any new API endpoint exceeds a 50ms execution budget.",
+        "result": "Global P95 API response times dropped from 850ms to 68ms worldwide. International user engagement metrics jumped by 34%, and APAC enterprise contract conversion rates doubled over the next 2 quarters. The architecture established a benchmark for global performance across the industry.",
+        "keyTakeaway": "True customer obsession is geographic and inclusive. High latency is a bug regardless of where your customer lives."
+      }
+    ]
   }
 ]
