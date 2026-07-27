@@ -209,7 +209,7 @@ export default function RootLayout({
               </Link>
             </div>
 
-            <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
               <Link href="/topics" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 HLD
               </Link>
@@ -232,6 +232,12 @@ export default function RootLayout({
                 Bar Raiser
                 <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-full border border-rose-200 dark:border-rose-800">New</span>
               </Link>
+              <Link href="/about" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                About
+              </Link>
+              <Link href="/contact" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+                Contact
+              </Link>
             </nav>
 
             <div className="flex items-center gap-4">
@@ -247,14 +253,18 @@ export default function RootLayout({
         </main>
 
         {/* Footer */}
-        <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 py-8 bg-[#fafafa]/50 dark:bg-[#09090b]/50">
+        <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 py-10 bg-[#fafafa]/50 dark:bg-[#09090b]/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500 dark:text-zinc-500">
-            <div className="text-center md:text-left">
-              &copy; {new Date().getFullYear()} beingsde.in. All rights reserved. Built for System Architects.
+            <div className="text-center md:text-left flex flex-col gap-1">
+              <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">beingsde.in — System Architecture Learning Platform</span>
+              <span>&copy; {new Date().getFullYear()} beingsde.in. All rights reserved. Built for Software Engineers &amp; System Architects.</span>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap justify-center md:justify-end items-center gap-x-6 gap-y-2">
+              <Link href="/about" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">About Us</Link>
+              <Link href="/contact" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Contact Us</Link>
               <Link href="/privacy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Terms of Service</Link>
+              <Link href="/disclaimer" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Disclaimer</Link>
               <Link href="/support" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Support</Link>
             </div>
           </div>

@@ -61,12 +61,39 @@ export default function PrivacyPolicyPage() {
         </ul>
       </Section>
 
-      <Section title="3. Cookies & Tracking">
+      <Section title="3. Cookies & Google AdSense Advertising">
         <p>
-          We use strictly necessary cookies for session management and JWT-based authentication. We do not
-          use third-party advertising cookies. You can disable cookies in your browser settings, but some
-          features (such as staying logged in) will not work without them.
+          We use strictly necessary cookies for session management and JWT-based authentication. In addition,
+          we use Google AdSense to serve advertisements when you visit our website.
         </p>
+        <ul className="list-disc list-inside flex flex-col gap-1.5 ml-2 mt-2">
+          <li>
+            <strong>Third-Party Vendors:</strong> Google, as a third-party vendor, uses cookies to serve ads on <strong>beingsde.in</strong>.
+          </li>
+          <li>
+            <strong>DART & Advertising Cookies:</strong> Google&apos;s use of advertising cookies enables it and its partners to serve ads to users based on their visit to <strong>beingsde.in</strong> and/or other websites on the Internet.
+          </li>
+          <li>
+            <strong>Opt-Out Options:</strong> Users may opt out of personalized advertising by visiting{" "}
+            <a
+              href="https://adssettings.google.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-zinc-900 dark:hover:text-zinc-100"
+            >
+              Google Ads Settings
+            </a>{" "}
+            or by visiting{" "}
+            <a
+              href="https://www.aboutads.info/choices/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-zinc-900 dark:hover:text-zinc-100"
+            >
+              aboutads.info
+            </a>.
+          </li>
+        </ul>
       </Section>
 
       <Section title="4. Data Sharing">

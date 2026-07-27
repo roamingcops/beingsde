@@ -34,7 +34,14 @@ export default function MobileMenu() {
     { href: "/fde", label: "FDE" },
     { href: "/questions", label: "TOP HLD Questions" },
     { href: "/dsa", label: "DSA" },
+    { href: "/cheat-sheet", label: "Cheat Sheet" },
+    { href: "/bar-raiser", label: "Bar Raiser" },
     { href: "/interviews", label: "Mock Interviews" },
+    { href: "/about", label: "About Us" },
+    { href: "/contact", label: "Contact Us" },
+    { href: "/privacy", label: "Privacy Policy" },
+    { href: "/terms", label: "Terms of Service" },
+    { href: "/disclaimer", label: "Disclaimer" },
   ];
 
   return (
