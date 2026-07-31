@@ -279,29 +279,59 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       const listItems: React.ReactNode[] = [];
       const isNumbered = /^\d+\.\s/.test(line.trim());
 
-      while (
-        i < lines.length &&
-        (lines[i].trim().startsWith("* ") || lines[i].trim().startsWith("- ") || /^\d+\.\s/.test(lines[i].trim()))
-      ) {
-        const itemLine = lines[i].trim();
-        const contentStr = itemLine.replace(/^(\*|-|\d+\.)\s+/, "");
-        listItems.push(
-          <li key={`li-${i}`} className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
-            {renderInline(contentStr)}
-          </li>
-        );
-        i++;
+      while (i < lines.length) {
+        const curLine = lines[i].trim();
+        if (curLine.startsWith("* ") || curLine.startsWith("- ") || /^\d+\.\s/.test(curLine)) {
+          let contentStr = curLine.replace(/^(\*|-|\d+\.)\s*/, "");
+
+          // If bullet marker is on its own line, fold next line into item content
+          if (contentStr.trim() === "" && i + 1 < lines.length) {
+            const nextLine = lines[i + 1].trim();
+            if (
+              nextLine &&
+              !nextLine.startsWith("#") &&
+              !nextLine.startsWith("```") &&
+              !nextLine.startsWith(">") &&
+              !nextLine.startsWith("---") &&
+              !nextLine.startsWith("|")
+            ) {
+              i++;
+              contentStr = lines[i].trim();
+            }
+          }
+
+          listItems.push(
+            <li key={`li-${i}`} className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+              {renderInline(contentStr)}
+            </li>
+          );
+          i++;
+        } else if (curLine === "") {
+          // Allow loose list items separated by empty lines
+          if (
+            i + 1 < lines.length &&
+            (lines[i + 1].trim().startsWith("* ") ||
+              lines[i + 1].trim().startsWith("- ") ||
+              /^\d+\.\s/.test(lines[i + 1].trim()))
+          ) {
+            i++;
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
       }
 
       if (isNumbered) {
         elements.push(
-          <ol key={`ol-${i}`} className="list-decimal pl-5 my-3 space-y-1.5">
+          <ol key={`ol-${i}`} className="list-decimal pl-5 my-3 space-y-2">
             {listItems}
           </ol>
         );
       } else {
         elements.push(
-          <ul key={`ul-${i}`} className="list-disc pl-5 my-3 space-y-1.5">
+          <ul key={`ul-${i}`} className="list-disc pl-5 my-3 space-y-2">
             {listItems}
           </ul>
         );

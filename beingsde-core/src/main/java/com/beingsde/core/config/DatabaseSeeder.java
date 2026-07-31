@@ -89,8 +89,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // 3. Seed HLD Topics
-        if (topicRepository.count() == 0) {
+        if (topicRepository.count() < 60) {
             try {
+                topicRepository.deleteAll();
                 File file = new File("/Users/arnavagarwal/beingsde/beingsde-ui/src/data/topics.json");
                 if (file.exists()) {
                     List<Topic> topics = objectMapper.readValue(file, new TypeReference<List<Topic>>() {});

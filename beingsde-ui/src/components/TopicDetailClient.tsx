@@ -218,17 +218,19 @@ export default function TopicDetailClient({ slug, initialTopic }: { slug: string
 
           {/* Right Column: Prerequisites & Related Topics */}
           <div className="flex flex-col gap-6">
-            <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">Prerequisites</h3>
-              <ul className="flex flex-col gap-3">
-                {topic.prerequisites?.map((prereq: string) => (
-                  <li key={prereq} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
-                    <CheckCircle className="w-4 h-4 text-zinc-400 shrink-0" />
-                    {prereq}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {topic.prerequisites && topic.prerequisites.length > 0 && (
+              <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md">
+                <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">Prerequisites</h3>
+                <ul className="flex flex-col gap-3">
+                  {topic.prerequisites.map((prereq: string) => (
+                    <li key={prereq} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                      <CheckCircle className="w-4 h-4 text-zinc-400 shrink-0" />
+                      {prereq}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {renderTopicSpecificSidebar(topic.slug, topic.category, topic.tags || [])}
           </div>
@@ -522,33 +524,25 @@ function InteractiveQuizCard({ rawText }: { rawText: string }) {
   const [orderChecked, setOrderChecked] = useState(false);
   const [isOrderCorrect, setIsOrderCorrect] = useState(false);
 
-  // Check if it's a multiple choice/true-false question
-  const hasChoices = rawText.includes("1") && rawText.includes("2");
+  // Clean trailing section headers if attached
+  const cleanRawText = rawText.replace(/\n\n---[\s\S]*$/, "").trim();
 
-  if (hasChoices) {
-    // Parse question and choices
-    const option1Index = rawText.indexOf("1");
-    const question = rawText.substring(0, option1Index).trim();
-    const remaining = rawText.substring(option1Index);
+  // Match multiple choice / True-False options pattern at end of rawText:
+  // e.g. "1True2False" or "1. True 2. False" or "1GraphQL2REST3gRPC4WebSockets"
+  const choiceRegex = /(?:^|\b|\s)1(?:\.|\s)*([A-Za-z][\s\S]*?)2(?:\.|\s)*([A-Za-z][\s\S]*?)(?:3(?:\.|\s)*([A-Za-z][\s\S]*?))?(?:4(?:\.|\s)*([A-Za-z][\s\S]*?))?$/;
+  const choiceMatch = cleanRawText.match(choiceRegex);
 
-    // Extract options by finding indices of digits
-    const options: string[] = [];
-    const idx1 = remaining.indexOf("1");
-    const idx2 = remaining.indexOf("2");
-    const idx3 = remaining.indexOf("3");
-    const idx4 = remaining.indexOf("4");
+  if (choiceMatch) {
+    const matchIndex = cleanRawText.lastIndexOf(choiceMatch[0]);
+    let question = cleanRawText.substring(0, matchIndex).trim();
+    question = question.replace(/^Question\s+\d+\s+of\s+\d+\s*/i, "").trim();
 
-    if (idx1 !== -1 && idx2 !== -1) {
-      if (idx3 !== -1 && idx4 !== -1) {
-        options.push(remaining.substring(idx1 + 1, idx2).trim());
-        options.push(remaining.substring(idx2 + 1, idx3).trim());
-        options.push(remaining.substring(idx3 + 1, idx4).trim());
-        options.push(remaining.substring(idx4 + 1).trim());
-      } else {
-        options.push(remaining.substring(idx1 + 1, idx2).trim());
-        options.push(remaining.substring(idx2 + 1).trim());
-      }
-    }
+    let options: string[] = [choiceMatch[1].trim(), choiceMatch[2].trim()];
+    if (choiceMatch[3]) options.push(choiceMatch[3].trim());
+    if (choiceMatch[4]) options.push(choiceMatch[4].trim());
+
+    // Clean any trailing delimiter or linebreaks from last option
+    options = options.map((opt) => opt.split(/\n\n|---|##/)[0].trim());
 
     const correctIndex = getCorrectAnswerIndex(question);
     const explanation = getQuizExplanation(question);
