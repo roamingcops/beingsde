@@ -13,7 +13,9 @@ import {
   Sliders,
   ArrowUpRight,
   Flame,
-  CheckCircle2
+  CheckCircle2,
+  Layers,
+  Zap
 } from "lucide-react";
 import defaultHldQuestions from "@/data/hld-questions.json";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
@@ -66,6 +68,8 @@ export default function QuestionsClient() {
     { id: "Scaling", label: "Scaling & Optimization", icon: Cpu },
     { id: "Security & Auth", label: "Security & Auth", icon: Shield },
     { id: "Protocols", label: "Protocols & Real-Time", icon: Network },
+    { id: "Microservices", label: "Microservices", icon: Layers },
+    { id: "Caching", label: "Caching & Reliability", icon: Zap },
   ];
 
   const filteredQuestions = questions.filter((q) => {

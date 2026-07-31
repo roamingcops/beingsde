@@ -143,8 +143,9 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // 6. Seed HLD (System Design) Questions
-        if (hldQuestionRepository.count() == 0) {
+        if (hldQuestionRepository.count() < 50) {
             try {
+                hldQuestionRepository.deleteAll();
                 File file = new File("/Users/arnavagarwal/beingsde/beingsde-ui/src/data/hld-questions.json");
                 if (file.exists()) {
                     List<HldQuestion> questions = objectMapper.readValue(file, new TypeReference<List<HldQuestion>>() {});
