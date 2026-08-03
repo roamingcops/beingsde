@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download } from "lucide-react";
 
 import MOCK_TOPICS from "@/data/topics.json";
+import SlidePlayer from "@/components/SlidePlayer";
 
 export default function TopicDetailClient({ slug, initialTopic }: { slug: string; initialTopic?: any }) {
   const [activeTab, setActiveTab] = useState<"notes" | "video" | "pdf">("notes");
@@ -188,13 +189,7 @@ export default function TopicDetailClient({ slug, initialTopic }: { slug: string
               )}
 
               {activeTab === "video" && (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-4 py-8">
-                  <div className="w-full aspect-video border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 rounded flex flex-col items-center justify-center gap-2">
-                    <Video className="w-12 h-12 text-zinc-400" />
-                    <span className="text-xs font-mono text-zinc-400">{topic.title} video lecture placeholder</span>
-                  </div>
-                  <p className="text-2xs text-zinc-400 text-center">Video streams directly via CloudFront CDN cache edge.</p>
-                </div>
+                <SlidePlayer topic={topic} />
               )}
 
               {activeTab === "pdf" && (

@@ -234,40 +234,41 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     }
 
     // 4. Headings (#, ##, ###, ####)
-    if (line.startsWith("# ")) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith("# ")) {
       elements.push(
         <h1 key={`h1-${i}`} className="text-xl sm:text-2xl font-black tracking-tight text-zinc-950 dark:text-zinc-50 border-b border-zinc-200 dark:border-zinc-800 pb-2 mt-6 mb-3">
-          {renderInline(line.substring(2))}
+          {renderInline(trimmedLine.substring(2))}
         </h1>
       );
       i++;
       continue;
     }
 
-    if (line.startsWith("## ")) {
+    if (trimmedLine.startsWith("## ")) {
       elements.push(
         <h2 key={`h2-${i}`} className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-5 mb-2.5">
-          {renderInline(line.substring(3))}
+          {renderInline(trimmedLine.substring(3))}
         </h2>
       );
       i++;
       continue;
     }
 
-    if (line.startsWith("### ")) {
+    if (trimmedLine.startsWith("### ")) {
       elements.push(
         <h3 key={`h3-${i}`} className="text-sm sm:text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-4 mb-2">
-          {renderInline(line.substring(4))}
+          {renderInline(trimmedLine.substring(4))}
         </h3>
       );
       i++;
       continue;
     }
 
-    if (line.startsWith("#### ")) {
+    if (trimmedLine.startsWith("#### ")) {
       elements.push(
         <h4 key={`h4-${i}`} className="text-xs sm:text-sm font-bold tracking-tight text-zinc-850 dark:text-zinc-200 mt-3 mb-1.5">
-          {renderInline(line.substring(5))}
+          {renderInline(trimmedLine.substring(5))}
         </h4>
       );
       i++;
