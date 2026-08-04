@@ -275,15 +275,18 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       continue;
     }
 
-    // 5. Bullet Lists (* or - or numbered)
-    if (line.trim().startsWith("* ") || line.trim().startsWith("- ") || /^\d+\.\s/.test(line.trim())) {
+    // 5. Bullet Lists (* or - or + or numbered)
+    if (line.trim().startsWith("* ") || line.trim().startsWith("- ") || line.trim().startsWith("+ ") || /^\d+\.\s/.test(line.trim())) {
       const listItems: React.ReactNode[] = [];
       const isNumbered = /^\d+\.\s/.test(line.trim());
 
       while (i < lines.length) {
-        const curLine = lines[i].trim();
-        if (curLine.startsWith("* ") || curLine.startsWith("- ") || /^\d+\.\s/.test(curLine)) {
-          let contentStr = curLine.replace(/^(\*|-|\d+\.)\s*/, "");
+        const rawLine = lines[i];
+        const curLine = rawLine.trim();
+        if (curLine.startsWith("* ") || curLine.startsWith("- ") || curLine.startsWith("+ ") || /^\d+\.\s/.test(curLine)) {
+          let contentStr = curLine.replace(/^(\*|-|\+|\d+\.)\s*/, "");
+          const indentSpaces = rawLine.search(/\S/);
+          const isNested = indentSpaces >= 2;
 
           // If bullet marker is on its own line, fold next line into item content
           if (contentStr.trim() === "" && i + 1 < lines.length) {
@@ -302,7 +305,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           }
 
           listItems.push(
-            <li key={`li-${i}`} className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+            <li key={`li-${i}`} className={`text-xs leading-relaxed text-zinc-600 dark:text-zinc-300 ${isNested ? "ml-5 list-[circle]" : ""}`}>
               {renderInline(contentStr)}
             </li>
           );
@@ -313,6 +316,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             i + 1 < lines.length &&
             (lines[i + 1].trim().startsWith("* ") ||
               lines[i + 1].trim().startsWith("- ") ||
+              lines[i + 1].trim().startsWith("+ ") ||
               /^\d+\.\s/.test(lines[i + 1].trim()))
           ) {
             i++;
@@ -326,13 +330,13 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
       if (isNumbered) {
         elements.push(
-          <ol key={`ol-${i}`} className="list-decimal pl-5 my-3 space-y-2">
+          <ol key={`ol-${i}`} className="list-decimal pl-5 my-3 space-y-1.5">
             {listItems}
           </ol>
         );
       } else {
         elements.push(
-          <ul key={`ul-${i}`} className="list-disc pl-5 my-3 space-y-2">
+          <ul key={`ul-${i}`} className="list-disc pl-5 my-3 space-y-1.5">
             {listItems}
           </ul>
         );
@@ -353,13 +357,32 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       continue;
     }
 
-    // 8. Normal Paragraph
-    elements.push(
-      <p key={`p-${i}`} className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-3">
-        {renderInline(line)}
-      </p>
-    );
-    i++;
+    // 8. Normal Paragraph (Group consecutive text lines into a single <p>)
+    const paragraphLines: string[] = [];
+    while (
+      i < lines.length &&
+      lines[i].trim() !== "" &&
+      !lines[i].trim().startsWith("```") &&
+      !lines[i].trim().startsWith(">") &&
+      !lines[i].trim().startsWith("#") &&
+      !lines[i].trim().startsWith("|") &&
+      !lines[i].trim().startsWith("---") &&
+      !lines[i].trim().startsWith("* ") &&
+      !lines[i].trim().startsWith("- ") &&
+      !lines[i].trim().startsWith("+ ") &&
+      !/^\d+\.\s/.test(lines[i].trim())
+    ) {
+      paragraphLines.push(lines[i].trim());
+      i++;
+    }
+
+    if (paragraphLines.length > 0) {
+      elements.push(
+        <p key={`p-${i}`} className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-3">
+          {renderInline(paragraphLines.join(" "))}
+        </p>
+      );
+    }
   }
 
   return <div className="space-y-1">{elements}</div>;

@@ -91,7 +91,7 @@ export default function SlidePlayer({ topic }: SlidePlayerProps) {
     <div 
       ref={containerRef}
       className={`w-full flex flex-col bg-zinc-950 text-zinc-100 rounded-xl border border-zinc-800 shadow-2xl overflow-hidden font-sans ${
-        isFullscreen ? "h-screen justify-between p-6 rounded-none border-none" : "min-h-[620px]"
+        isFullscreen ? "fixed inset-0 z-50 h-screen justify-between p-6 rounded-none border-none" : "min-h-[500px] lg:min-h-[560px]"
       }`}
     >
       

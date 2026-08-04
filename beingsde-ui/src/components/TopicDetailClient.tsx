@@ -159,7 +159,9 @@ export default function TopicDetailClient({ slug, initialTopic }: { slug: string
             </div>
 
             {/* Tab Rendering Content */}
-            <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 rounded-md shadow-sm min-h-[300px]">
+            <div className={`rounded-md shadow-sm min-h-[300px] ${
+              activeTab === "video" ? "p-0 bg-transparent border-none" : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6"
+            }`}>
               
               {activeTab === "notes" && (
                 <div className="flex flex-col gap-6">
