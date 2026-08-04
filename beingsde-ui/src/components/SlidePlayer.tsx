@@ -91,7 +91,7 @@ export default function SlidePlayer({ topic }: SlidePlayerProps) {
     <div 
       ref={containerRef}
       className={`w-full flex flex-col bg-zinc-950 text-zinc-100 rounded-xl border border-zinc-800/90 shadow-2xl overflow-hidden font-sans ${
-        isFullscreen ? "fixed inset-0 z-50 h-screen justify-between p-6 rounded-none border-none" : "min-h-[520px] lg:min-h-[580px]"
+        isFullscreen ? "fixed inset-0 z-50 h-screen justify-between p-6 rounded-none border-none" : "min-h-[520px]"
       }`}
     >
       
@@ -138,11 +138,11 @@ export default function SlidePlayer({ topic }: SlidePlayerProps) {
         </div>
       </div>
 
-      {/* MAIN SLIDE STAGE CANVAS */}
-      <div className="flex-1 flex flex-col p-5 sm:p-7 gap-5 bg-gradient-to-b from-zinc-950 via-zinc-900/30 to-zinc-950 relative overflow-y-auto no-scrollbar">
+      {/* MAIN SLIDE STAGE CANVAS (Spacious Stacked Layout) */}
+      <div className="flex-1 flex flex-col p-5 sm:p-6 gap-5 bg-gradient-to-b from-zinc-950 via-zinc-900/30 to-zinc-950 overflow-y-auto no-scrollbar">
         
         {/* Slide Header & Meta */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/70 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/70 pb-3.5">
           <div>
             <div className="flex items-center gap-2 text-2xs font-mono text-zinc-400 uppercase tracking-widest mb-1">
               <span>Scene {currentSlide.slideNumber}</span>
@@ -169,59 +169,59 @@ export default function SlidePlayer({ topic }: SlidePlayerProps) {
           )}
         </div>
 
-        {/* Slide Body Grid: Architecture Diagram & Bullet Points */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 flex-1 items-stretch">
+        {/* FULL-WIDTH SYSTEM ARCHITECTURE DIAGRAM CANVAS */}
+        <div className="w-full flex flex-col bg-[#08080c] border border-zinc-800 rounded-lg overflow-hidden shadow-lg">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-900/90 border-b border-zinc-800 text-xs font-mono text-zinc-400">
+            <span className="flex items-center gap-2 font-semibold">
+              <Cpu className="w-3.5 h-3.5 text-amber-400" />
+              {currentSlide.diagramTitle || "Architecture Diagram Topology"}
+            </span>
+            <span className="text-3xs px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-semibold uppercase">
+              Schematic View
+            </span>
+          </div>
           
-          {/* Left Box: System Diagram Schematic */}
-          <div className="flex flex-col bg-zinc-900/90 border border-zinc-800/90 rounded-lg overflow-hidden shadow-lg min-w-0">
-            <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-950/90 border-b border-zinc-800 text-xs font-mono text-zinc-400">
-              <span className="flex items-center gap-2 font-semibold">
-                <Cpu className="w-3.5 h-3.5 text-amber-400" />
-                {currentSlide.diagramTitle || "Architecture Diagram"}
-              </span>
-              <span className="text-3xs px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-semibold uppercase">
-                Schematic
-              </span>
+          <div className="p-4 sm:p-5 flex items-start justify-start bg-[#060609] overflow-x-auto no-scrollbar w-full min-h-[140px]">
+            <pre className="font-mono text-2xs sm:text-xs text-amber-300/95 leading-relaxed whitespace-pre text-left font-semibold tracking-wide">
+              {currentSlide.diagramCode || `[ ${topic.title} Core Architecture ]`}
+            </pre>
+          </div>
+        </div>
+
+        {/* KEY TECHNICAL POINTS & GOLDEN RULE (Spacious Grid) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* Key Takeaways (2 Cols on Desktop) */}
+          <div className="md:col-span-2 flex flex-col bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-4 gap-3">
+            <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
+              <Layers className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">
+                Key Technical Takeaways
+              </h3>
             </div>
-            
-            <div className="p-4 flex-1 flex flex-col items-start justify-start bg-[#08080c] overflow-x-auto no-scrollbar w-full min-h-[160px]">
-              <pre className="font-mono text-2xs sm:text-xs text-amber-300/90 leading-relaxed whitespace-pre text-left font-semibold">
-                {currentSlide.diagramCode || `[ ${topic.title} Core ]`}
-              </pre>
-            </div>
+
+            <ul className="grid grid-cols-1 gap-2">
+              {currentSlide.bulletPoints.map((point, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-300 leading-relaxed">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Right Box: Key Architectural Bullet Points */}
-          <div className="flex flex-col justify-between bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-5 gap-4">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 border-b border-zinc-800 pb-2">
-                <Layers className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-300">
-                  Key Technical Points
-                </h3>
+          {/* Golden Rule Callout (1 Col) */}
+          {currentSlide.keyTakeaway && (
+            <div className="md:col-span-1 flex flex-col justify-between bg-amber-950/20 border border-amber-800/50 p-4 rounded-lg text-xs text-amber-300/90 gap-2">
+              <div className="flex items-center gap-2 font-mono text-amber-400 font-bold uppercase text-2xs border-b border-amber-800/40 pb-1.5">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Golden Rule</span>
               </div>
-
-              <ul className="flex flex-col gap-2.5">
-                {currentSlide.bulletPoints.map((point, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-300 leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-2xs text-amber-200/90 leading-relaxed italic">
+                "{currentSlide.keyTakeaway}"
+              </p>
             </div>
-
-            {/* Bottom Key Takeaway Callout */}
-            {currentSlide.keyTakeaway && (
-              <div className="bg-amber-950/20 border border-amber-800/40 p-3 rounded text-2xs text-amber-300/90 flex items-start gap-2 mt-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold uppercase font-mono text-amber-400 block mb-0.5">Golden Rule</span>
-                  <span>{currentSlide.keyTakeaway}</span>
-                </div>
-              </div>
-            )}
-          </div>
+          )}
 
         </div>
 
@@ -232,7 +232,7 @@ export default function SlidePlayer({ topic }: SlidePlayerProps) {
               <Volume2 className="w-3.5 h-3.5" />
               <span>Presenter Narration Script</span>
             </div>
-            <p className="text-xs text-zinc-300 leading-relaxed italic bg-zinc-950/50 p-3 rounded border border-zinc-800/60">
+            <p className="text-xs text-zinc-300 leading-relaxed italic bg-zinc-950/60 p-3 rounded border border-zinc-800/60">
               "{currentSlide.narrationScript}"
             </p>
           </div>
