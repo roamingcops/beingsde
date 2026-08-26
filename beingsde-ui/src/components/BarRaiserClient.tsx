@@ -422,18 +422,6 @@ export default function BarRaiserClient() {
           </div>
         )}
       </div>
-
-      <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-8 text-center space-y-4 bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-900/40 dark:to-zinc-950/40">
-        <Trophy className="w-7 h-7 text-amber-500 mx-auto" />
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Ready to Practice Live?</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">Schedule a mock interview with an experienced FAANG interviewer and get real-time feedback on your STAR answers.</p>
-        <a
-          href="/interviews"
-          className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Book a Mock Interview <ArrowRight className="w-3.5 h-3.5" />
-        </a>
-      </div>
     </div>
   );
 }

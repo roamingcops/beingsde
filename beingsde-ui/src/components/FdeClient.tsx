@@ -124,19 +124,13 @@ export default function FdeClient() {
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-xl mx-auto">
           Brush up on your High-Level Design and System Integration concepts. Mastering HLD is the fastest way to ace the FDE Decomposition round.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex justify-center">
           <Link 
             href="/topics"
             className="inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 px-6 py-3 border border-zinc-900 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-900 dark:hover:text-zinc-100 transition-all"
           >
             Study HLD Topics
             <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link 
-            href="/interviews"
-            className="inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wider bg-transparent text-zinc-900 dark:text-zinc-100 px-6 py-3 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-900 dark:hover:border-zinc-100 transition-all"
-          >
-            Practice Mock Interviews
           </Link>
         </div>
       </div>
