@@ -1,8 +1,50 @@
-import React from "react";
-import { Info, AlertTriangle, CheckCircle2, Flame, Lightbulb } from "lucide-react";
+"use client";
+
+import React, { useState } from "react";
+import { Info, AlertTriangle, CheckCircle2, Flame, Lightbulb, Check, Copy } from "lucide-react";
 
 interface MarkdownRendererProps {
   content: string;
+}
+
+function CodeBlock({ code, language }: { code: string; language: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="my-5 rounded-md overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm">
+      <div className="bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 text-3xs font-mono text-zinc-500 dark:text-zinc-400 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800">
+        <span className="font-semibold">{language || "code"}</span>
+        <button
+          onClick={handleCopy}
+          type="button"
+          className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors cursor-pointer"
+        >
+          {copied ? (
+            <>
+              <Check className="w-3 h-3 text-emerald-500" />
+              <span className="text-emerald-500 font-semibold">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-3 h-3" />
+              <span>Copy</span>
+            </>
+          )}
+        </button>
+      </div>
+      <pre className="bg-zinc-950 p-4 overflow-x-auto text-xs font-mono text-zinc-200 leading-relaxed">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
 }
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
@@ -83,14 +125,11 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
       }
 
       elements.push(
-        <div key={`code-${i}`} className="my-5 rounded-md overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm">
-          <div className="bg-zinc-100 dark:bg-zinc-900 px-4 py-1.5 text-3xs font-mono text-zinc-500 dark:text-zinc-400 flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800">
-            <span>{codeLanguage || "code"}</span>
-          </div>
-          <pre className="bg-zinc-950 p-4 overflow-x-auto text-xs font-mono text-zinc-200 leading-relaxed">
-            <code>{codeLines.join("\n")}</code>
-          </pre>
-        </div>
+        <CodeBlock
+          key={`code-${i}`}
+          code={codeLines.join("\n")}
+          language={codeLanguage}
+        />
       );
       continue;
     }
@@ -382,6 +421,14 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           {renderInline(paragraphLines.join(" "))}
         </p>
       );
+    } else if (i < lines.length) {
+      // Guaranteed forward progress: handles any edge-case line without infinite looping
+      elements.push(
+        <p key={`p-${i}`} className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed mb-3">
+          {renderInline(lines[i].trim())}
+        </p>
+      );
+      i++;
     }
   }
 

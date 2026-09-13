@@ -94,7 +94,7 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
                   "url": "https://beingsde.in",
                   "logo": {
                     "@type": "ImageObject",
-                    "url": "https://beingsde.in/images/redis-caching-diagram.png"
+                    "url": "https://beingsde.in/logo.png"
                   }
                 },
                 "inLanguage": "en-US"

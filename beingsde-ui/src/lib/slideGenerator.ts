@@ -431,6 +431,115 @@ Key "user_42" -> hash(key) % 5 = Server 0  ❌ (CACHE MISS! Re-mapped!)`,
       keyTakeaway: "Kafka + Flink + Cassandra is the gold-standard architecture for high-volume stream aggregation.",
       type: "summary"
     }
+  ],
+  "api-design": [
+    {
+      slideNumber: 1,
+      timestamp: "0:00 - 0:30",
+      title: "Scene 1: Protocol Selection & Architecture",
+      subtitle: "REST vs GraphQL vs gRPC in Distributed Systems",
+      veoPrompt: "3D visualization of diverse client devices routing traffic through an API Gateway to microservices, showing REST for external web clients and high-speed binary gRPC streams for internal services.",
+      narrationScript: "In system design, API design is the foundational contract between clients and microservices. Choosing the right protocol defines your system's latency and bandwidth efficiency. Default to REST over HTTPS for external public clients and web frontends due to universal compatibility and CDN cacheability. For high-throughput internal microservice communication, use gRPC over HTTP/2 with Protocol Buffers for 5 to 10x faster binary serialization.",
+      bulletPoints: [
+        "REST: Resource-oriented, stateless, standard HTTP verbs, universal compatibility & CDN caching.",
+        "gRPC: HTTP/2 multiplexing, binary Protobuf serialization, strict contracts, 30-60% lower CPU.",
+        "GraphQL: Single endpoint, client-defined schemas, solves mobile over-fetching & under-fetching.",
+        "WebSockets / SSE: Persistent connections for full-duplex live chat and real-time event streaming."
+      ],
+      diagramTitle: "Protocol Architecture Topology",
+      diagramCode: `[ Web / Mobile Clients ] ---> HTTPS / REST (JSON) ---> [ API Gateway ]
+                                                                |
+                                             +------------------+------------------+
+                                             | (HTTP/2 gRPC Protobuf)              | (gRPC)
+                                             v                                     v
+                                  [ Booking Microservice ] <--- Event ---> [ Payment Microservice ]`,
+      keyTakeaway: "Use REST for public and client-facing APIs; use gRPC with Protobuf for East-West internal microservices.",
+      type: "architecture"
+    },
+    {
+      slideNumber: 2,
+      timestamp: "0:30 - 1:00",
+      title: "Scene 2: The Idempotency-Key Pattern",
+      subtitle: "Zero Duplicate Charges Under Network Retries",
+      veoPrompt: "A client sending repeated payment requests during network timeouts. A glowing Redis lock intercepts duplicate requests and instantly returns cached successful receipts without touching the database.",
+      narrationScript: "Networks are unreliable, and clients retry failed or timed-out requests. Without idempotency, network retries cause double charges and duplicated reservations. By requiring an Idempotency-Key header, the server acquires a distributed Redis lock, verifies whether the transaction has executed, and safely caches the response for instant replay.",
+      bulletPoints: [
+        "Client generates a unique UUIDv4 Idempotency-Key header on write operations.",
+        "Server acquires distributed Redis lock (SET NX EX 30) to prevent concurrent race conditions.",
+        "Payload fingerprinting (SHA-256) rejects modified bodies reusing an existing idempotency key.",
+        "Response status and payload are stored inside the DB transaction and cached in Redis for 24 hours."
+      ],
+      diagramTitle: "Stripe-Style Idempotency Flow",
+      diagramCode: `[ Client POST /payments ] --(Idempotency-Key: abc-123)--> [ API Gateway ]
+                                                               |
+                                            1. Check Redis Lock & Cache
+                                                               v
+                                            +--------------------------------------+
+                                            | Key exists? -> Return Cached 201 OK  |
+                                            | Key missing? -> Execute DB Tx & Save |
+                                            +--------------------------------------+`,
+      keyTakeaway: "Always enforce Idempotency-Key headers on transactional POST endpoints to guarantee at-most-once execution.",
+      type: "deepdive"
+    },
+    {
+      slideNumber: 3,
+      timestamp: "1:00 - 1:30",
+      title: "Scene 3: Pagination at Scale",
+      subtitle: "Eliminating O(N) Offset Scans with Keyset Cursors",
+      veoPrompt: "A database index tree demonstrating the difference between skipping 100,000 rows in offset pagination versus an instant B-tree seek using keyset cursor pagination.",
+      narrationScript: "When querying millions of records, traditional offset pagination forces the database to read and discard thousands of rows, causing high disk I/O and query timeouts. Furthermore, live inserts cause data drift and duplicate rows. Keyset or cursor-based pagination solves this by seeking directly to indexed column pointers, delivering constant-time O(1) query performance.",
+      bulletPoints: [
+        "Offset Pagination (OFFSET 50000 LIMIT 20): O(N) disk traversal, causes CPU spikes and slow queries.",
+        "Data Drift: Live inserts during scrolling push rows between pages, showing duplicate items.",
+        "Keyset / Cursor Pagination: Uses WHERE (created_at, id) < (cursor_time, cursor_id) in O(log N) time.",
+        "Consistent Response Contract: Return data array with has_more boolean and next_cursor token."
+      ],
+      diagramTitle: "Offset vs Cursor Performance at Scale",
+      diagramCode: `Offset Paging:  [==== Skip 100,000 rows (Slow O(N) Disk Scan) ====] -> [ Return 20 Rows ]
+Cursor Paging:  [ B-Tree Index Seek directly to (cursor_id) in O(1) ] ------> [ Return 20 Rows ]`,
+      keyTakeaway: "Use cursor-based pagination for high-volume, dynamic datasets to prevent database exhaustion and data drift.",
+      type: "problem"
+    },
+    {
+      slideNumber: 4,
+      timestamp: "1:30 - 2:00",
+      title: "Scene 4: Asynchronous Jobs & Webhooks",
+      subtitle: "The 202 Accepted Pattern for Long-Running Tasks",
+      veoPrompt: "A client submitting a heavy video transcoding job. The server immediately returns a 202 Accepted status with a tracking URL, delegating work to a background worker queue.",
+      narrationScript: "Operations exceeding 500 milliseconds—like generating complex reports, transcribing media, or bulk CSV processing—must never block synchronous HTTP threads. Return an immediate 202 Accepted status with a Location header pointing to the job status resource. Clients can poll the status URL with exponential backoff or receive an automated Webhook push when completed.",
+      bulletPoints: [
+        "POST /v1/jobs returns 202 Accepted with Location: /v1/jobs/{id} and Retry-After: 30 header.",
+        "Prevents 504 Gateway Timeouts and frees up synchronous HTTP connection pools.",
+        "Background workers (Kafka / Celery / SQS) process heavy computational tasks asynchronously.",
+        "Webhook integration: Sign webhook payloads with HMAC-SHA256 to ensure cryptographic authenticity."
+      ],
+      diagramTitle: "Asynchronous Job Polling & Webhook Architecture",
+      diagramCode: `[ Client ] -- 1. POST /v1/reports --------> [ API Gateway ] -- 2. Push Job -> [ Kafka Queue ]
+            <-- 3. 202 Accepted (Location) -- [ API Gateway ]                       |
+                 (Status: "queued")                                                 v
+                                                                           [ Background Worker ]
+            <-- 4. Webhook Push (Report Ready) -------------------------------------+`,
+      keyTakeaway: "Decouple long-running operations using the HTTP 202 Accepted pattern paired with background queues.",
+      type: "deepdive"
+    },
+    {
+      slideNumber: 5,
+      timestamp: "2:00 - 2:30",
+      title: "Scene 5: The 5-Minute Interview Blueprint",
+      subtitle: "A Systematic Framework for FAANG API Design",
+      veoPrompt: "A sleek executive summary card highlighting the 5 key steps to nail API design in a 45-minute technical system design interview.",
+      narrationScript: "To ace API design in your system design interview: first, declare your protocol in 30 seconds. Second, define 2 to 3 core nouns using plural REST conventions. Third, specify request parameters, status codes, and JSON bodies for your primary read and write operations. Finally, proactively highlight idempotency keys, cursor pagination, rate limiting, and tenant security. Spend no more than 5 minutes to leave ample time for core architecture deep-dives.",
+      bulletPoints: [
+        "Protocol Declaration: Explicitly justify REST for clients vs gRPC for internal microservices.",
+        "Resource Modeling: Use plural nouns (/v1/events, /v1/bookings); never put verbs in endpoint URLs.",
+        "Production Resilience: Specify Idempotency-Key headers on payments and writes.",
+        "Security & Scale: Call out RFC 7807 problem details, rate limiting (429), and tenant authorization checks."
+      ],
+      diagramTitle: "5-Minute Interview Checklist",
+      diagramCode: `[ 1. Protocol (30s) ] -> [ 2. Resources (1m) ] -> [ 3. Endpoints (2m) ] -> [ 4. Scale & Safety (1.5m) ]`,
+      keyTakeaway: "Spend 3-5 minutes outlining clean REST endpoints with idempotency, pagination, and security to prove production seniority.",
+      type: "summary"
+    }
   ]
 };
 
