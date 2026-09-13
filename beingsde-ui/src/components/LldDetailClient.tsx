@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, Clock, CheckCircle2, Code2, AlertTriangle, Boxes } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, Code2, AlertTriangle, Boxes, Copy, Check } from "lucide-react";
 
 import lldQuestions from "@/data/lld.json";
 
@@ -27,6 +27,7 @@ interface LLDQuestion {
 
 export default function LldDetailClient({ slug, initialQuestion }: { slug: string; initialQuestion?: any }) {
   const [selectedLang, setSelectedLang] = useState<"java" | "cpp" | "python">("java");
+  const [copied, setCopied] = useState(false);
   const [question, setQuestion] = useState<LLDQuestion>(
     initialQuestion || (lldQuestions as LLDQuestion[]).find((q) => q.slug === slug) || (lldQuestions[0] as LLDQuestion)
   );
@@ -166,24 +167,47 @@ export default function LldDetailClient({ slug, initialQuestion }: { slug: strin
               <div className="flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                 <Code2 className="w-4 h-4" /> Code Blueprint
               </div>
-              <div className="flex gap-1.5">
-                {(["java", "cpp", "python"] as const).map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => setSelectedLang(lang)}
-                    className={`text-[10px] font-mono font-bold px-3 py-1 border uppercase tracking-wider rounded-sm transition-all duration-300 ${
-                      selectedLang === lang
-                        ? "bg-zinc-100 text-zinc-900 border-zinc-100"
-                        : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-650"
-                    }`}
-                  >
-                    {lang === "cpp" ? "C++" : lang}
-                  </button>
-                ))}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (question.languages[selectedLang]) {
+                      navigator.clipboard.writeText(question.languages[selectedLang]);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2.5 py-1 border rounded-sm border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
+                  title="Copy code"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-400" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3 text-zinc-400" /> Copy
+                    </>
+                  )}
+                </button>
+                <div className="flex gap-1.5">
+                  {(["java", "cpp", "python"] as const).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setSelectedLang(lang)}
+                      className={`text-[10px] font-mono font-bold px-3 py-1 border uppercase tracking-wider rounded-sm transition-all duration-300 ${
+                        selectedLang === lang
+                          ? "bg-zinc-100 text-zinc-900 border-zinc-100"
+                          : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-650"
+                      }`}
+                    >
+                      {lang === "cpp" ? "C++" : lang}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
             
-            <pre className="bg-zinc-950 text-zinc-100 text-xs p-4 rounded-sm font-mono overflow-x-auto border border-zinc-800 leading-relaxed max-h-[500px]">
+            <pre className="bg-zinc-950 text-zinc-100 text-xs p-4 rounded-sm font-mono overflow-x-auto border border-zinc-800 leading-relaxed max-h-[680px]">
               <code>{question.languages[selectedLang]}</code>
             </pre>
           </div>

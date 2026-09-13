@@ -108,21 +108,20 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // 4. Seed LLD Items
-        if (lldRepository.count() == 0) {
-            try {
-                File file = new File("/Users/arnavagarwal/beingsde/beingsde-ui/src/data/lld.json");
-                if (file.exists()) {
-                    List<LldItem> items = objectMapper.readValue(file, new TypeReference<List<LldItem>>() {});
-                    items.forEach(t -> {
-                        t.setArchived(false);
-                        if (t.getCreatedAt() == null) t.setCreatedAt(Instant.now());
-                    });
-                    lldRepository.saveAll(items);
-                    System.out.println(">>> Seeded " + items.size() + " LLD Questions");
-                }
-            } catch (Exception e) {
-                System.err.println("Failed to seed LLD items: " + e.getMessage());
+        try {
+            File file = new File("/Users/arnavagarwal/beingsde/beingsde-ui/src/data/lld.json");
+            if (file.exists() && lldRepository.count() <= 27) {
+                lldRepository.deleteAll();
+                List<LldItem> items = objectMapper.readValue(file, new TypeReference<List<LldItem>>() {});
+                items.forEach(t -> {
+                    t.setArchived(false);
+                    if (t.getCreatedAt() == null) t.setCreatedAt(Instant.now());
+                });
+                lldRepository.saveAll(items);
+                System.out.println(">>> Seeded " + items.size() + " LLD Questions");
             }
+        } catch (Exception e) {
+            System.err.println("Failed to seed LLD items: " + e.getMessage());
         }
 
         // 5. Seed DSA Questions
