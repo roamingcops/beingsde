@@ -3,14 +3,12 @@
 import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Clock, Lock, CheckCircle, Video, FileText, Download } from "lucide-react";
+import { ArrowLeft, Clock, Lock, CheckCircle, FileText } from "lucide-react";
 
 import MOCK_TOPICS from "@/data/topics.json";
-import SlidePlayer from "@/components/SlidePlayer";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 export default function TopicDetailClient({ slug, initialTopic }: { slug: string; initialTopic?: any }) {
-  const [activeTab, setActiveTab] = useState<"notes" | "video" | "pdf">("notes");
   const [topic, setTopic] = useState<any>(() => initialTopic || MOCK_TOPICS.find((t) => t.slug === slug) || MOCK_TOPICS[1]);
   const [isPremiumUser, setIsPremiumUser] = useState(false);
   const isLocked = false;
@@ -90,7 +88,7 @@ export default function TopicDetailClient({ slug, initialTopic }: { slug: string
             <h2 className="text-2xl font-bold tracking-tight">Premium Architecture Locked</h2>
             
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              This system design module includes complex database sharding strategies, trade-off notes, video lectures, and architectural blueprints available exclusively to Premium subscribers.
+              This system design module includes complex database sharding strategies, deep architectural trade-off notes, and production patterns available exclusively to Premium subscribers.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 w-full justify-center">
@@ -122,95 +120,34 @@ export default function TopicDetailClient({ slug, initialTopic }: { slug: string
         /* OPEN WORKSPACE (FREE TOPIC) */
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Left Column: Learning Notes & Tabs */}
+          {/* Left Column: Learning Notes & Architecture */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             
-            {/* Workspace tabs selector */}
-            <div className="flex border-b border-zinc-200 dark:border-zinc-800">
-              <button 
-                onClick={() => setActiveTab("notes")}
-                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                  activeTab === "notes" 
-                    ? "border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50" 
-                    : "border-transparent text-zinc-400 hover:text-zinc-600"
-                }`}
-              >
-                <FileText className="w-3.5 h-3.5" /> Notes
-              </button>
-              <button 
-                onClick={() => setActiveTab("video")}
-                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                  activeTab === "video" 
-                    ? "border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50" 
-                    : "border-transparent text-zinc-400 hover:text-zinc-600"
-                }`}
-              >
-                <Video className="w-3.5 h-3.5" /> Video Lecture
-              </button>
-              <button 
-                onClick={() => setActiveTab("pdf")}
-                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all ${
-                  activeTab === "pdf" 
-                    ? "border-zinc-900 dark:border-zinc-50 text-zinc-900 dark:text-zinc-50" 
-                    : "border-transparent text-zinc-400 hover:text-zinc-600"
-                }`}
-              >
-                <Download className="w-3.5 h-3.5" /> PDF blueprint
-              </button>
-            </div>
-
-            {/* Tab Rendering Content */}
-            <div className={`rounded-md shadow-sm min-h-[300px] ${
-              activeTab === "video" ? "p-0 bg-transparent border-none" : "border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6"
-            }`}>
-              
-              {activeTab === "notes" && (
-                <div className="flex flex-col gap-6">
-                  {/* Explanation Diagram Block */}
-                  {topic.imageUrl && (
-                    <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-lg flex flex-col gap-3">
-                      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
-                        <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">System Architecture Diagram</span>
-                        <span className="text-3xs font-mono px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded">Interactive Zoom</span>
-                      </div>
-                      <div className="relative w-full aspect-[4/3] max-h-[480px] overflow-hidden rounded bg-black flex items-center justify-center group cursor-pointer border border-zinc-200 dark:border-zinc-800">
-                        <Image
-                          src={topic.imageUrl}
-                          alt={`${topic.title} architecture diagram`}
-                          fill
-                          className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                          sizes="(max-w-768px) 100vw, 800px"
-                        />
-                      </div>
+            <div className="rounded-md shadow-sm min-h-[300px] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6">
+              <div className="flex flex-col gap-6">
+                {/* Explanation Diagram Block */}
+                {topic.imageUrl && (
+                  <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-lg flex flex-col gap-3">
+                    <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                      <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">System Architecture Diagram</span>
+                      <span className="text-3xs font-mono px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded">Interactive Zoom</span>
                     </div>
-                  )}
-
-                  <div className="prose dark:prose-invert max-w-none">
-                    <MarkdownRenderer content={topic.contentMarkdown} />
+                    <div className="relative w-full aspect-[4/3] max-h-[480px] overflow-hidden rounded bg-black flex items-center justify-center group cursor-pointer border border-zinc-200 dark:border-zinc-800">
+                      <Image
+                        src={topic.imageUrl}
+                        alt={`${topic.title} architecture diagram`}
+                        fill
+                        className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                        sizes="(max-w-768px) 100vw, 800px"
+                      />
+                    </div>
                   </div>
+                )}
+
+                <div className="prose dark:prose-invert max-w-none">
+                  <MarkdownRenderer content={topic.contentMarkdown} />
                 </div>
-              )}
-
-              {activeTab === "video" && (
-                <SlidePlayer topic={topic} />
-              )}
-
-              {activeTab === "pdf" && (
-                <div className="w-full py-12 flex flex-col items-center justify-center gap-4 text-center">
-                  <FileText className="w-12 h-12 text-zinc-400" />
-                  <div>
-                    <h3 className="font-semibold text-sm">Download System Blueprints</h3>
-                    <p className="text-xs text-zinc-400 mt-1">Get high-resolution hand-sketched blueprints of this topology.</p>
-                  </div>
-                  <button 
-                    type="button"
-                    className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 px-4 py-2.5 border border-zinc-900 dark:border-zinc-100 hover:bg-transparent hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-300"
-                  >
-                    <Download className="w-4 h-4" /> Download PDF Blueprint
-                  </button>
-                </div>
-              )}
-
+              </div>
             </div>
           </div>
 

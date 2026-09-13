@@ -366,28 +366,6 @@ export default function AdminTopicsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="font-mono font-bold text-zinc-400 uppercase block mb-1">Video CDN URL</label>
-                  <input
-                    type="text"
-                    value={videoUrl}
-                    onChange={(e) => setVideoUrl(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full p-2 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded"
-                  />
-                </div>
-                <div>
-                  <label className="font-mono font-bold text-zinc-400 uppercase block mb-1">PDF Blueprint URL</label>
-                  <input
-                    type="text"
-                    value={pdfUrl}
-                    onChange={(e) => setPdfUrl(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full p-2 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded"
-                  />
-                </div>
-              </div>
 
               <div>
                 <label className="font-mono font-bold text-zinc-400 uppercase block mb-1">Content Markdown</label>
