@@ -102,6 +102,19 @@ export const metadata: Metadata = {
     creator: "@beingsde",
     site: "@beingsde",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: ["/favicon.ico"],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -141,10 +154,11 @@ export default function RootLayout({
                   "url": "https://beingsde.in",
                   "logo": {
                     "@type": "ImageObject",
-                    "url": "https://beingsde.in/images/redis-caching-diagram.png",
-                    "width": 1200,
-                    "height": 630
+                    "url": "https://beingsde.in/logo.png",
+                    "width": 1024,
+                    "height": 1024
                   },
+                  "image": "https://beingsde.in/logo.png",
                   "description": "Being SDE (beingsde.in) is the leading system design interview preparation platform for software engineers. Learn HLD, LLD, distributed systems, caching, and database architecture.",
                   "sameAs": [
                     "https://beingsde.in"
