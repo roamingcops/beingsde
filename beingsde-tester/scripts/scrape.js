@@ -80,7 +80,7 @@ Options:
   if (params.login) {
     console.log(`Launching headed browser to log in at: ${params.login}`);
     console.log("Please perform the login inside the browser window. The script will save state when the browser is closed or after 2 minutes.");
-    
+
     const browser = await chromium.launch({ headless: false });
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -117,7 +117,7 @@ Options:
   // --- SCRAPING MODE ---
   console.log(`Preparing to scrape ${params.urls.length} URLs...`);
   const browser = await chromium.launch({ headless: true });
-  
+
   let contextOptions = {};
   if (fs.existsSync(STATE_FILE)) {
     console.log(`Loading saved authentication state from: ${STATE_FILE}`);
@@ -150,12 +150,12 @@ Options:
       const articleData = await page.evaluate((config) => {
         const titleEl = document.querySelector("h1") || document.querySelector("title");
         const title = titleEl ? titleEl.innerText.trim() : "Scraped Article";
-        
+
         // Find main content container
         const contentEl = document.querySelector(config.selector);
         let contentHtml = "";
         let textContent = "";
-        
+
         if (contentEl) {
           contentHtml = contentEl.innerHTML;
           textContent = contentEl.innerText || "";
@@ -167,10 +167,10 @@ Options:
         // Custom simple HTML to Markdown converter running inside DOM context
         function htmlToMarkdown(htmlString) {
           let doc = new DOMParser().parseFromString(htmlString, 'text/html');
-          
+
           // Basic replacements
           let markdown = "";
-          
+
           function walk(node) {
             if (node.nodeType === Node.TEXT_NODE) {
               markdown += node.nodeValue;
@@ -186,11 +186,11 @@ Options:
               else if (tag === 'pre') markdown += "\n```\n";
               else if (tag === 'li') markdown += "\n* ";
               else if (tag === 'br') markdown += "\n";
-              
+
               for (let child of node.childNodes) {
                 walk(child);
               }
-              
+
               if (tag === 'strong' || tag === 'b') markdown += "**";
               else if (tag === 'em' || tag === 'i') markdown += "*";
               else if (tag === 'code') markdown += "` ";
@@ -198,9 +198,9 @@ Options:
               else if (tag === 'h1' || tag === 'h2' || tag === 'h3') markdown += "\n";
             }
           }
-          
+
           walk(doc.body);
-          
+
           // Clean up formatting
           return markdown
             .replace(/\n\s*\n\s*\n/g, "\n\n") // Collapse multiple blank lines
@@ -208,11 +208,11 @@ Options:
         }
 
         const contentMarkdown = htmlToMarkdown(contentHtml);
-        
+
         // Retrieve meta tags for description or tags
         const metaDesc = document.querySelector("meta[name='description']");
         const description = metaDesc ? metaDesc.getAttribute("content") : textContent.substring(0, 160).replace(/\s+/g, " ") + "...";
-        
+
         const metaKeywords = document.querySelector("meta[name='keywords']");
         const keywords = metaKeywords ? metaKeywords.getAttribute("content").split(",").map(k => k.trim()) : [];
 
@@ -228,7 +228,7 @@ Options:
       // Generate additional details
       const slug = generateSlug(articleData.title);
       const estimatedTime = Math.max(5, Math.ceil(articleData.wordCount / 200)); // ~200 wpm
-      
+
       // Determine category based on URL
       let category = "Core Fundamentals";
       if (url.includes("/deep-dives/")) {
