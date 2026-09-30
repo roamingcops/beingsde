@@ -150,9 +150,9 @@ public class PasswordResetEmailService {
                           <p style="margin:0;font-size:11px;color:#a1a1aa;line-height:1.5;">
                             &copy; 2026 beingsde.in &mdash; Built for System Architects.<br>
                             Questions? Email us at
-                            <a href="mailto:support@beingsde.in"
+                            <a href="mailto:support.beingsde@gmail.com"
                                style="color:#71717a;text-decoration:underline;">
-                              support@beingsde.in
+                              support.beingsde@gmail.com
                             </a>
                           </p>
                         </td>

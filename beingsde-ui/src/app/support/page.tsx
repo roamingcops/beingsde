@@ -55,8 +55,11 @@ const faqs = [
     a: (
       <>
         We offer a full refund within <strong>7 days</strong> of your initial subscription purchase.
-        Please reach out via our contact channels with your registered email and order ID.
-        Renewal charges are non-refundable per our{" "}
+        Please email us at{" "}
+        <a href="mailto:support.beingsde@gmail.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+          support.beingsde@gmail.com
+        </a>{" "}
+        with your registered email and order ID. Renewal charges are non-refundable per our{" "}
         <Link href="/terms" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
           Terms of Service
         </Link>.
@@ -69,7 +72,15 @@ const faqs = [
   },
   {
     q: "I found an error in the content. How do I report it?",
-    a: "We really appreciate that! Please reach out via our contact channels with the topic name and a description of the issue. Verified corrections receive a shoutout in our changelog.",
+    a: (
+      <>
+        We really appreciate that! Please email us at{" "}
+        <a href="mailto:support.beingsde@gmail.com" className="underline hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
+          support.beingsde@gmail.com
+        </a>{" "}
+        with the topic name and a description of the issue. Verified corrections receive a shoutout in our changelog.
+      </>
+    ),
   },
   {
     q: "Is beingsde available as a mobile app?",
@@ -109,7 +120,7 @@ export default function SupportPage() {
                 "name": "How do I get a refund?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "We offer a full refund within 7 days of your initial subscription purchase. Please reach out via our contact channels with your registered email and order ID. Renewal charges are non-refundable per our Terms of Service."
+                  "text": "We offer a full refund within 7 days of your initial subscription purchase. Please email us at support.beingsde@gmail.com with your registered email and order ID. Renewal charges are non-refundable per our Terms of Service."
                 }
               },
               {
@@ -125,7 +136,7 @@ export default function SupportPage() {
                 "name": "I found an error in the content. How do I report it?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "We really appreciate that! Please reach out via our contact channels with the topic name and a description of the issue. Verified corrections receive a shoutout in our changelog."
+                  "text": "We really appreciate that! Please email us at support.beingsde@gmail.com with the topic name and a description of the issue. Verified corrections receive a shoutout in our changelog."
                 }
               },
               {
@@ -146,43 +157,57 @@ export default function SupportPage() {
         <span className="text-xs font-semibold uppercase tracking-widest font-mono text-zinc-400">Help Center</span>
         <h1 className="text-4xl font-black tracking-tight">Support</h1>
         <p className="text-sm text-zinc-500 max-w-xl">
-          We&apos;re here to help. Browse the FAQs below or check back soon for our contact channels.
+          We&apos;re here to help. Browse the FAQs below or reach out directly to our support team.
         </p>
       </div>
 
-      {/* Contact cards — no emails yet */}
+      {/* Contact cards */}
       <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h2 className="text-lg font-bold tracking-tight">Contact Us</h2>
-          <span className="text-xs font-mono text-zinc-400 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded-sm">
-            Coming soon
-          </span>
+          <a
+            href="mailto:support.beingsde@gmail.com"
+            className="text-xs font-mono font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 px-3 py-1.5 rounded-sm hover:underline w-fit"
+          >
+            support.beingsde@gmail.com
+          </a>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {topics.map((topic) => {
             const Icon = topic.icon;
             return (
-              <div
+              <a
                 key={topic.title}
-                className="flex flex-col gap-3 p-5 border border-zinc-200 dark:border-zinc-800 rounded-sm bg-white dark:bg-[#18181b] opacity-60"
+                href={`mailto:support.beingsde@gmail.com?subject=${encodeURIComponent(`[Being SDE Support] ${topic.title}`)}`}
+                className="flex flex-col gap-3 p-5 border border-zinc-200 dark:border-zinc-800 rounded-sm bg-white dark:bg-[#18181b] hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors group cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-sm">
-                    <Icon className="w-4 h-4 text-zinc-400" />
+                  <div className="w-8 h-8 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 rounded-sm group-hover:border-zinc-400 dark:group-hover:border-zinc-600">
+                    <Icon className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
                   </div>
                   <span className="text-sm font-semibold">{topic.title}</span>
                 </div>
-                <p className="text-xs text-zinc-400 leading-relaxed">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
                   {topic.description}
                 </p>
-              </div>
+                <span className="text-2xs font-mono text-blue-600 dark:text-blue-400 mt-auto group-hover:underline">
+                  Email about {topic.title.toLowerCase()} &rarr;
+                </span>
+              </a>
             );
           })}
         </div>
 
-        <p className="text-xs text-zinc-400 italic">
-          Dedicated support channels will be available soon. In the meantime, see the FAQs below.
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          Have an urgent question or account inquiry? Email us directly at{" "}
+          <a
+            href="mailto:support.beingsde@gmail.com"
+            className="underline font-mono text-zinc-900 dark:text-zinc-100 hover:text-blue-600 dark:hover:text-blue-400"
+          >
+            support.beingsde@gmail.com
+          </a>
+          . We respond within 24 hours on business days.
         </p>
       </section>
 

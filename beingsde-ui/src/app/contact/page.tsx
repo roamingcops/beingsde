@@ -27,7 +27,7 @@ export default function ContactPage() {
             "mainEntity": {
               "@type": "Organization",
               "name": "Being SDE",
-              "email": "contact@beingsde.in",
+              "email": "support.beingsde@gmail.com",
               "url": "https://beingsde.in"
             }
           }),
@@ -57,10 +57,10 @@ export default function ContactPage() {
             For general inquiries, billing help, and feedback:
           </p>
           <a
-            href="mailto:contact@beingsde.in"
+            href="mailto:support.beingsde@gmail.com"
             className="text-xs font-mono font-semibold text-zinc-900 dark:text-zinc-100 underline hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
           >
-            contact@beingsde.in
+            support.beingsde@gmail.com
           </a>
         </div>
 
