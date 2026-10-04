@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Clock, CheckCircle2, Code2, AlertTriangle, Boxes, Copy, Check } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle2, Code2, AlertTriangle, Boxes, Copy, Check, Maximize2, Minimize2 } from "lucide-react";
 
 import lldQuestions from "@/data/lld.json";
 
@@ -28,6 +28,7 @@ interface LLDQuestion {
 export default function LldDetailClient({ slug, initialQuestion }: { slug: string; initialQuestion?: any }) {
   const [selectedLang, setSelectedLang] = useState<"java" | "cpp" | "python">("java");
   const [copied, setCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [question, setQuestion] = useState<LLDQuestion>(
     initialQuestion || (lldQuestions as LLDQuestion[]).find((q) => q.slug === slug) || (lldQuestions[0] as LLDQuestion)
   );
@@ -40,6 +41,20 @@ export default function LldDetailClient({ slug, initialQuestion }: { slug: strin
         if (res.ok) {
           const data = await res.json();
           if (data) {
+            const staticQ = (lldQuestions as LLDQuestion[]).find((item) => item.slug === slug);
+            if (staticQ && staticQ.languages) {
+              data.languages = {
+                java: (data.languages?.java && data.languages.java.length >= (staticQ.languages.java?.length || 0))
+                  ? data.languages.java
+                  : staticQ.languages.java,
+                cpp: (data.languages?.cpp && data.languages.cpp.length >= (staticQ.languages.cpp?.length || 0))
+                  ? data.languages.cpp
+                  : staticQ.languages.cpp,
+                python: (data.languages?.python && data.languages.python.length >= (staticQ.languages.python?.length || 0))
+                  ? data.languages.python
+                  : staticQ.languages.python,
+              };
+            }
             setQuestion(data);
           }
         }
@@ -162,55 +177,96 @@ export default function LldDetailClient({ slug, initialQuestion }: { slug: strin
           </div>
 
           {/* Code Panel */}
-          <div className="border border-zinc-200 dark:border-zinc-800 bg-[#18181b] p-5 rounded-sm shadow-sm">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
-              <div className="flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                <Code2 className="w-4 h-4" /> Code Blueprint
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    if (question.languages[selectedLang]) {
-                      navigator.clipboard.writeText(question.languages[selectedLang]);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2.5 py-1 border rounded-sm border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
-                  title="Copy code"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-3 h-3 text-emerald-400" /> Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3 h-3 text-zinc-400" /> Copy
-                    </>
-                  )}
-                </button>
-                <div className="flex gap-1.5">
-                  {(["java", "cpp", "python"] as const).map((lang) => (
+          {(() => {
+            const currentCode = question.languages?.[selectedLang] || "";
+            const lineCount = currentCode ? currentCode.split("\n").length : 0;
+            return (
+              <div className="border border-zinc-200 dark:border-zinc-800 bg-[#18181b] p-5 rounded-sm shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                      <Code2 className="w-4 h-4 text-emerald-400" /> Code Blueprint
+                    </div>
+                    {lineCount > 0 && (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
+                        {lineCount} lines
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
-                      key={lang}
-                      onClick={() => setSelectedLang(lang)}
-                      className={`text-[10px] font-mono font-bold px-3 py-1 border uppercase tracking-wider rounded-sm transition-all duration-300 ${
-                        selectedLang === lang
-                          ? "bg-zinc-100 text-zinc-900 border-zinc-100"
-                          : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-650"
-                      }`}
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2.5 py-1 border rounded-sm border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
+                      title={isExpanded ? "Collapse to fixed height" : "Expand to view all lines"}
                     >
-                      {lang === "cpp" ? "C++" : lang}
+                      {isExpanded ? (
+                        <>
+                          <Minimize2 className="w-3 h-3 text-zinc-400" /> Collapse
+                        </>
+                      ) : (
+                        <>
+                          <Maximize2 className="w-3 h-3 text-zinc-400" /> Expand
+                        </>
+                      )}
                     </button>
-                  ))}
+
+                    <button
+                      onClick={() => {
+                        if (currentCode) {
+                          navigator.clipboard.writeText(currentCode);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2000);
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2.5 py-1 border rounded-sm border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white hover:border-zinc-700 transition-colors"
+                      title="Copy code"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-400" /> Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3 text-zinc-400" /> Copy
+                        </>
+                      )}
+                    </button>
+
+                    <div className="flex gap-1.5">
+                      {(["java", "cpp", "python"] as const).map((lang) => (
+                        <button
+                          key={lang}
+                          onClick={() => setSelectedLang(lang)}
+                          className={`text-[10px] font-mono font-bold px-3 py-1 border uppercase tracking-wider rounded-sm transition-all duration-300 ${
+                            selectedLang === lang
+                              ? "bg-zinc-100 text-zinc-900 border-zinc-100"
+                              : "bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-650"
+                          }`}
+                        >
+                          {lang === "cpp" ? "C++" : lang}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="relative">
+                  <pre
+                    tabIndex={0}
+                    className="bg-zinc-950 text-zinc-100 text-xs p-4 rounded-sm font-mono border border-zinc-800 leading-relaxed overflow-x-auto overflow-y-auto select-text focus:outline-none focus:ring-1 focus:ring-zinc-700"
+                    style={{
+                      maxHeight: isExpanded ? "none" : "580px",
+                      overflowY: "auto",
+                      overflowX: "auto"
+                    }}
+                  >
+                    <code>{currentCode}</code>
+                  </pre>
                 </div>
               </div>
-            </div>
-            
-            <pre className="bg-zinc-950 text-zinc-100 text-xs p-4 rounded-sm font-mono overflow-x-auto border border-zinc-800 leading-relaxed max-h-[680px]">
-              <code>{question.languages[selectedLang]}</code>
-            </pre>
-          </div>
+            );
+          })()}
         </div>
       </div>
     </div>
