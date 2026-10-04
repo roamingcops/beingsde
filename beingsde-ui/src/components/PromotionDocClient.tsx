@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
+  ArrowRight,
   Printer,
   Copy,
   Check,
@@ -34,6 +35,10 @@ import {
   DEPLOYMENT_CHECKLIST,
   CONTINUOUS_1ON1_LOG,
   TEMPLATES,
+  Q4_CORE_PLAYS,
+  Q4_TIMELINE,
+  Q4_SCRIPTS,
+  Q4_TRADEOFFS,
 } from "@/data/promotion-guide";
 
 type TabId =
@@ -43,6 +48,7 @@ type TabId =
   | "automation"
   | "senior-traits"
   | "one-on-one"
+  | "q4-strategy"
   | "templates";
 
 type LevelFilter = "ALL" | "SDE1_TO_SDE2" | "SDE2_TO_SDE3" | "SDE3_TO_STAFF";
@@ -93,6 +99,7 @@ export default function PromotionDocClient() {
     { id: "automation", label: "Toil & Automation", icon: Zap },
     { id: "senior-traits", label: "Senior & Deployment Owner", icon: Users },
     { id: "one-on-one", label: "1:1 Feedback Tracking", icon: Clock },
+    { id: "q4-strategy", label: "Q4 Endgame Playbook", icon: Flame },
     { id: "templates", label: "Copyable Templates", icon: FileText },
   ];
 
@@ -1023,7 +1030,233 @@ export default function PromotionDocClient() {
       )}
 
       {/* ========================================================= */}
-      {/* TAB 7: COPYABLE TEMPLATES */}
+      {/* TAB 7: Q4 ENDGAME PLAYBOOK */}
+      {/* ========================================================= */}
+      {activeTab === "q4-strategy" && (
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in-50 duration-200">
+          {/* Header */}
+          <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-6 sm:p-8 space-y-4 rounded-sm shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5" />
+                  Q4 Endgame Strategy
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50 mt-1">
+                  What SDEs Can Do in the Last Quarter to Showcase Impact &amp; Win Promotions
+                </h2>
+                <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-3xl mt-1.5">
+                  By early December, promotion committee slates are already 95% finalized. Managers calibrated initial tiers in October and November. To secure an <strong>Exceeds Expectations</strong> rating or earn a promotion, you must treat Q4 as an intentional endgame sprint.
+                </p>
+              </div>
+              <Link
+                href="/topics/sde-q4-showcase-playbook"
+                className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold px-4 py-2 border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100 transition-colors rounded-xs shadow-xs self-start md:self-auto shrink-0"
+              >
+                <span>Read Full Article</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* 4 Psychological Drivers Callout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 text-xs">
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xs space-y-1">
+                <div className="font-mono font-bold text-zinc-900 dark:text-zinc-100">1. Risk Aversion</div>
+                <p className="text-zinc-500">Holiday freezes &amp; retail peaks mean managers prioritize rock-solid stability above all else.</p>
+              </div>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xs space-y-1">
+                <div className="font-mono font-bold text-zinc-900 dark:text-zinc-100">2. OKR Completion</div>
+                <p className="text-zinc-500">Tying off stalled annual goals directly saves your manager&apos;s own annual review.</p>
+              </div>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xs space-y-1">
+                <div className="font-mono font-bold text-zinc-900 dark:text-zinc-100">3. Cross-Team Champions</div>
+                <p className="text-zinc-500">Unblocking peer teams creates advocates who will actively vote for you in calibration.</p>
+              </div>
+              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xs space-y-1">
+                <div className="font-mono font-bold text-zinc-900 dark:text-zinc-100">4. Recency Bias</div>
+                <p className="text-zinc-500">Wins delivered in October/November burn freshest in Director and committee memories.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* The 6 High-Leverage Q4 Plays */}
+          <div className="space-y-4">
+            <div className="border-b border-zinc-200 dark:border-zinc-800 pb-2">
+              <h3 className="text-lg sm:text-xl font-bold font-mono text-zinc-950 dark:text-zinc-50">
+                The 6 High-Leverage Q4 Plays
+              </h3>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Execute these high-visibility moves before calibration slates are locked in November.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Q4_CORE_PLAYS.map((play) => (
+                <div
+                  key={play.id}
+                  className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-5 rounded-sm space-y-3 shadow-xs text-xs sm:text-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xs font-mono font-semibold px-2.5 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-xs">
+                      {play.tag}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                      Senior Signal
+                    </span>
+                  </div>
+
+                  <h4 className="font-bold text-sm sm:text-base text-zinc-950 dark:text-zinc-50">{play.title}</h4>
+                  <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">{play.summary}</p>
+
+                  <div className="space-y-1 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <span className="font-mono text-2xs uppercase text-zinc-500 font-bold">Key Action Steps:</span>
+                    <ul className="list-disc pl-4 space-y-1 text-zinc-700 dark:text-zinc-300">
+                      {play.actionSteps.map((step, sIdx) => (
+                        <li key={sIdx}>{step}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-2 text-xs font-mono text-emerald-700 dark:text-emerald-400 border-t border-zinc-100 dark:border-zinc-800">
+                    <span className="font-bold">Why Committees Care: </span>
+                    {play.seniorSignal}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3 Manager Alignment Scripts */}
+          <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-5 sm:p-6 rounded-sm space-y-4 shadow-xs">
+            <div className="border-b border-zinc-200 dark:border-zinc-800 pb-2">
+              <h3 className="text-base sm:text-lg font-bold font-mono text-zinc-950 dark:text-zinc-50">
+                Word-for-Word Q4 Manager Calibration Scripts
+              </h3>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Copy and adapt these exact scripts for your upcoming 1:1 meetings with your Engineering Manager.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {Q4_SCRIPTS.map((s) => (
+                <div
+                  key={s.id}
+                  className="p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 rounded-sm space-y-2 text-xs sm:text-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-sm sm:text-base text-zinc-950 dark:text-zinc-50">{s.title}</span>
+                      <span className="font-mono text-2xs px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-xs ml-2">
+                        {s.timing}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(s.script, s.id)}
+                      className="flex items-center gap-1 text-2xs font-mono px-2.5 py-1 border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded-xs transition-colors shadow-xs"
+                    >
+                      {copiedKey === s.id ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-500" />
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3 text-zinc-500" />
+                          <span>Copy Script</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-zinc-800 dark:text-zinc-200 italic font-sans bg-white dark:bg-zinc-900 p-3 border border-zinc-200 dark:border-zinc-800 rounded-xs leading-relaxed whitespace-pre-line">
+                    {s.script}
+                  </p>
+                  <div className="text-xs font-mono text-zinc-500">
+                    <span className="font-bold text-zinc-700 dark:text-zinc-300">Strategic Rationale: </span>
+                    {s.rationale}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* The Last 60 Days Execution Calendar */}
+          <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-5 sm:p-6 rounded-sm space-y-4 shadow-xs">
+            <div className="border-b border-zinc-200 dark:border-zinc-800 pb-2">
+              <h3 className="text-base sm:text-lg font-bold font-mono text-zinc-950 dark:text-zinc-50">
+                The Last 60 Days: Week-by-Week Execution Calendar
+              </h3>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                A structured execution plan from early October to final calibration sign-off.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {Q4_TIMELINE.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-sm space-y-2 text-xs sm:text-sm"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold px-2 py-0.5 bg-zinc-950 text-white dark:bg-zinc-100 dark:text-zinc-950 rounded-xs">
+                        {item.timeframe}
+                      </span>
+                      <span className="font-bold text-sm text-zinc-950 dark:text-zinc-50">{item.phase}</span>
+                    </div>
+                  </div>
+                  <p className="text-zinc-600 dark:text-zinc-400">{item.description}</p>
+                  <div className="space-y-1 pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <span className="font-mono text-2xs uppercase text-zinc-500 font-bold">Key Deliverables:</span>
+                    <ul className="list-disc pl-4 space-y-0.5 text-zinc-700 dark:text-zinc-300">
+                      {item.deliverables.map((deliv, dIdx) => (
+                        <li key={dIdx}>{deliv}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Decision Matrix Table */}
+          <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] p-5 sm:p-6 rounded-sm space-y-4 shadow-xs">
+            <div className="border-b border-zinc-200 dark:border-zinc-800 pb-2">
+              <h3 className="text-base sm:text-lg font-bold font-mono text-zinc-950 dark:text-zinc-50">
+                Decision Matrix: High-Impact vs Low-Impact Q4 Moves
+              </h3>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Avoid common traps that derail promotion packets during the final sprint.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-mono text-xs uppercase tracking-wider">
+                    <th className="p-3">Dimension</th>
+                    <th className="p-3 text-emerald-600 dark:text-emerald-400 font-bold">High-Impact Q4 Move (Do This)</th>
+                    <th className="p-3 text-rose-600 dark:text-rose-400 font-bold">Pitfall / Low-Impact (Avoid This)</th>
+                    <th className="p-3">Strategic Rationale</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-zinc-800 dark:text-zinc-200">
+                  {Q4_TRADEOFFS.map((t, idx) => (
+                    <tr key={idx} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30">
+                      <td className="p-3 font-semibold text-zinc-950 dark:text-zinc-50 font-mono text-xs">{t.dimension}</td>
+                      <td className="p-3 text-emerald-700 dark:text-emerald-300 font-medium">{t.highImpact}</td>
+                      <td className="p-3 text-rose-700 dark:text-rose-300 font-medium">{t.pitfall}</td>
+                      <td className="p-3 text-zinc-500 text-xs">{t.why}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* TAB 8: COPYABLE TEMPLATES */}
       {/* ========================================================= */}
       {activeTab === "templates" && (
         <div className="space-y-6 sm:space-y-8 animate-in fade-in-50 duration-200">

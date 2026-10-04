@@ -40,7 +40,18 @@ async function run() {
   await page.screenshot({ path: path.join(screenshotDir, "promo-quality-dark.png"), fullPage: false });
   console.log("Saved promo-quality-dark.png");
 
-  // Switch to light mode and take a screenshot
+  // Click on "Q4 Endgame Playbook"
+  await page.click("button:has-text('Q4 Endgame Playbook')");
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: path.join(screenshotDir, "promo-q4-dark.png"), fullPage: false });
+  console.log("Saved promo-q4-dark.png");
+
+  // Navigate to the standalone topic page
+  await page.goto("http://localhost:3000/topics/sde-q4-showcase-playbook", { waitUntil: "networkidle" });
+  await page.screenshot({ path: path.join(screenshotDir, "topic-q4-article.png"), fullPage: false });
+  console.log("Saved topic-q4-article.png");
+
+  // Switch to light mode and take a screenshot of promotion doc
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto("http://localhost:3000/promotion-doc", { waitUntil: "networkidle" });
   await page.screenshot({ path: path.join(screenshotDir, "promo-hero-light.png"), fullPage: false });

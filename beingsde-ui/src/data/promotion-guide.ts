@@ -663,3 +663,232 @@ Refused to settle for basic HTTP retries. Understood that accidental double-char
 4. **No Q4 surprises:** Calibration is decided in September/October. Ensure every gap has been closed months before formal submission.
 `,
 };
+
+export interface Q4Play {
+  id: string;
+  title: string;
+  tag: string;
+  summary: string;
+  actionSteps: string[];
+  seniorSignal: string;
+}
+
+export interface Q4TimelineItem {
+  timeframe: string;
+  phase: string;
+  description: string;
+  deliverables: string[];
+}
+
+export interface Q4Script {
+  id: string;
+  title: string;
+  timing: string;
+  script: string;
+  rationale: string;
+}
+
+export interface Q4Tradeoff {
+  dimension: string;
+  highImpact: string;
+  pitfall: string;
+  why: string;
+}
+
+export const Q4_CORE_PLAYS: Q4Play[] = [
+  {
+    id: "play-1",
+    title: "1. The 'Unblocker' Sprint (Tying Off Lingering Cross-Team Work)",
+    tag: "Cross-Team Leadership",
+    summary:
+      "Audit team and adjacent backlogs for stalled 85%-done projects blocked by cross-team dependencies (API contracts, schema reviews, languishing PRs). Step in to mediate, apply Disagree & Commit, and merge the code.",
+    actionSteps: [
+      "Find 1-2 cross-team dependencies holding up other engineering pods.",
+      "Schedule a focused 30-minute sync, write an ADR (Architecture Decision Record), and align on contract.",
+      "Drive PR reviews to completion and ship before the mid-November code freeze.",
+    ],
+    seniorSignal: "Peer managers from adjacent teams will explicitly champion your nomination during calibration.",
+  },
+  {
+    id: "play-2",
+    title: "2. Safe Holiday Code Freeze & Blast-Radius Shield",
+    tag: "Operational Excellence",
+    summary:
+      "Q4 features Black Friday, Cyber Monday, and strict holiday code freezes. Become the team's Reliability Champion by proving your systems can withstand 3x peak load with zero outages.",
+    actionSteps: [
+      "Run synthetic load tests using k6 up to 3x peak expected QPS to discover memory leaks or DB connection exhaustion.",
+      "Wrap all third-party downstream APIs in circuit breakers with cached fallback responses.",
+      "Audit PagerDuty / Datadog alert roster to eliminate >50% of false-positive noisy alerts before the holidays.",
+      "Author or refresh the team's Emergency Rollback and On-Call Playbook.",
+    ],
+    seniorSignal: "Protects business revenue during peak season; proves operational maturity at the Senior/Staff bar.",
+  },
+  {
+    id: "play-3",
+    title: "3. The 48-Hour 'Toil Elimination' Side Project",
+    tag: "Force Multiplication",
+    summary:
+      "Pick ONE painful manual chore that the team complains about every sprint, and spend a focused 2–3 days automating it into a clean self-service CLI or CI/CD workflow.",
+    actionSteps: [
+      "Automate manual test-data seeding, dead-letter queue replaying, or slow CI build steps.",
+      "Document clean developer instructions and demo it at the next team engineering sync.",
+      "Calculate and publish the ROI: Annual Hours Saved = Engineers × Hours/Week × 52.",
+    ],
+    seniorSignal: "Multiplies team velocity without waiting for product managers to allocate tickets.",
+  },
+  {
+    id: "play-4",
+    title: "4. Ship the 'Customer Obsession' Edge-Case Fix",
+    tag: "Customer Obsession",
+    summary:
+      "Dive into Zendesk support tickets and APM error logs to find a high-friction customer papercut that product roadmap never prioritized. Fix it and share the win with Product Management.",
+    actionSteps: [
+      "Identify a frequent customer error (e.g. bulk CSV export timeout, missing idempotency check).",
+      "Implement a streaming or asynchronous background solution with regression test coverage.",
+      "Notify Product Managers and Support Leads of the zero-defect resolution.",
+    ],
+    seniorSignal: "Generates enthusiastic 360 review endorsements from Product Managers who praise your customer focus.",
+  },
+  {
+    id: "play-5",
+    title: "5. Author and Socialize an RFC for Q1 Next Year",
+    tag: "Strategic Vision",
+    summary:
+      "Senior SDEs don't just finish the current quarter—they shape the upcoming year's technical roadmap. Author an RFC targeting a major scaling or architectural debt milestone for next year.",
+    actionSteps: [
+      "Draft an RFC with 3 discrete alternatives, a CAP/cost trade-off matrix, and a phased rollout plan.",
+      "Pre-circulate the document to 2 Staff or Principal Engineers to gather early feedback.",
+      "Host a 45-minute design review, build consensus, and lock in the architecture decision.",
+    ],
+    seniorSignal: "Physical evidence that you are already operating as an architectural leader shaping the multi-quarter roadmap.",
+  },
+  {
+    id: "play-6",
+    title: "6. Proactive 360 Feedback & Peer Endorsement Harvest",
+    tag: "Calibration Preparation",
+    summary:
+      "Don't wait for HR software to request generic peer reviews in December. Proactively reach out to 3–4 cross-functional collaborators in late October to collect substantive testimonials.",
+    actionSteps: [
+      "Ask a PM, QA Lead, Principal Engineer, and peer tech lead for 2–3 bullets on your collaboration.",
+      "Incorporate their exact quotes into your self-review document draft.",
+      "Share the draft with your direct manager before department calibration meetings commence.",
+    ],
+    seniorSignal: "Arms your manager with defensible peer quotes when advocating your promotion against other candidates.",
+  },
+];
+
+export const Q4_TIMELINE: Q4TimelineItem[] = [
+  {
+    timeframe: "Weeks 1–2 (Oct 1 – Oct 15)",
+    phase: "Gap Diagnosis & 1:1 Calibration",
+    description: "Align with your manager on the exact remaining promotion criteria and pick your high-leverage Q4 bets.",
+    deliverables: [
+      "Conduct Gap Calibration 1:1 with manager (Script 1).",
+      "Select 1 cross-team dependency to unblock and 1 toil automation project.",
+      "Establish weekly Friday Brag Doc updates.",
+    ],
+  },
+  {
+    timeframe: "Weeks 3–5 (Oct 16 – Nov 5)",
+    phase: "Heavy Execution & Pre-Freeze Delivery",
+    description: "Complete core feature commitments, automate toil, and author the strategic RFC for next year.",
+    deliverables: [
+      "Ship high-priority feature tickets ahead of deadline.",
+      "Deliver Play 3 (Toil Automation) and quantify annual hours saved.",
+      "Draft and review Play 5 (Q1 Strategic RFC) with Principal Engineers.",
+    ],
+  },
+  {
+    timeframe: "Weeks 6–7 (Nov 6 – Nov 25)",
+    phase: "Reliability, Load Testing & Black Friday",
+    description: "Execute peak load tests, tune noisy alerts, and act as Deployment Owner during code freeze.",
+    deliverables: [
+      "Run k6 load tests to 3x peak load with zero connection drops.",
+      "Audit on-call alerts; reduce noisy alerts by 50%+.",
+      "Sign off on the team's Emergency Rollback and On-Call Runbook.",
+    ],
+  },
+  {
+    timeframe: "Weeks 8–9 (Nov 26 – Dec 10)",
+    phase: "Peer Feedback Harvest & Self-Review",
+    description: "Gather cross-functional testimonials and assemble the final STAR-I promotion packet.",
+    deliverables: [
+      "Collect 360 peer feedback quotes from PM, QA, and Principal Engineers.",
+      "Fill in the complete self-review document with hard metrics and defect counts.",
+      "Review the completed draft with your manager before formal submission.",
+    ],
+  },
+  {
+    timeframe: "Week 10 (Dec 11 – Dec 20)",
+    phase: "Final Submission & Calibration Lock",
+    description: "Submit formal HR documentation with 100% confidence and zero calibration surprises.",
+    deliverables: [
+      "Submit official self-review in company HR portal.",
+      "Ensure manager has all physical links, dashboards, and metrics.",
+      "Celebrate an exceptional, high-impact year of growth!",
+    ],
+  },
+];
+
+export const Q4_SCRIPTS: Q4Script[] = [
+  {
+    id: "script-1",
+    title: "1. Diagnosing the Promotion Gap in Early October",
+    timing: "Early October 1:1",
+    script:
+      "\"Hey [Manager], as we enter Q4, I want to be proactive about my career progression toward the [Target Level, e.g. Senior SDE / SDE-2] bar. Looking at my delivery, quality, and leadership over the past 9 months, what is the single biggest gap or hesitation between my current performance and the next-level bar that I need to definitively close this quarter?\"",
+    rationale:
+      "Forces your manager to be explicit and transparent early enough for you to take concrete action before calibration slates are locked in November.",
+  },
+  {
+    id: "script-2",
+    title: "2. Locking in the Q4 Success Mandate in Mid October",
+    timing: "Mid October 1:1",
+    script:
+      "\"Based on our last discussion about closing the gap on cross-team technical leadership, my plan for Q4 is to lead the API contract alignment for the Checkout migration, ship the automated CI build-cache optimization, and ensure zero P0/P1 defects across the holiday release. If I deliver these three outcomes, will you feel 100% confident advocating for my promotion in calibration?\"",
+    rationale:
+      "Establishes a mutual performance contract. When you deliver what was agreed upon, your manager is bound to advocate passionately for you.",
+  },
+  {
+    id: "script-3",
+    title: "3. The Weekly Friday 'Brag Doc' Micro-Update",
+    timing: "Every Friday at 4:30 PM",
+    script:
+      "*Weekly Highlights - [Your Name] - Oct 24*\n1. **Major Delivery:** Merged CORE-3829 (Idempotent Payment Gateway) ahead of schedule; verified 0 duplicate charges in staging across 2M mock transactions.\n2. **Operational Excellence:** Conducted holiday peak load test up to 45,000 QPS with k6; tuned database connection pooling, reducing P99 latency by 35%.\n3. **Unblocking Peers:** Led sync with Data Platform team to finalize RFC-108 streaming schema; resolved 2 blocking PRs.\n4. **Next Week's Focus:** Finalizing deployment canary runbook and holiday code freeze checklist.",
+    rationale:
+      "Eliminates recency bias and saves your manager dozens of hours. During calibration, they copy-paste your weekly updates directly into the committee packet.",
+  },
+];
+
+export const Q4_TRADEOFFS: Q4Tradeoff[] = [
+  {
+    dimension: "Code Changes",
+    highImpact: "Hardening error handling, adding fallback caches, load testing.",
+    pitfall: "Large-scale architectural rewrites right before holiday code freeze.",
+    why: "Q4 rewards rock-solid stability. Causing a Sev-1 outage in November obliterates your promotion case.",
+  },
+  {
+    dimension: "Cross-Team Work",
+    highImpact: "Unblocking stuck dependencies, finalizing API contracts, resolving PR backlogs.",
+    pitfall: "Starting ambitious 6-month multi-team projects that cannot show Q4 results.",
+    why: "Unblocking shows immediate velocity and wins peer manager champions who sit in your calibration meeting.",
+  },
+  {
+    dimension: "Operational Focus",
+    highImpact: "Eliminating repetitive toil, automating manual runbooks, tuning noisy alerts.",
+    pitfall: "Passively handling on-call tickets without automating root causes.",
+    why: "Automating toil provides hard numbers (hours and dollars saved) that Directors love.",
+  },
+  {
+    dimension: "Communication",
+    highImpact: "Weekly bulleted brag doc updates, proactive 1:1 gap alignment in October.",
+    pitfall: "Staying silent and dumping an unquantified task list in December.",
+    why: "Calibration happens in November. If your manager isn't armed with data by Week 4, you're too late.",
+  },
+  {
+    dimension: "Documentation",
+    highImpact: "Structured RFCs with alternative trade-offs and disaster recovery runbooks.",
+    pitfall: "Vague wiki notes or fragmented Slack threads.",
+    why: "High-quality RFCs provide physical proof of senior technical leadership.",
+  },
+];
