@@ -93,10 +93,10 @@ export default function TopicDetailClient({ slug, initialTopic }: { slug: string
 
             <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 w-full justify-center">
               <Link 
-                href="/subscriptions"
+                href="/contact"
                 className="w-full sm:w-auto text-xs font-semibold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 px-6 py-3 border border-zinc-950 dark:border-zinc-50 hover:bg-transparent hover:text-zinc-900 dark:hover:bg-transparent dark:hover:text-zinc-100 transition-all duration-300"
               >
-                Upgrade to Premium
+                Inquire About Premium
               </Link>
               <Link 
                 href="/topics"

@@ -11,6 +11,10 @@ export const metadata: Metadata = {
     description: "Get unlimited access to premium system design content, interactive mock interviews, Excalidraw templates, and architectural checklists.",
     url: "https://beingsde.in/subscriptions",
   },
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function SubscriptionsLayout({

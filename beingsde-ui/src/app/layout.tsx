@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     "beingsde topics",
     "beingsde questions"
   ],
-  authors: [{ name: "beingsde Team", url: "https://beingsde.in" }],
-  creator: "beingsde",
-  publisher: "beingsde",
+  authors: [{ name: "Abha Gupta", url: "https://beingsde.in/about" }],
+  creator: "Abha Gupta",
+  publisher: "Abha Gupta",
   category: "Education",
   classification: "System Design Interview Preparation",
   verification: {
