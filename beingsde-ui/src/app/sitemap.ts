@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/lld", priority: 0.90 },
     { path: "/questions", priority: 0.90 },
     { path: "/bar-raiser", priority: 0.90 },
+    { path: "/promotion-doc", priority: 0.90 },
     { path: "/dsa", priority: 0.85 },
     { path: "/cheat-sheet", priority: 0.85 },
     { path: "/interviews", priority: 0.80 },

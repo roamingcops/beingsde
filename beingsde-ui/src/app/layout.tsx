@@ -243,6 +243,10 @@ export default function RootLayout({
                 Bar Raiser
                 <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-full border border-rose-200 dark:border-rose-800">New</span>
               </Link>
+              <Link href="/promotion-doc" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1">
+                Promo Doc
+                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-200 dark:border-emerald-800">Guide</span>
+              </Link>
               <Link href="/about" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 About
               </Link>
@@ -271,6 +275,7 @@ export default function RootLayout({
               <span>&copy; {new Date().getFullYear()} beingsde.in. All rights reserved. Built for Software Engineers &amp; System Architects.</span>
             </div>
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-x-6 gap-y-2">
+              <Link href="/promotion-doc" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Promotion Guide</Link>
               <Link href="/about" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">About Us</Link>
               <Link href="/contact" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Contact Us</Link>
               <Link href="/privacy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Privacy Policy</Link>
