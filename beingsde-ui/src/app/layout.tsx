@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import HeaderAuth from "@/components/HeaderAuth";
 import MobileMenu from "@/components/MobileMenu";
 import CookieConsent from "@/components/CookieConsent";
+import Navbar from "@/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -215,7 +216,7 @@ export default function RootLayout({
         {/* Navigation Header */}
         <header className="sticky top-0 z-50 w-full border-b border-zinc-200 dark:border-zinc-800 bg-[#fafafa]/80 dark:bg-[#09090b]/80 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 shrink-0">
               <MobileMenu />
               <Link href="/" className="flex items-center gap-2 group">
                 <span className="text-xl font-bold tracking-tight font-mono border border-zinc-900 dark:border-zinc-100 px-2 py-0.5 rounded-sm hover:bg-zinc-900 hover:text-zinc-100 dark:hover:bg-zinc-100 dark:hover:text-zinc-900 transition-all duration-300">
@@ -224,40 +225,9 @@ export default function RootLayout({
               </Link>
             </div>
 
-            <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-              <Link href="/topics" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                HLD
-              </Link>
-              <Link href="/guides" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1">
-                Case Studies
-                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-full border border-blue-200 dark:border-blue-800">Deep</span>
-              </Link>
-              <Link href="/lld" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                LLD
-              </Link>
-              <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                TOP HLD Questions
-              </Link>
-              <Link href="/dsa" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                DSA
-              </Link>
-              <Link href="/bar-raiser" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1">
-                Bar Raiser
-                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 rounded-full border border-rose-200 dark:border-rose-800">New</span>
-              </Link>
-              <Link href="/promotion-doc" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1">
-                Promo Doc
-                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-200 dark:border-emerald-800">Guide</span>
-              </Link>
-              <Link href="/about" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                About
-              </Link>
-              <Link href="/contact" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                Contact
-              </Link>
-            </nav>
+            <Navbar />
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 shrink-0">
               <ThemeToggle />
               <HeaderAuth />
             </div>
