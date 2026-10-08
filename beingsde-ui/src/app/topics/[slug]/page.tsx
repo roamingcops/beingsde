@@ -18,8 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const title = `${topic.title} — System Design Tutorial & Interview Guide | beingsde.in`;
-  const description = topic.description || `Master ${topic.title} for software architecture and FAANG system design interviews. Covers ${topic.category}, trade-offs, and implementation details.`;
+  const title = `${topic.title} — System Design Blueprint, Trade-offs & Interview Guide | beingsde.in`;
+  const description =
+    topic.description
+      ? `${topic.description} Detailed architecture diagram, database schema, latency trade-offs, and FAANG interview blueprint on Being SDE.`
+      : `Master ${topic.title} for software architecture and FAANG system design interviews. Covers ${topic.category}, trade-offs, and implementation details on Being SDE.`;
 
   return {
     title,

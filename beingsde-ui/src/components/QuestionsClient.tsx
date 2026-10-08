@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Search,
   ChevronDown,
@@ -15,7 +16,8 @@ import {
   Flame,
   CheckCircle2,
   Layers,
-  Zap
+  Zap,
+  ExternalLink
 } from "lucide-react";
 import defaultHldQuestions from "@/data/hld-questions.json";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
@@ -28,6 +30,7 @@ interface HldQuestion {
   difficulty: string;
   summary: string;
   contentMarkdown: string;
+  slug?: string;
 }
 
 export default function QuestionsClient() {
@@ -144,6 +147,15 @@ export default function QuestionsClient() {
         {filteredQuestions.length > 0 ? (
           filteredQuestions.map((q, index) => {
             const isExpanded = expandedIndex === index;
+            const slug =
+              q.slug ||
+              q.title
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, "")
+                .replace(/\s+/g, "-")
+                .replace(/--+/g, "-")
+                .trim();
+
             return (
               <div
                 key={q.id || q.questionId}
@@ -154,11 +166,11 @@ export default function QuestionsClient() {
                 }`}
               >
                 {/* Header/Summary Card Trigger */}
-                <button
-                  onClick={() => toggleExpand(index)}
-                  className="w-full text-left p-5 flex items-start justify-between gap-4 cursor-pointer focus:outline-none"
-                >
-                  <div className="space-y-1">
+                <div className="flex items-start justify-between p-5 gap-3">
+                  <button
+                    onClick={() => toggleExpand(index)}
+                    className="flex-1 text-left cursor-pointer focus:outline-none space-y-1"
+                  >
                     <div className="flex flex-wrap gap-2 items-center text-3xs font-mono tracking-widest font-black uppercase">
                       <span className="text-zinc-400">Q{q.questionId}</span>
                       <span className="text-zinc-300 dark:text-zinc-700">&bull;</span>
@@ -172,17 +184,31 @@ export default function QuestionsClient() {
                         {q.difficulty}
                       </span>
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-50 leading-tight hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
                       {q.title}
                     </h3>
                     <p className="text-xs text-zinc-450 dark:text-zinc-500 line-clamp-2">
                       {q.summary}
                     </p>
+                  </button>
+
+                  <div className="flex items-center gap-1.5 shrink-0 pt-1">
+                    <Link
+                      href={`/questions/${slug}`}
+                      title="Open dedicated standalone page"
+                      className="p-1 rounded-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-400 transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Link>
+                    <button
+                      onClick={() => toggleExpand(index)}
+                      className="p-1 rounded-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-250 transition-colors cursor-pointer"
+                      title={isExpanded ? "Collapse answer" : "Expand answer"}
+                    >
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
                   </div>
-                  <div className="mt-1 p-1 rounded-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-250 transition-colors shrink-0">
-                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  </div>
-                </button>
+                </div>
 
                 {/* Collapsible Answer Body */}
                 <div
@@ -191,6 +217,20 @@ export default function QuestionsClient() {
                   }`}
                 >
                   <MarkdownRenderer content={q.contentMarkdown} />
+                  
+                  {/* Standalone Deep-Dive Footer Link */}
+                  <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                    <Link
+                      href={`/questions/${slug}`}
+                      className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase text-zinc-900 dark:text-zinc-100 hover:underline"
+                    >
+                      <span>Read Full Breakdown on Dedicated Page</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Link>
+                    <span className="text-3xs font-mono text-zinc-400">
+                      beingsde.in/questions/{slug}
+                    </span>
+                  </div>
                 </div>
               </div>
             );

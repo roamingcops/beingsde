@@ -18,8 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const title = `${q.title} LLD — Code Blueprint & Class Diagram | beingsde.in`;
-  const description = q.summary || `Step-by-step object-oriented design and code implementation for ${q.title} in Java, C++, and Python. Learn design patterns and class diagrams on Being SDE.`;
+  const title = `${q.title} LLD — Code Blueprint, Class Diagram & Java Patterns | beingsde.in`;
+  const description =
+    q.summary
+      ? `${q.summary} Complete object-oriented design with UML class diagram, design patterns, and clean code in Java, C++, and Python on Being SDE.`
+      : `Step-by-step object-oriented design and code implementation for ${q.title} in Java, C++, and Python. Learn design patterns and class diagrams on Being SDE.`;
 
   return {
     title,

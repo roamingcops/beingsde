@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import MOCK_TOPICS from "../data/topics.json";
 import lldQuestions from "../data/lld.json";
+import defaultHldQuestions from "../data/hld-questions.json";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://beingsde.in";
@@ -46,5 +47,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }));
 
-  return [...staticRoutes, ...topicRoutes, ...lldRoutes];
+  // Dynamic HLD Question routes — high priority (0.85) for specific interview answers
+  const hldRoutes = defaultHldQuestions.map((q) => ({
+    url: `${baseUrl}/questions/${q.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  }));
+
+  return [...staticRoutes, ...topicRoutes, ...lldRoutes, ...hldRoutes];
 }
