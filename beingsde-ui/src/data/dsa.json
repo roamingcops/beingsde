@@ -14,7 +14,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Boyer-Moore Voting",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "find-the-majority-element-in-an-array-appears-n2-times"
   },
   {
     "id": 2,
@@ -31,7 +32,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1) extra (output array excluded)",
     "pattern": "Prefix / Suffix Product",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "product-of-array-except-self"
   },
   {
     "id": 3,
@@ -48,7 +50,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Kadane's / Dynamic Programming",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "maximum-subarray-sum-kadanes-algorithm"
   },
   {
     "id": 4,
@@ -65,7 +68,8 @@
     "timeComplexity": "O(n²)",
     "spaceComplexity": "O(1) (excluding output)",
     "pattern": "Two Pointers",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "3sum-find-all-unique-triplets-that-sum-to-zero"
   },
   {
     "id": 5,
@@ -82,7 +86,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Two Pointers / Greedy",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "container-with-most-water"
   },
   {
     "id": 6,
@@ -99,7 +104,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Index Marking",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "find-all-duplicates-in-an-array-values-in-1-n"
   },
   {
     "id": 7,
@@ -116,7 +122,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(1) extra",
     "pattern": "Simulation / Boundary Shrinking",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "spiral-order-traversal-of-a-matrix"
   },
   {
     "id": 8,
@@ -133,7 +140,8 @@
     "timeComplexity": "O(n²)",
     "spaceComplexity": "O(1)",
     "pattern": "Matrix Manipulation",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "rotate-an-nn-matrix-in-place-by-90"
   },
   {
     "id": 9,
@@ -150,7 +158,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "Prefix Sum + HashMap",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "subarray-sum-equals-k"
   },
   {
     "id": 10,
@@ -167,7 +176,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "HashSet",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "longest-consecutive-sequence"
   },
   {
     "id": 11,
@@ -184,7 +194,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Floyd's Cycle Detection",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "detect-and-find-the-start-of-a-cycle-in-a-linked-list"
   },
   {
     "id": 12,
@@ -201,7 +212,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Slow/Fast Pointer + In-place Reversal",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "reorder-linked-list-l0l1ln-becomes-l0lnl1ln-1"
   },
   {
     "id": 13,
@@ -218,7 +230,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Two Pointers",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "remove-the-nth-node-from-the-end-of-a-linked-list"
   },
   {
     "id": 14,
@@ -235,7 +248,8 @@
     "timeComplexity": "O(max(m,n))",
     "spaceComplexity": "O(max(m,n))",
     "pattern": "Simulation",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "add-two-numbers-represented-as-reversed-linked-lists"
   },
   {
     "id": 15,
@@ -252,7 +266,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n) HashMap / O(1) in-place",
     "pattern": "HashMap / Interleaving",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "deep-copy-a-linked-list-with-random-pointers"
   },
   {
     "id": 16,
@@ -269,7 +284,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "Monotonic Stack",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "daily-temperatures-next-warmer-day"
   },
   {
     "id": 17,
@@ -286,7 +302,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "Monotonic Stack",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "largest-rectangle-in-histogram"
   },
   {
     "id": 18,
@@ -303,7 +320,8 @@
     "timeComplexity": "O(1) all ops",
     "spaceComplexity": "O(n)",
     "pattern": "Auxiliary Stack",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "implement-a-min-stack-with-o1-getmin"
   },
   {
     "id": 19,
@@ -320,7 +338,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "Stack Simulation",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "evaluate-reverse-polish-notation-rpn"
   },
   {
     "id": 20,
@@ -337,7 +356,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(k)",
     "pattern": "Monotonic Deque",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "sliding-window-maximum-using-a-deque"
   },
   {
     "id": 21,
@@ -354,7 +374,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "BFS",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "binary-tree-level-order-traversal-bfs"
   },
   {
     "id": 22,
@@ -371,7 +392,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h) recursion stack",
     "pattern": "DFS with Bounds",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "validate-a-binary-search-tree"
   },
   {
     "id": 23,
@@ -388,7 +410,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h)",
     "pattern": "Post-order DFS",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "lowest-common-ancestor-lca-of-a-binary-tree"
   },
   {
     "id": 24,
@@ -405,7 +428,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "BFS / DFS",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "binary-tree-right-side-view"
   },
   {
     "id": 25,
@@ -422,7 +446,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(h)",
     "pattern": "Post-order DFS",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "diameter-of-a-binary-tree"
   },
   {
     "id": 26,
@@ -439,7 +464,8 @@
     "timeComplexity": "O(L) per op (L = word length)",
     "spaceComplexity": "O(ALPHABET_SIZE × total_chars)",
     "pattern": "Trie",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "implement-a-trie-prefix-tree"
   },
   {
     "id": 27,
@@ -456,7 +482,8 @@
     "timeComplexity": "O(m×n×4^L) worst case",
     "spaceComplexity": "O(L) recursion stack",
     "pattern": "Backtracking",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "word-search-in-a-2d-grid"
   },
   {
     "id": 28,
@@ -473,7 +500,8 @@
     "timeComplexity": "O(log k) per add",
     "spaceComplexity": "O(k)",
     "pattern": "Min-Heap",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "kth-largest-element-in-a-stream"
   },
   {
     "id": 29,
@@ -490,7 +518,8 @@
     "timeComplexity": "O(n log k)",
     "spaceComplexity": "O(k)",
     "pattern": "Max-Heap / Quickselect",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "find-k-closest-points-to-the-origin"
   },
   {
     "id": 30,
@@ -507,7 +536,8 @@
     "timeComplexity": "O(T log T) — T = total tasks",
     "spaceComplexity": "O(1) (26 letters)",
     "pattern": "Greedy / Max-Heap",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "task-scheduler-minimum-cpu-intervals-with-cooldown"
   },
   {
     "id": 31,
@@ -524,7 +554,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(m×n) worst-case recursion",
     "pattern": "DFS / Flood Fill",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "number-of-islands-connected-components-in-grid"
   },
   {
     "id": 32,
@@ -541,7 +572,8 @@
     "timeComplexity": "O(V+E)",
     "spaceComplexity": "O(V+E)",
     "pattern": "Topological Sort",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "course-schedule-detect-cycle-in-directed-graph"
   },
   {
     "id": 33,
@@ -558,7 +590,8 @@
     "timeComplexity": "O(V+E)",
     "spaceComplexity": "O(V)",
     "pattern": "DFS / HashMap",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "clone-a-graph"
   },
   {
     "id": 34,
@@ -575,7 +608,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(m×n)",
     "pattern": "Multi-Source BFS",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "rotting-oranges-minimum-time-for-all-to-rot-bfs"
   },
   {
     "id": 35,
@@ -592,7 +626,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(m×n)",
     "pattern": "Multi-Source BFS",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "walls-and-gates-fill-distance-to-nearest-gate"
   },
   {
     "id": 36,
@@ -609,7 +644,8 @@
     "timeComplexity": "O(n × k log k) — k = max string length",
     "spaceComplexity": "O(n×k)",
     "pattern": "Canonical Form / HashMap",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "group-anagrams-together"
   },
   {
     "id": 37,
@@ -626,7 +662,8 @@
     "timeComplexity": "O(n log k) heap; O(n) bucket",
     "spaceComplexity": "O(n)",
     "pattern": "HashMap + Heap / Bucket Sort",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "top-k-frequent-elements"
   },
   {
     "id": 38,
@@ -643,7 +680,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(min(n, alphabet))",
     "pattern": "Sliding Window + HashMap",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "longest-substring-without-repeating-characters"
   },
   {
     "id": 39,
@@ -660,7 +698,8 @@
     "timeComplexity": "O(1) get & put",
     "spaceComplexity": "O(capacity)",
     "pattern": "HashMap + Doubly Linked List",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "design-an-lru-cache"
   },
   {
     "id": 40,
@@ -677,7 +716,8 @@
     "timeComplexity": "O(n²)",
     "spaceComplexity": "O(1)",
     "pattern": "Expand Around Center",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "longest-palindromic-substring"
   },
   {
     "id": 41,
@@ -694,7 +734,8 @@
     "timeComplexity": "O(n) total chars",
     "spaceComplexity": "O(n)",
     "pattern": "Length-Prefix Encoding",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "encode-and-decode-strings-no-delimiter-in-charset"
   },
   {
     "id": 42,
@@ -711,7 +752,8 @@
     "timeComplexity": "O(|S| + |T|)",
     "spaceComplexity": "O(|S| + |T|)",
     "pattern": "Sliding Window",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "minimum-window-substring-containing-all-chars-of-t"
   },
   {
     "id": 43,
@@ -728,7 +770,8 @@
     "timeComplexity": "O(|S|)",
     "spaceComplexity": "O(1) (26 chars)",
     "pattern": "Fixed Sliding Window",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "find-all-anagrams-of-p-in-s"
   },
   {
     "id": 44,
@@ -745,7 +788,8 @@
     "timeComplexity": "O(1) — 32 bits max",
     "spaceComplexity": "O(1)",
     "pattern": "Bit Manipulation",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "sum-of-two-integers-without-or-operators"
   },
   {
     "id": 45,
@@ -762,7 +806,8 @@
     "timeComplexity": "O(k) — k = number of set bits",
     "spaceComplexity": "O(1)",
     "pattern": "Bit Manipulation",
-    "tabGroup": "ds"
+    "tabGroup": "ds",
+    "slug": "number-of-1-bits-hamming-weight"
   },
   {
     "id": 1,
@@ -779,7 +824,8 @@
     "timeComplexity": "O(log n)",
     "spaceComplexity": "O(1)",
     "pattern": "Binary Search",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "search-in-rotated-sorted-array"
   },
   {
     "id": 2,
@@ -796,7 +842,8 @@
     "timeComplexity": "O(log n)",
     "spaceComplexity": "O(1)",
     "pattern": "Binary Search",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "find-minimum-in-rotated-sorted-array"
   },
   {
     "id": 3,
@@ -813,7 +860,8 @@
     "timeComplexity": "O(n log m) — m = max pile",
     "spaceComplexity": "O(1)",
     "pattern": "Binary Search on Answer",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "koko-eating-bananas-find-minimum-eating-speed"
   },
   {
     "id": 4,
@@ -830,7 +878,8 @@
     "timeComplexity": "O(log n)",
     "spaceComplexity": "O(1)",
     "pattern": "Binary Search",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "find-peak-element-in-unsorted-array"
   },
   {
     "id": 5,
@@ -847,7 +896,8 @@
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
     "pattern": "Sorting + Greedy",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "merge-intervals"
   },
   {
     "id": 6,
@@ -864,7 +914,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Three Pointers / Partition",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "sort-colors-dutch-national-flag"
   },
   {
     "id": 7,
@@ -881,7 +932,8 @@
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
     "pattern": "DP / Binary Search",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "longest-increasing-subsequence-lis"
   },
   {
     "id": 8,
@@ -898,7 +950,8 @@
     "timeComplexity": "O(amount × coins)",
     "spaceComplexity": "O(amount)",
     "pattern": "Unbounded Knapsack / DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "coin-change-minimum-coins-to-make-amount"
   },
   {
     "id": 9,
@@ -915,7 +968,8 @@
     "timeComplexity": "O(n × W)",
     "spaceComplexity": "O(W)",
     "pattern": "0/1 Knapsack",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "01-knapsack-problem"
   },
   {
     "id": 10,
@@ -932,7 +986,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(n) with 1D DP",
     "pattern": "Grid DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "unique-paths-in-a-grid"
   },
   {
     "id": 11,
@@ -949,7 +1004,8 @@
     "timeComplexity": "O(n²)",
     "spaceComplexity": "O(n + dict size)",
     "pattern": "DP + HashSet",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "word-break-can-string-be-segmented-into-dictionary-words"
   },
   {
     "id": 12,
@@ -966,7 +1022,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1) with two variables",
     "pattern": "DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "decode-ways-number-of-ways-to-decode-a-digit-string"
   },
   {
     "id": 13,
@@ -983,7 +1040,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Greedy",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "jump-game-can-you-reach-the-last-index"
   },
   {
     "id": 14,
@@ -1000,7 +1058,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "house-robber-max-sum-of-non-adjacent-elements"
   },
   {
     "id": 15,
@@ -1017,7 +1076,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(min(m,n))",
     "pattern": "DP / 2D Table",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "longest-common-subsequence-lcs"
   },
   {
     "id": 16,
@@ -1034,7 +1094,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(min(m,n))",
     "pattern": "DP / 2D Table",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "edit-distance-levenshtein"
   },
   {
     "id": 17,
@@ -1051,7 +1112,8 @@
     "timeComplexity": "O(n × sum/2)",
     "spaceComplexity": "O(sum/2)",
     "pattern": "0/1 Knapsack",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "partition-equal-subset-sum"
   },
   {
     "id": 18,
@@ -1068,7 +1130,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "DP / Fibonacci",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "climbing-stairs-with-variable-steps"
   },
   {
     "id": 19,
@@ -1085,7 +1148,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "State Machine DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "best-time-to-buy-and-sell-stock-with-cooldown"
   },
   {
     "id": 20,
@@ -1102,7 +1166,8 @@
     "timeComplexity": "O(n³)",
     "spaceComplexity": "O(n²)",
     "pattern": "Interval DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "matrix-chain-multiplication-minimum-cost"
   },
   {
     "id": 21,
@@ -1119,7 +1184,8 @@
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(1)",
     "pattern": "Greedy / Interval Scheduling",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "non-overlapping-intervals-minimum-removal"
   },
   {
     "id": 22,
@@ -1136,7 +1202,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Greedy",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "gas-station-can-you-complete-the-circuit"
   },
   {
     "id": 23,
@@ -1153,7 +1220,8 @@
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
     "pattern": "Greedy + Heap",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "meeting-rooms-ii-minimum-rooms-needed"
   },
   {
     "id": 24,
@@ -1170,7 +1238,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(n)",
     "pattern": "Greedy",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "candy-distribution-minimum-candies"
   },
   {
     "id": 25,
@@ -1187,7 +1256,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Sliding Window",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "longest-subarray-with-sum-k-all-positives"
   },
   {
     "id": 26,
@@ -1204,7 +1274,8 @@
     "timeComplexity": "O(n³)",
     "spaceComplexity": "O(1) extra",
     "pattern": "Two Pointers",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "four-sum-find-all-unique-quadruplets-summing-to-target"
   },
   {
     "id": 27,
@@ -1221,7 +1292,8 @@
     "timeComplexity": "O(n)",
     "spaceComplexity": "O(1)",
     "pattern": "Two Pointers",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "trapping-rain-water"
   },
   {
     "id": 28,
@@ -1238,7 +1310,8 @@
     "timeComplexity": "O(|s|)",
     "spaceComplexity": "O(1) (26 chars)",
     "pattern": "Fixed Sliding Window",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "permutation-in-string-sliding-window"
   },
   {
     "id": 29,
@@ -1255,7 +1328,8 @@
     "timeComplexity": "O(n × 2^n)",
     "spaceComplexity": "O(n) recursion",
     "pattern": "Backtracking",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "subsets-generate-all-subsets-power-set"
   },
   {
     "id": 30,
@@ -1272,7 +1346,8 @@
     "timeComplexity": "O(2^(target/min))",
     "spaceComplexity": "O(target/min) depth",
     "pattern": "Backtracking",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "combination-sum-unique-combinations-summing-to-target"
   },
   {
     "id": 31,
@@ -1289,7 +1364,8 @@
     "timeComplexity": "O(n! × n)",
     "spaceComplexity": "O(n)",
     "pattern": "Backtracking",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "permutations-of-a-list-with-duplicates"
   },
   {
     "id": 32,
@@ -1306,7 +1382,8 @@
     "timeComplexity": "O(4^n × n) — n = digits length",
     "spaceComplexity": "O(n) recursion stack",
     "pattern": "Backtracking",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "letter-combinations-of-a-phone-number"
   },
   {
     "id": 33,
@@ -1323,7 +1400,8 @@
     "timeComplexity": "O(n!)",
     "spaceComplexity": "O(n)",
     "pattern": "Backtracking",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "n-queens-place-n-queens-on-nn-board-without-conflict"
   },
   {
     "id": 34,
@@ -1340,7 +1418,8 @@
     "timeComplexity": "O(n × 2^n)",
     "spaceComplexity": "O(n²) DP table",
     "pattern": "Backtracking + DP",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "palindrome-partitioning"
   },
   {
     "id": 35,
@@ -1357,7 +1436,8 @@
     "timeComplexity": "O((V+E) log V)",
     "spaceComplexity": "O(V)",
     "pattern": "Greedy + Min-Heap",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "dijkstras-shortest-path-algorithm"
   },
   {
     "id": 36,
@@ -1374,7 +1454,8 @@
     "timeComplexity": "O(V+E)",
     "spaceComplexity": "O(V+E)",
     "pattern": "BFS / Topological Sort",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "topological-sort-of-a-dag-kahns-algorithm"
   },
   {
     "id": 37,
@@ -1391,7 +1472,8 @@
     "timeComplexity": "O(V×E)",
     "spaceComplexity": "O(V)",
     "pattern": "Dynamic Programming / Edge Relaxation",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "bellman-ford-detect-negative-weight-cycles"
   },
   {
     "id": 38,
@@ -1408,7 +1490,8 @@
     "timeComplexity": "O(α(n)) per op",
     "spaceComplexity": "O(n)",
     "pattern": "Union-Find",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "union-find-connected-components-with-dynamic-union"
   },
   {
     "id": 39,
@@ -1425,7 +1508,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(m×n) recursion",
     "pattern": "DFS / BFS",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "flood-fill-algorithm"
   },
   {
     "id": 40,
@@ -1442,7 +1526,8 @@
     "timeComplexity": "O(m×n)",
     "spaceComplexity": "O(m×n)",
     "pattern": "Multi-Source DFS / BFS",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "pacific-atlantic-water-flow"
   },
   {
     "id": 41,
@@ -1459,7 +1544,8 @@
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
     "pattern": "Divide & Conquer",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "merge-sort-divide-and-conquer-sort"
   },
   {
     "id": 42,
@@ -1476,7 +1562,8 @@
     "timeComplexity": "O(n) average, O(n²) worst",
     "spaceComplexity": "O(log n) average",
     "pattern": "Divide & Conquer",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "quickselect-find-kth-smallest-element-in-on-average"
   },
   {
     "id": 43,
@@ -1493,7 +1580,8 @@
     "timeComplexity": "O(log n)",
     "spaceComplexity": "O(log n) recursion / O(1) iterative",
     "pattern": "Divide & Conquer",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "powx-n-fast-exponentiation"
   },
   {
     "id": 44,
@@ -1510,7 +1598,8 @@
     "timeComplexity": "O(n log n)",
     "spaceComplexity": "O(n)",
     "pattern": "Merge Sort / Divide & Conquer",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "count-inversions-in-array"
   },
   {
     "id": 45,
@@ -1527,6 +1616,7 @@
     "timeComplexity": "O(4^n / √n) — Catalan number",
     "spaceComplexity": "O(n) recursion",
     "pattern": "Backtracking",
-    "tabGroup": "algo"
+    "tabGroup": "algo",
+    "slug": "generate-parentheses-all-valid-combinations-of-n-pairs"
   }
 ]

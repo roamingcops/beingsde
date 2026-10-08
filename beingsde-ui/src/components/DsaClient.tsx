@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Search,
   ChevronDown,
@@ -12,6 +13,7 @@ import {
   CheckCircle2,
   Zap,
   AlertTriangle,
+  ExternalLink,
 } from "lucide-react";
 import defaultDsaQuestions from "@/data/dsa.json";
 
@@ -22,7 +24,7 @@ type Tab = "ds" | "algo";
 type Difficulty = "Medium";
 
 interface DSAQuestion {
-  id?: string;
+  id?: string | number;
   questionId: number;
   title: string;
   tag: string;
@@ -34,6 +36,7 @@ interface DSAQuestion {
   spaceComplexity: string;
   pattern: string;
   tabGroup: string; // "ds" or "algo"
+  slug?: string;
 }
 
 export default function DsaClient() {
@@ -364,6 +367,15 @@ function QuestionCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const slug =
+    q.slug ||
+    q.title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .trim();
+
   return (
     <div
       className={`border rounded-sm transition-all duration-200 ${
@@ -373,17 +385,17 @@ function QuestionCard({
       } bg-white dark:bg-[#18181b]`}
     >
       {/* Header Row */}
-      <button
-        onClick={onToggle}
-        className="w-full text-left px-5 py-4 flex items-start gap-3 group"
-        aria-expanded={expanded}
-      >
+      <div className="px-5 py-4 flex items-start gap-3 group">
         {/* Index badge */}
         <span className="flex-shrink-0 w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-xs font-mono font-bold flex items-center justify-center mt-0.5">
           {index + 1}
         </span>
 
-        <div className="flex-1 min-w-0">
+        <button
+          onClick={onToggle}
+          className="flex-1 min-w-0 text-left cursor-pointer focus:outline-none"
+          aria-expanded={expanded}
+        >
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span
               className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm ${getTagColor(
@@ -399,18 +411,31 @@ function QuestionCard({
               {q.pattern}
             </span>
           </div>
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-snug pr-4">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-snug pr-4 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             {q.title}
           </h3>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 group-hover:line-clamp-none transition-all">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
             {q.summary}
           </p>
-        </div>
+        </button>
 
-        <span className="flex-shrink-0 text-zinc-400 dark:text-zinc-500 mt-1">
-          {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </span>
-      </button>
+        <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+          <Link
+            href={`/dsa/${slug}`}
+            title="Open dedicated problem page"
+            className="p-1 rounded-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-400 transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
+          <button
+            onClick={onToggle}
+            className="p-1 rounded-sm border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-250 transition-colors cursor-pointer"
+            title={expanded ? "Collapse details" : "Expand details"}
+          >
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+      </div>
 
       {/* Expanded Content */}
       {expanded && (
@@ -456,6 +481,20 @@ function QuestionCard({
                 {q.spaceComplexity}
               </p>
             </div>
+          </div>
+
+          {/* Dedicated standalone page permalink */}
+          <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <Link
+              href={`/dsa/${slug}`}
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase text-zinc-900 dark:text-zinc-100 hover:underline"
+            >
+              <span>Read Full Algorithmic Breakdown on Dedicated Page</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+            <span className="text-3xs font-mono text-zinc-400">
+              beingsde.in/dsa/{slug}
+            </span>
           </div>
         </div>
       )}

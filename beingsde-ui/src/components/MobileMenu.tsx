@@ -29,14 +29,16 @@ export default function MobileMenu() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const links = [
-    { href: "/topics", label: "HLD" },
-    { href: "/lld", label: "LLD" },
-    { href: "/fde", label: "FDE" },
+    { href: "/topics", label: "HLD Topics" },
+    { href: "/guides", label: "Case Studies (Deep Dives)" },
+    { href: "/lld", label: "LLD Blueprints" },
     { href: "/questions", label: "TOP HLD Questions" },
-    { href: "/dsa", label: "DSA" },
+    { href: "/dsa", label: "DSA Patterns" },
+    { href: "/fde", label: "FDE Role Guide" },
     { href: "/cheat-sheet", label: "Cheat Sheet" },
-    { href: "/bar-raiser", label: "Bar Raiser" },
+    { href: "/bar-raiser", label: "Bar Raiser STAR Answers" },
     { href: "/promotion-doc", label: "Year-End Promotion Guide" },
+    { href: "/editorial-policy", label: "Editorial Policy" },
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact Us" },
     { href: "/privacy", label: "Privacy Policy" },

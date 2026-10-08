@@ -6,6 +6,7 @@ import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
 import HeaderAuth from "@/components/HeaderAuth";
 import MobileMenu from "@/components/MobileMenu";
+import CookieConsent from "@/components/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -227,11 +228,12 @@ export default function RootLayout({
               <Link href="/topics" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 HLD
               </Link>
+              <Link href="/guides" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors flex items-center gap-1">
+                Case Studies
+                <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-full border border-blue-200 dark:border-blue-800">Deep</span>
+              </Link>
               <Link href="/lld" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 LLD
-              </Link>
-              <Link href="/fde" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
-                FDE
               </Link>
               <Link href="/questions" className="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
                 TOP HLD Questions
@@ -275,6 +277,8 @@ export default function RootLayout({
               <span>&copy; {new Date().getFullYear()} beingsde.in. All rights reserved. Built for Software Engineers &amp; System Architects.</span>
             </div>
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-x-6 gap-y-2">
+              <Link href="/guides" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Case Studies</Link>
+              <Link href="/editorial-policy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Editorial Policy</Link>
               <Link href="/promotion-doc" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Promotion Guide</Link>
               <Link href="/about" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">About Us</Link>
               <Link href="/contact" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Contact Us</Link>
@@ -285,6 +289,8 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+
+        <CookieConsent />
       </body>
     </html>
   );
