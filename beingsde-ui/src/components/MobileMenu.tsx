@@ -82,7 +82,7 @@ export default function MobileMenu() {
                   href="/questions"
                   className="py-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-200 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                 >
-                  50+ HLD Questions
+                  60+ HLD Questions
                 </Link>
                 <Link
                   href="/cheat-sheet"

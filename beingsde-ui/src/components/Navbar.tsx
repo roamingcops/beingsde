@@ -173,12 +173,12 @@ export default function Navbar() {
                     </span>
                   </div>
                   <span className="text-3xs text-zinc-500 leading-tight">
-                    Netflix, Uber, WhatsApp &amp; payment architecture
+                    10 deep dives: Netflix, Uber, Discord, YouTube &amp; Stripe
                   </span>
                 </div>
               </Link>
 
-              {/* 50+ HLD Questions */}
+              {/* 60+ HLD Questions */}
               <Link
                 href="/questions"
                 className={`flex items-start gap-3 p-2 rounded-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors group ${
@@ -190,10 +190,10 @@ export default function Navbar() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">
-                    50+ HLD Questions
+                    60+ HLD Questions
                   </span>
                   <span className="text-3xs text-zinc-500 leading-tight">
-                    Sharding, WebSockets, and trade-off Q&amp;As
+                    Sharding, Kafka, and trade-off Q&amp;As
                   </span>
                 </div>
               </Link>

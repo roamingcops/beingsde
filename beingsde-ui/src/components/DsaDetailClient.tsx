@@ -268,7 +268,7 @@ export default function DsaDetailClient({
             className="p-3 bg-white dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 rounded-sm flex flex-col gap-1 group"
           >
             <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-between">
-              50+ HLD Questions
+              60+ HLD Questions
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </span>
             <span className="text-3xs text-zinc-500">

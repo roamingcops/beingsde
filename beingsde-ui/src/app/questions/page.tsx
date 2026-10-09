@@ -3,8 +3,8 @@ import defaultHldQuestions from "@/data/hld-questions.json";
 import QuestionsClient from "@/components/QuestionsClient";
 
 export const metadata: Metadata = {
-  title: "Top 50+ System Design (HLD) Interview Questions & Answers (2025) | beingsde.in",
-  description: "Master the top 50+ High-Level Design (HLD) interview questions for FAANG software engineering interviews. In-depth architectural trade-offs, caching, database sharding, and scalability solutions with diagrams.",
+  title: "Top 60+ System Design (HLD) Interview Questions & Answers (2025) | beingsde.in",
+  description: "Master the top 60+ High-Level Design (HLD) interview questions for FAANG software engineering interviews. In-depth architectural trade-offs, caching, database sharding, and scalability solutions with diagrams.",
   keywords: [
     "top system design interview questions",
     "HLD interview questions",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     canonical: "https://beingsde.in/questions",
   },
   openGraph: {
-    title: "Top 50+ System Design (HLD) Interview Questions & Answers (2025) | beingsde.in",
+    title: "Top 60+ System Design (HLD) Interview Questions & Answers (2025) | beingsde.in",
     description: "In-depth architectural trade-offs, caching, database sharding, and scalability solutions for FAANG system design interviews.",
     url: "https://beingsde.in/questions",
     siteName: "Being SDE (beingsde.in)",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Top 50+ HLD System Design Questions & Answers | beingsde.in",
+    title: "Top 60+ HLD System Design Questions & Answers | beingsde.in",
     description: "Master High-Level Design interview questions with deep architectural answers and trade-offs.",
     images: ["/images/redis-caching-diagram.png"],
   },
