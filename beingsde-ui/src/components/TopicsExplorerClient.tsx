@@ -26,17 +26,34 @@ export default function TopicsExplorerClient() {
         const res = await sessionAwareFetch(`${API_BASE}/topics`, { headers });
         if (res.ok) {
           const data = await res.json();
-            const activeTopics = data.content.filter((t: any) => !t.isArchived);
-            const merged = activeTopics.map((t: any) => {
-              const mockMatch = MOCK_TOPICS.find(m => m.slug === t.slug);
-              return {
-                ...t,
-                category: mockMatch ? mockMatch.category : t.category,
-                tags: mockMatch ? mockMatch.tags : t.tags,
-                isPremium: false
-              };
-            });
-            setTopics(merged);
+            const rawList = Array.isArray(data.content) ? data.content : Array.isArray(data) ? data : [];
+            const activeTopics = rawList.filter((t: any) => !t.isArchived && !t.archived);
+            if (activeTopics.length > 0) {
+              const liveMap = new Map<string, any>();
+              activeTopics.forEach((t: any) => {
+                liveMap.set(t.slug, t);
+              });
+
+              // Merge live details into MOCK_TOPICS without dropping unseeded topics
+              const merged = MOCK_TOPICS.map((mock) => {
+                if (liveMap.has(mock.slug)) {
+                  const live = liveMap.get(mock.slug);
+                  liveMap.delete(mock.slug);
+                  return {
+                    ...mock,
+                    ...live,
+                    category: live.category || mock.category,
+                    tags: live.tags || mock.tags,
+                    isPremium: false
+                  };
+                }
+                return { ...mock, isPremium: false };
+              });
+
+              // Any new topics created in live backend
+              const newLive = Array.from(liveMap.values()).map((t: any) => ({ ...t, isPremium: false }));
+              setTopics([...merged, ...newLive]);
+            }
         }
       } catch {
         // Fallback silently to mock details if server is down

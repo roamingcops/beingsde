@@ -47,10 +47,26 @@ export default function QuestionsClient() {
         const res = await fetch(`${API_BASE}/hld-questions`);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
-            const activeQuestions = data.filter((q: any) => !q.isArchived);
+          if (Array.isArray(data) && data.length > 0) {
+            const activeQuestions = data.filter((q: any) => !q.isArchived && !q.archived);
             if (activeQuestions.length > 0) {
-              setQuestions(activeQuestions);
+              const staticList = defaultHldQuestions as HldQuestion[];
+              const liveMap = new Map<string, any>();
+              activeQuestions.forEach((q: any) => {
+                const key = q.slug || q.title?.toLowerCase().trim() || String(q.id ?? q.questionId);
+                liveMap.set(key, q);
+              });
+              const merged = staticList.map((sq) => {
+                const key = sq.slug || sq.title?.toLowerCase().trim() || String(sq.id ?? sq.questionId);
+                if (liveMap.has(key)) {
+                  const live = liveMap.get(key);
+                  liveMap.delete(key);
+                  return { ...sq, ...live };
+                }
+                return sq;
+              });
+              const newLive = Array.from(liveMap.values());
+              setQuestions([...merged, ...newLive]);
             }
           }
         }

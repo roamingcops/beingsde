@@ -55,10 +55,31 @@ export default function DsaClient() {
         const res = await fetch(`${API_BASE}/dsa`);
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
-            const activeQuestions = data.filter((q: any) => !q.isArchived);
-            if (activeQuestions.length > 0) {
-              setQuestionsList(activeQuestions);
+          if (Array.isArray(data) && data.length > 0) {
+            const activeLive = data.filter((q: any) => !q.isArchived && !q.archived);
+            if (activeLive.length > 0) {
+              const staticList = defaultDsaQuestions as DSAQuestion[];
+              const liveMap = new Map<string, any>();
+              
+              activeLive.forEach((q: any) => {
+                const key = q.slug || q.title?.toLowerCase().trim() || String(q.id ?? q.questionId);
+                liveMap.set(key, q);
+              });
+
+              // Merge live questions into static list, keeping all static questions intact
+              const updatedStatic = staticList.map((sq) => {
+                const key = sq.slug || sq.title?.toLowerCase().trim() || String(sq.id ?? sq.questionId);
+                if (liveMap.has(key)) {
+                  const live = liveMap.get(key);
+                  liveMap.delete(key);
+                  return { ...sq, ...live };
+                }
+                return sq;
+              });
+
+              // Append any newly created questions from backend
+              const newLive = Array.from(liveMap.values());
+              setQuestionsList([...updatedStatic, ...newLive]);
             }
           }
         }
@@ -273,7 +294,7 @@ export default function DsaClient() {
               setDsFilter("all");
               setAlgoFilter("all");
             }}
-            className="mt-2 text-xs underline text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+            className="mt-2 text-xs underline text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
           >
             Reset all filters
           </button>
@@ -282,7 +303,7 @@ export default function DsaClient() {
         <div className="space-y-2">
           {filtered.map((q, idx) => (
             <QuestionCard
-              key={`${activeTab}-${q.questionId}`}
+              key={`${activeTab}-${q.slug || q.id || idx}`}
               q={q}
               index={idx}
               expanded={expandedIndex === idx}
