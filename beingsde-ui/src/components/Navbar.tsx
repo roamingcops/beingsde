@@ -79,6 +79,7 @@ export default function Navbar() {
   ].some((path) => pathname.startsWith(path));
 
   const isCodeActive = [
+    "/coding-design",
     "/lld",
     "/dsa"
   ].some((path) => pathname.startsWith(path));
@@ -223,6 +224,23 @@ export default function Navbar() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────── */}
+      {/* DIRECT TAB: CODING DESIGN                                   */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <Link
+        href="/coding-design"
+        className={`whitespace-nowrap text-xs uppercase tracking-wider font-mono transition-colors py-1.5 px-1 flex items-center gap-1.5 ${
+          pathname.startsWith("/coding-design")
+            ? "text-zinc-950 dark:text-zinc-50 font-bold border-b-2 border-zinc-900 dark:border-zinc-100"
+            : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        }`}
+      >
+        <span>Coding Design</span>
+        <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded border border-emerald-300 dark:border-emerald-800">
+          NEW
+        </span>
+      </Link>
+
+      {/* ─────────────────────────────────────────────────────────── */}
       {/* CATEGORY 2: CODE & PATTERNS                                 */}
       {/* ─────────────────────────────────────────────────────────── */}
       <div
@@ -249,6 +267,31 @@ export default function Navbar() {
               <span className="text-3xs font-mono uppercase tracking-widest text-zinc-400 font-bold px-2 py-1">
                 Software Design &amp; DSA
               </span>
+
+              {/* Coding Design Best Practices */}
+              <Link
+                href="/coding-design"
+                className={`flex items-start gap-3 p-2 rounded-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors group ${
+                  isLinkActive("/coding-design") ? "bg-zinc-100/70 dark:bg-zinc-800/40" : ""
+                }`}
+              >
+                <div className="p-1.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4 text-emerald-500" />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
+                      Coding Design
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded border border-emerald-200 dark:border-emerald-900">
+                      25 Practices
+                    </span>
+                  </div>
+                  <span className="text-3xs text-zinc-500 leading-tight">
+                    Retries, idempotency, state machines &amp; scribble blueprints
+                  </span>
+                </div>
+              </Link>
 
               {/* LLD Blueprints */}
               <Link

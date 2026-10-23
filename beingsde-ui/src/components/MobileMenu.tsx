@@ -100,6 +100,15 @@ export default function MobileMenu() {
               </span>
               <div className="flex flex-col gap-1 pl-1">
                 <Link
+                  href="/coding-design"
+                  className="py-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold transition-colors flex items-center justify-between"
+                >
+                  <span>Coding Design (25 Best Practices)</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded border border-emerald-300 dark:border-emerald-800">
+                    NEW
+                  </span>
+                </Link>
+                <Link
                   href="/lld"
                   className="py-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                 >

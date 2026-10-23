@@ -247,6 +247,7 @@ export default function RootLayout({
               <span>&copy; {new Date().getFullYear()} beingsde.in. All rights reserved. Built for Software Engineers &amp; System Architects.</span>
             </div>
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-x-6 gap-y-2">
+              <Link href="/coding-design" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">Coding Design</Link>
               <Link href="/guides" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Case Studies</Link>
               <Link href="/editorial-policy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Editorial Policy</Link>
               <Link href="/promotion-doc" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Promotion Guide</Link>
