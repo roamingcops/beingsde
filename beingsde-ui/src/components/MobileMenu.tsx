@@ -109,6 +109,15 @@ export default function MobileMenu() {
                   </span>
                 </Link>
                 <Link
+                  href="/design-patterns"
+                  className="py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition-colors flex items-center justify-between"
+                >
+                  <span>Design Patterns (Interactive UIs)</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 rounded border border-blue-300 dark:border-blue-800">
+                    GoF
+                  </span>
+                </Link>
+                <Link
                   href="/lld"
                   className="py-1.5 text-sm font-medium text-zinc-800 dark:text-zinc-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                 >

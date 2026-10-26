@@ -5,6 +5,7 @@ import defaultHldQuestions from "../data/hld-questions.json";
 import defaultDsaQuestions from "../data/dsa.json";
 import guides from "../data/guides.json";
 import { CODING_DESIGN_TOPICS } from "../data/coding-design";
+import { DESIGN_PATTERNS } from "../data/design-patterns";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://beingsde.in";
@@ -12,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Base routes
   const staticRoutes = [
     { path: "", priority: 1.0 },
+    { path: "/design-patterns", priority: 0.95 },
     { path: "/coding-design", priority: 0.95 },
     { path: "/topics", priority: 0.95 },
     { path: "/guides", priority: 0.95 },
@@ -85,6 +87,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.90,
   }));
 
+  // Dynamic Design Patterns routes — high priority (0.90) for pattern guides
+  const designPatternRoutes = DESIGN_PATTERNS.map((pattern) => ({
+    url: `${baseUrl}/design-patterns/${pattern.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.90,
+  }));
+
   return [
     ...staticRoutes,
     ...topicRoutes,
@@ -93,5 +103,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...dsaRoutes,
     ...guideRoutes,
     ...codingDesignRoutes,
+    ...designPatternRoutes,
   ];
 }

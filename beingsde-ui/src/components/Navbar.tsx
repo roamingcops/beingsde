@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Terminal,
   ShieldCheck,
-  Sparkles
+  Sparkles,
+  Shapes
 } from "lucide-react";
 
 type MenuKey = "system" | "code" | "career" | null;
@@ -79,6 +80,7 @@ export default function Navbar() {
   ].some((path) => pathname.startsWith(path));
 
   const isCodeActive = [
+    "/design-patterns",
     "/coding-design",
     "/lld",
     "/dsa"
@@ -289,6 +291,31 @@ export default function Navbar() {
                   </div>
                   <span className="text-3xs text-zinc-500 leading-tight">
                     Retries, idempotency, state machines &amp; scribble blueprints
+                  </span>
+                </div>
+              </Link>
+
+              {/* Design Patterns (GoF) */}
+              <Link
+                href="/design-patterns"
+                className={`flex items-start gap-3 p-2 rounded-sm hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors group ${
+                  isLinkActive("/design-patterns") ? "bg-zinc-100/70 dark:bg-zinc-800/40" : ""
+                }`}
+              >
+                <div className="p-1.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shrink-0 mt-0.5">
+                  <Shapes className="w-4 h-4 text-blue-500" />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      Design Patterns
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded border border-blue-200 dark:border-blue-900">
+                      Interactive UI
+                    </span>
+                  </div>
+                  <span className="text-3xs text-zinc-500 leading-tight">
+                    Creational, Structural &amp; Behavioral live simulators
                   </span>
                 </div>
               </Link>
