@@ -19,7 +19,6 @@ import {
   Code2
 } from "lucide-react";
 import { DESIGN_PATTERNS, DesignPattern } from "@/data/design-patterns";
-import PatternInteractiveSimulator from "./PatternInteractiveSimulator";
 
 interface Props {
   slug: string;
@@ -104,19 +103,62 @@ export default function DesignPatternDetailClient({ slug }: Props) {
       </header>
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* LIVE INTERACTIVE SIMULATOR FOR THIS PATTERN                 */}
+      {/* ARCHITECTURAL BLUEPRINT FLOW (FAST & CLEAN VISUALIZATION)   */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Interactive Runtime Simulator</span>
-          </h2>
+      <section className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-[#141416] p-5 sm:p-6 flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-500" />
+            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">
+              Architectural Flow Blueprint
+            </h2>
+          </div>
           <span className="text-2xs font-mono text-zinc-400">
-            Test and tweak inputs dynamically
+            Participant Interactions &amp; Component Wiring
           </span>
         </div>
-        <PatternInteractiveSimulator pattern={pattern} />
+
+        {/* Visual Flow diagram: step-by-step participant pill flow */}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 py-1">
+          {pattern.structure.participants.map((participant, idx) => (
+            <React.Fragment key={participant.name}>
+              <div className="flex flex-col gap-1 p-3 rounded-md border border-zinc-200 dark:border-zinc-700/80 bg-white dark:bg-[#18181b] min-w-[140px] max-w-[240px]">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                    {participant.name}
+                  </span>
+                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                    {participant.type}
+                  </span>
+                </div>
+                <p className="text-[11px] font-sans text-zinc-600 dark:text-zinc-400 leading-tight">
+                  {participant.role}
+                </p>
+              </div>
+
+              {idx < pattern.structure.participants.length - 1 && (
+                <div className="hidden sm:flex text-zinc-400 dark:text-zinc-600 items-center">
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Real World Usage Badges */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 text-2xs font-mono">
+          <span className="text-zinc-400 font-bold uppercase tracking-wider">
+            Production Implementations:
+          </span>
+          {pattern.realWorldUsage.map((usage, idx) => (
+            <span
+              key={idx}
+              className="px-2 py-0.5 rounded bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800"
+            >
+              {usage}
+            </span>
+          ))}
+        </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────── */}

@@ -13,21 +13,13 @@ import {
   Code2, 
   BookOpen, 
   Sliders, 
-  Workflow, 
-  Play,
-  RotateCcw
+  Workflow 
 } from "lucide-react";
 import { DESIGN_PATTERNS, PATTERN_CATEGORIES, DesignPattern } from "@/data/design-patterns";
-import PatternInteractiveSimulator from "./PatternInteractiveSimulator";
 
 export default function DesignPatternsExplorerClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [activePlaygroundPatternId, setActivePlaygroundPatternId] = useState<string>("strategy-pattern");
-
-  const activePlaygroundPattern = useMemo(() => {
-    return DESIGN_PATTERNS.find((p) => p.id === activePlaygroundPatternId) || DESIGN_PATTERNS[0];
-  }, [activePlaygroundPatternId]);
 
   const filteredPatterns = useMemo(() => {
     return DESIGN_PATTERNS.filter((pattern) => {
@@ -49,7 +41,7 @@ export default function DesignPatternsExplorerClient() {
   }, [searchQuery, selectedCategory]);
 
   return (
-    <div className="flex flex-col gap-10 max-w-7xl mx-auto py-4 sm:py-8">
+    <div className="flex flex-col gap-8 max-w-7xl mx-auto py-4 sm:py-8">
       {/* ─────────────────────────────────────────────────────────── */}
       {/* HERO SECTION                                                */}
       {/* ─────────────────────────────────────────────────────────── */}
@@ -67,7 +59,7 @@ export default function DesignPatternsExplorerClient() {
 
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b] text-xs font-medium tracking-wide">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Being SDE — Software Design Patterns &amp; Interactive Coding UI</span>
+          <span>Being SDE — Software Design Patterns Catalog</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-zinc-950 dark:text-zinc-50">
@@ -80,17 +72,17 @@ export default function DesignPatternsExplorerClient() {
               viewBox="0 0 200 12"
             >
               <path 
-                className="animate-scribble"
+                className="animate-scribble" 
                 strokeLinecap="round" 
                 d="M2,8 C40,15 80,2 198,10 C140,15 60,6 10,8"
               />
             </svg>
           </span>{" "}
-          with Interactive UIs
+          with Architectural Blueprints
         </h1>
 
         <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl font-normal leading-relaxed">
-          Interactive runtime simulators, real-world metaphors, UML structures, and production code in Java, TypeScript, and Python for all Creational, Structural, and Behavioral patterns.
+          Real-world metaphors, UML participant structures, and production-ready code in Java, TypeScript, and Python for all Creational, Structural, and Behavioral patterns.
         </p>
 
         {/* Quick Stats Badges */}
@@ -99,54 +91,12 @@ export default function DesignPatternsExplorerClient() {
             22+ Gang of Four &amp; Modern Patterns
           </span>
           <span className="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b]">
-            Live Interactive Simulator UI
+            Architectural Mental Models
           </span>
           <span className="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#18181b]">
             Java • TypeScript • Python Code
           </span>
         </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* FEATURED LIVE PATTERN SIMULATOR PLAYGROUND                  */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
-              Interactive Runtime Simulator: Try Any Pattern Live
-            </h2>
-          </div>
-
-          {/* Quick pattern switcher pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-2xs font-mono">
-            {[
-              { id: "strategy-pattern", label: "Strategy" },
-              { id: "observer-pattern", label: "Observer" },
-              { id: "builder-pattern", label: "Builder" },
-              { id: "decorator-pattern", label: "Decorator" },
-              { id: "chain-of-responsibility", label: "Chain of Resp." },
-              { id: "state-pattern", label: "State Machine" },
-              { id: "singleton-pattern", label: "Singleton" },
-            ].map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setActivePlaygroundPatternId(p.id)}
-                className={`px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${
-                  activePlaygroundPatternId === p.id
-                    ? "bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 font-bold border-zinc-900 dark:border-zinc-100"
-                    : "bg-white dark:bg-[#18181b] text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Embedded Live Simulator */}
-        <PatternInteractiveSimulator pattern={activePlaygroundPattern} />
       </section>
 
       {/* ─────────────────────────────────────────────────────────── */}
@@ -289,21 +239,15 @@ export default function DesignPatternsExplorerClient() {
 
               {/* Action Footer */}
               <div className="pt-4 mt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
-                <button
-                  onClick={() => {
-                    setActivePlaygroundPatternId(pattern.id);
-                    window.scrollTo({ top: 300, behavior: "smooth" });
-                  }}
-                  className="text-2xs font-mono text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <Play className="w-3 h-3" /> Test in Simulator
-                </button>
+                <span className="text-2xs font-mono text-zinc-400">
+                  Java • TS • Python
+                </span>
 
                 <Link
                   href={`/design-patterns/${pattern.slug}`}
-                  className="inline-flex items-center gap-1 text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform"
                 >
-                  <span>Read Article</span>
+                  <span>Explore Blueprint &amp; Code</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
