@@ -1418,6 +1418,58 @@ volumes:
         </div>
       </div>
 
+      {/* ── SEO FAQ Section (Matches JSON-LD FAQ Schema) ── */}
+      <div className="mb-12">
+        <div className="flex items-center gap-2 mb-1">
+          <BookOpen className="w-4 h-4 text-purple-500" />
+          <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">Frequently Asked Questions</span>
+        </div>
+        <h2 className="text-xl font-bold font-mono text-zinc-900 dark:text-zinc-100 mb-2 border-b border-zinc-200 dark:border-zinc-800 pb-2">
+          Forward Deployed Engineer (FDE) FAQs
+        </h2>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">
+          Answers to the most common questions about the FDE role, career progression, required skill sets, and interview loops at companies like Palantir and Snowflake.
+        </p>
+
+        <div className="space-y-3">
+          <CollapsibleSection title="What is a Forward Deployed Engineer (FDE)?" defaultOpen={true}>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              A <strong>Forward Deployed Engineer (FDE)</strong> is a full-stack software engineer who works directly on the frontlines with enterprise clients. Pioneered by companies like Palantir and Snowflake, FDEs translate ambiguous business challenges into custom software architectures, data pipelines, and agentic AI systems within customer environments. They blend high-level software engineering with strategic client consulting.
+            </p>
+          </CollapsibleSection>
+
+          <CollapsibleSection title="How does an FDE differ from a Solutions Architect or traditional SWE?">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              Unlike traditional Software Engineers who build core products at their desks for generic users, and unlike Solutions Architects who primarily advise and produce slide decks, FDEs <strong>write production code directly inside client systems</strong>. FDEs deploy solutions to on-premise or air-gapped infrastructure, troubleshoot live integrations, and own client outcomes end-to-end.
+            </p>
+          </CollapsibleSection>
+
+          <CollapsibleSection title="What is tested in a Palantir or FDE interview loop?">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              The FDE interview loop typically comprises 4 main rounds:
+            </p>
+            <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-1.5 mt-2 list-none">
+              <li className="flex items-start gap-2"><span className="text-purple-400 mt-0.5">▸</span><span><strong>1. Problem Decomposition / Role Play:</strong> Scoping vague requirements, asking clarifying business questions, and pitching technical architectures to the interviewer acting as a client.</span></li>
+              <li className="flex items-start gap-2"><span className="text-purple-400 mt-0.5">▸</span><span><strong>2. Systems Integration &amp; API Design:</strong> Designing resilient webhooks, ETL pipelines, OAuth flows, and data synchronization across legacy systems.</span></li>
+              <li className="flex items-start gap-2"><span className="text-purple-400 mt-0.5">▸</span><span><strong>3. Agentic AI &amp; RAG System Design:</strong> Structuring retrieval pipelines, vector databases (pgvector/Pinecone), tool-use schemas, and evaluation guardrails.</span></li>
+              <li className="flex items-start gap-2"><span className="text-purple-400 mt-0.5">▸</span><span><strong>4. Data Structures, Algorithms &amp; SQL:</strong> Coding optimal solutions (Trees, Graphs, HashMaps) and query optimization with window functions.</span></li>
+            </ul>
+          </CollapsibleSection>
+
+          <CollapsibleSection title="Which vector database is best for enterprise on-prem FDE deployments?">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              For enterprise clients with strict data residency, privacy, or air-gapped networks (such as financial institutions and healthcare providers), <strong>pgvector</strong> (PostgreSQL extension) and <strong>self-hosted Qdrant</strong> are the premier choices because data never leaves the client&apos;s private VPC.
+            </p>
+          </CollapsibleSection>
+
+          <CollapsibleSection title="What is Vibe Coding and why is it important for FDEs?">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              Vibe coding is a spec-driven rapid development methodology using modern AI coding assistants (like Cursor, v0, and Claude). For FDEs, it enables rapid prototyping—moving from a client discovery conversation to a deployed, working full-stack prototype on a live URL within hours.
+            </p>
+          </CollapsibleSection>
+        </div>
+      </div>
+
       {/* ── CTA ── */}
       <div className="bg-zinc-50 dark:bg-[#121214] border border-zinc-200 dark:border-zinc-800 rounded-sm p-8 text-center">
         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">Master the Full FDE Stack</h2>

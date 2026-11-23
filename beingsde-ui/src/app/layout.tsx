@@ -254,6 +254,7 @@ export default function RootLayout({
             <div className="flex flex-wrap justify-center md:justify-end items-center gap-x-6 gap-y-2">
               <Link href="/design-patterns" className="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 transition-colors">Design Patterns</Link>
               <Link href="/coding-design" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">Coding Design</Link>
+              <Link href="/fde" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-700 dark:hover:text-purple-300 transition-colors">FDE &amp; AI Agents</Link>
               <Link href="/guides" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Case Studies</Link>
               <Link href="/editorial-policy" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Editorial Policy</Link>
               <Link href="/promotion-doc" className="hover:text-zinc-800 dark:hover:text-zinc-300 transition-colors">Promotion Guide</Link>
