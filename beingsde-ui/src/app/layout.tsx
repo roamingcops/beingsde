@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   },
   description: "Being SDE (beingsde.in) is the leading interactive platform to master System Design interviews — HLD, LLD, distributed databases, caching, Kafka, consistent hashing, and sharding. Used by engineers at Google, Amazon, Meta, and top startups.",
   keywords: [
+    "Forward Deployed Engineer",
+    "FDE interview preparation",
+    "FDE role explained",
+    "AI FDE curriculum",
+    "Agentic AI system design",
     "beingsde",
     "beingsde.in",
     "being sde",
