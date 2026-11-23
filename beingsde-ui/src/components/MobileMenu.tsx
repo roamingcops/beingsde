@@ -60,6 +60,25 @@ export default function MobileMenu() {
       {isOpen && (
         <div className="absolute top-full left-0 w-full h-[calc(100vh-64px)] z-40 bg-[#fafafa] dark:bg-[#09090b] border-t border-zinc-200 dark:border-zinc-800 flex flex-col p-6 overflow-y-auto pb-20 animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col gap-6">
+            {/* FDE & AI Featured Section */}
+            <div className="flex flex-col gap-2">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-purple-600 dark:text-purple-400 font-bold flex items-center justify-between">
+                <span>Featured Career Track</span>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-900">
+                  HOT
+                </span>
+              </span>
+              <div className="flex flex-col gap-1 pl-1">
+                <Link
+                  href="/fde"
+                  className="py-2 px-2.5 rounded text-sm font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors flex items-center justify-between"
+                >
+                  <span>Forward Deployed Engineer (FDE &amp; AI)</span>
+                  <span className="text-xs font-mono">13 Weeks →</span>
+                </Link>
+              </div>
+            </div>
+
             {/* System Design */}
             <div className="flex flex-col gap-2">
               <span className="text-[11px] font-mono uppercase tracking-widest text-zinc-400 font-bold">

@@ -89,9 +89,10 @@ export default function Navbar() {
   const isCareerActive = [
     "/interviews",
     "/bar-raiser",
-    "/promotion-doc",
-    "/fde"
+    "/promotion-doc"
   ].some((path) => pathname.startsWith(path));
+
+  const isFdeActive = pathname.startsWith("/fde");
 
   const isLinkActive = (path: string) => pathname.startsWith(path);
 
@@ -473,11 +474,16 @@ export default function Navbar() {
                   <Terminal className="w-4 h-4 text-purple-500" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-purple-600 dark:group-hover:text-purple-400">
-                    FDE Role Guide
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                      FDE Role Guide
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.2 bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-900">
+                      AI
+                    </span>
+                  </div>
                   <span className="text-3xs text-zinc-500 leading-tight">
-                    Forward Deployed Engineering career roadmap
+                    Forward Deployed Engineering &amp; AI curriculum
                   </span>
                 </div>
               </Link>
@@ -485,6 +491,23 @@ export default function Navbar() {
           </div>
         )}
       </div>
+
+      {/* ─────────────────────────────────────────────────────────── */}
+      {/* STANDALONE TAB: FDE & AI AGENTS                             */}
+      {/* ─────────────────────────────────────────────────────────── */}
+      <Link
+        href="/fde"
+        className={`whitespace-nowrap text-xs uppercase tracking-wider font-mono transition-colors py-1.5 px-1 flex items-center gap-1.5 ${
+          isFdeActive
+            ? "text-purple-600 dark:text-purple-400 font-bold border-b-2 border-purple-600 dark:border-purple-400"
+            : "text-zinc-500 hover:text-purple-600 dark:text-zinc-400 dark:hover:text-purple-400 font-semibold"
+        }`}
+      >
+        <span>FDE &amp; AI</span>
+        <span className="text-[9px] font-bold px-1.5 py-0.2 bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-900">
+          HOT
+        </span>
+      </Link>
 
       {/* ─────────────────────────────────────────────────────────── */}
       {/* DIRECT COMPANY LINKS                                        */}
