@@ -220,7 +220,7 @@ export default function RootLayout({
       >
         {/* Navigation Header */}
         <header className="sticky top-0 z-50 w-full border-b border-zinc-200 dark:border-zinc-800 bg-[#fafafa]/80 dark:bg-[#09090b]/80 backdrop-blur-md">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-6 md:gap-8 lg:gap-12">
             <div className="flex items-center gap-4 shrink-0">
               <MobileMenu />
               <Link href="/" className="flex items-center gap-2 group">
@@ -230,7 +230,9 @@ export default function RootLayout({
               </Link>
             </div>
 
-            <Navbar />
+            <div className="flex-1 flex items-center justify-start md:pl-4 lg:pl-8">
+              <Navbar />
+            </div>
 
             <div className="flex items-center gap-3 shrink-0">
               <ThemeToggle />
